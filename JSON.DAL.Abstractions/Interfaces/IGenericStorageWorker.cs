@@ -1,4 +1,4 @@
-﻿using JSON.DAL.Models;
+﻿using Core.Models;
 
 namespace JSON.DAL.Abstractions.Interfaces
 {

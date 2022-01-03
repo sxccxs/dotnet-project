@@ -1,5 +1,4 @@
-﻿
-namespace BLL.Models
+﻿namespace Core.Models
 {
     public class UserLoginModel
     {

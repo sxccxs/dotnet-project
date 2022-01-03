@@ -11,6 +11,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\BLL.Abstractions\BLL.Abstractions.csproj" />
 		<ProjectReference Include="..\JSON.DAL\JSON.DAL.csproj" />
 	</ItemGroup>
 

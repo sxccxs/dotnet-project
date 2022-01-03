@@ -1,5 +1,4 @@
-﻿
-namespace JSON.DAL.Models
+﻿namespace Core.Models
 {
     public class BaseModel
     {
