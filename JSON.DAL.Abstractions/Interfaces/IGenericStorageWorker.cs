@@ -6,6 +6,8 @@ namespace JSON.DAL.Abstractions.Interfaces
     {
         public IEnumerable<T> GetAll();
 
+        public int GetNextId();
+
         public IEnumerable<T> GetByCondition(Func<T, bool> condition);
 
         public void Create(T entity);
