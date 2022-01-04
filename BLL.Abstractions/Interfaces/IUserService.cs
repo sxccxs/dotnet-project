@@ -13,5 +13,7 @@ namespace BLL.Abstractions.Interfaces
         void Delete(UserModel user);
         void Update(UserModel user);
         IEnumerable<UserModel> Get();
+
+        IEnumerable<UserModel> GetByCondition(Func<UserModel, bool> condition);
     }
 }
