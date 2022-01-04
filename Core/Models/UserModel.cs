@@ -14,6 +14,12 @@ namespace Core.Models
 
         public string HashedPassword { get; set; }
 
+        public UserModel(string userName, string email, string hashedPassword)
+        {
+            UserName = userName;
+            Email = email;
+            HashedPassword = hashedPassword;
+        }
 
     }
 }
