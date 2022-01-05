@@ -8,8 +8,8 @@ namespace DAL.Abstractions.Interfaces
 {
     public interface IReaderWriter
     {
-        public T Read<T>(string source);
+        T Read<T>(string source);
 
-        public void Write<T>(string source, T value);
+        void Write<T>(string source, T value);
     }
 }

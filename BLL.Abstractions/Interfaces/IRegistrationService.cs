@@ -9,6 +9,6 @@ namespace BLL.Abstractions.Interfaces
 {
     public interface IRegistrationService
     {
-        public void Register(UserRegistrationModel userData);
+        void Register(UserRegistrationModel userData);
     }
 }

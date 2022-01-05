@@ -9,6 +9,6 @@ namespace BLL.Abstractions.Interfaces
 {
     public interface ILoginService
     {
-        public string Login(UserLoginModel userData);
+        string Login(UserLoginModel userData);
     }
 }

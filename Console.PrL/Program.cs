@@ -23,10 +23,8 @@ namespace Console.PrL
                 .AddJsonFile("appsettings.json", optional: false)
                 .AddEnvironmentVariables()
                 .Build();
-            services.Configure<AppSettings>(configuration.GetSection(""));
 
 
-            DependencyRegistrar.ConfigureServices(services);
             services.AddScoped<App>();
         }
     }

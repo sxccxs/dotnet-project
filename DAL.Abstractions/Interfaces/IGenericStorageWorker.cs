@@ -4,16 +4,16 @@ namespace DAL.Abstractions.Interfaces
 {
     public interface IGenericStorageWorker<T> where T : BaseModel
     {
-        public IEnumerable<T> GetAll();
+        IEnumerable<T> GetAll();
 
-        public IEnumerable<T> GetByCondition(Func<T, bool> condition);
+        IEnumerable<T> GetByCondition(Func<T, bool> condition);
 
-        public int GetNextId();
+        int GetNextId();
 
-        public void Create(T entity);
+        void Create(T entity);
 
-        public void Update(T entity);
+        void Update(T entity);
 
-        public void Delete(T entity);
+        void Delete(T entity);
     }
 }
