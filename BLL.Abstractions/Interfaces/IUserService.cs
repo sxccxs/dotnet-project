@@ -4,6 +4,7 @@ namespace BLL.Abstractions.Interfaces
 {
     public interface IUserService
     {
+        IHashingService HashingService { get; }
         void CreateNonActiveUser(UserCreateModel user);
         void ActivateUser(int id);
         void Delete(int id);
