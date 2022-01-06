@@ -4,7 +4,8 @@ namespace BLL.Abstractions.Interfaces
 {
     public interface IUserService
     {
-        void Create(UserCreateModel user);
+        void CreateNonActiveUser(UserCreateModel user);
+        void ActivateUser(int id);
         void Delete(int id);
         void Update(UserUpdateModel user);
         IEnumerable<UserModel> Get();
