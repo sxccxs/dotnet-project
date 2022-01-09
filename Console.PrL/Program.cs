@@ -1,12 +1,13 @@
 ﻿using BLL;
-using Core;
+using Console.PrL.Interfaces;
+using Console.PrL.Utilities;
+using Core.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Console.PrL
 {
-
-    class Program
+    public class Program
     {
         public static void Main()
         {
@@ -24,7 +25,12 @@ namespace Console.PrL
                 .AddEnvironmentVariables()
                 .Build();
 
+            services.Configure<JsonDbSettings>(configuration.GetSection("JsonDb"));
+            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+            services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
 
+            DependencyRegistrar.ConfigureServices(services);
+            services.AddScoped<IConsole, CustomConsole>();
             services.AddScoped<App>();
         }
     }
