@@ -2,7 +2,8 @@
 
 namespace DAL.Abstractions.Interfaces
 {
-    public interface IGenericStorageWorker<T> where T : BaseModel
+    public interface IGenericStorageWorker<T>
+        where T : BaseModel
     {
         IEnumerable<T> GetAll();
 

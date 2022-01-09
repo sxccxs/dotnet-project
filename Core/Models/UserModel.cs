@@ -15,6 +15,5 @@ namespace Core.Models
         public string HashedPassword { get; set; }
 
         public bool IsActive { get; set; }
-
     }
 }
