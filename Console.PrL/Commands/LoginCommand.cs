@@ -1,5 +1,4 @@
 ﻿using BLL.Abstractions.Interfaces;
-using Console.PrL.Exceptions;
 using Console.PrL.Interfaces;
 using Core.DataClasses;
 using Core.Models;
