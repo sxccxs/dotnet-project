@@ -35,10 +35,10 @@ namespace BLL.Services
         public void Register(UserRegistrationModel userData)
         {
             this.validationService.Validate(userData);
-            var user = this.MapUserRegistrationModel(userData);
-            this.userService.CreateNonActiveUser(user);
+            var userModel = this.MapUserRegistrationModel(userData);
+            var user = this.userService.CreateNonActiveUser(userModel);
 
-            this.SendActivationEmail(this.userService.GetByCondition(x => x.Email == user.Email).FirstOrDefault());
+            this.SendActivationEmail(user);
         }
 
         private UserCreateModel MapUserRegistrationModel(UserRegistrationModel user)

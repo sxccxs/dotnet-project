@@ -25,10 +25,10 @@ namespace BLL.Services
 
         public IEnumerable<UserModel> GetByCondition(Func<UserModel, bool> condition)
         {
-            return this.Get().Where(condition);
+            return this.storage.GetByCondition(condition);
         }
 
-        public void CreateNonActiveUser(UserCreateModel user)
+        public UserModel CreateNonActiveUser(UserCreateModel user)
         {
             if (this.storage.GetByCondition(x => x.Email == user.Email).Any())
             {
@@ -37,9 +37,11 @@ namespace BLL.Services
 
             var userModel = this.MapUserCreateModel(user);
             this.storage.Create(userModel);
+
+            return userModel;
         }
 
-        public void Delete(int id)
+        public UserModel Delete(int id)
         {
             var user = this.storage.GetByCondition(x => x.Id == id).FirstOrDefault();
             if (user is null)
@@ -48,9 +50,11 @@ namespace BLL.Services
             }
 
             this.storage.Delete(user);
+
+            return user;
         }
 
-        public void Update(UserUpdateModel user)
+        public UserModel Update(UserUpdateModel user)
         {
             if (!this.storage.GetByCondition(x => x.Id == user.Id).Any())
             {
@@ -59,9 +63,11 @@ namespace BLL.Services
 
             var userModel = this.MapUserUpdateModel(user);
             this.storage.Update(userModel);
+
+            return userModel;
         }
 
-        public void ActivateUser(int id)
+        public UserModel ActivateUser(int id)
         {
             if (!this.storage.GetByCondition(x => x.Id == id).Any())
             {
@@ -74,7 +80,7 @@ namespace BLL.Services
                 IsActive = true,
             };
 
-            this.Update(userData);
+            return this.Update(userData);
         }
 
         private UserModel MapUserCreateModel(UserCreateModel user)

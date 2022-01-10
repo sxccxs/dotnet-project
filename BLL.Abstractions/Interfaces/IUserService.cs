@@ -6,13 +6,13 @@ namespace BLL.Abstractions.Interfaces
     {
         IHashingService HashingService { get; }
 
-        void CreateNonActiveUser(UserCreateModel user);
+        UserModel CreateNonActiveUser(UserCreateModel user);
 
-        void ActivateUser(int id);
+        UserModel ActivateUser(int id);
 
-        void Delete(int id);
+        UserModel Delete(int id);
 
-        void Update(UserUpdateModel user);
+        UserModel Update(UserUpdateModel user);
 
         IEnumerable<UserModel> Get();
 
