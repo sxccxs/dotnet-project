@@ -17,14 +17,14 @@ namespace Console.PrL.Commands
 
         public override string Name => "/login";
 
-        public override OptionalResult<string> Execute()
+        public override OptionalResult<string> Execute(string token)
         {
             var userData = this.GetLoginInfo();
-            var token = this.loginService.Login(userData);
+            var newToken = this.loginService.Login(userData);
 
             this.Console.Print("Logged in successfully\n");
 
-            return new OptionalResult<string>(token);
+            return new OptionalResult<string>(newToken);
         }
 
         private UserLoginModel GetLoginInfo()

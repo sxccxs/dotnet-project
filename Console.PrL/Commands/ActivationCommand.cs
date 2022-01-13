@@ -16,7 +16,7 @@ namespace Console.PrL.Commands
 
         public override string Name => "/activate";
 
-        public override OptionalResult<string> Execute()
+        public override OptionalResult<string> Execute(string token)
         {
             var payload = this.GetActivationInfo();
 

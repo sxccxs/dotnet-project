@@ -1,4 +1,5 @@
-﻿using BLL.Abstractions.Interfaces.UserInterfaces;
+﻿using BLL.Abstractions.Interfaces.RoomInterfaces;
+using BLL.Abstractions.Interfaces.UserInterfaces;
 using Console.PrL.Commands;
 using Console.PrL.Interfaces;
 
@@ -16,7 +17,9 @@ namespace Console.PrL
             IConsole console,
             ILoginService loginService,
             IRegistrationService registrationService,
-            IAccountActivationService accountActivationService)
+            IAccountActivationService accountActivationService,
+            IAuthenticationService authenticationService,
+            IUserRoomService userRoomService)
         {
             this.console = console;
 
@@ -25,6 +28,10 @@ namespace Console.PrL
                 new LoginCommand(console, loginService),
                 new RegistrationCommand(console, registrationService),
                 new ActivationCommand(console, accountActivationService),
+                new GetRoomsCommand(console, authenticationService, userRoomService),
+                new CreateRoomCommand(console, authenticationService, userRoomService),
+                new UpdateRoomCommand(console, authenticationService, userRoomService),
+                new DeleteRoomCommand(console, authenticationService, userRoomService),
             };
 
             this.commands = new Dictionary<string, Command>();
@@ -51,11 +58,11 @@ namespace Console.PrL
                         var cmd = this.commands[command];
                         if (cmd is LoginCommand)
                         {
-                            this.authToken = cmd.Execute().Value;
+                            this.authToken = cmd.Execute(this.authToken).Value;
                         }
                         else
                         {
-                            cmd.Execute();
+                            cmd.Execute(this.authToken);
                         }
                     }
                     else

@@ -17,7 +17,7 @@ namespace Console.PrL.Commands
 
         public override string Name => "/register";
 
-        public override OptionalResult<string> Execute()
+        public override OptionalResult<string> Execute(string token)
         {
             var userRegistration = this.GetRegistrationInfo();
 

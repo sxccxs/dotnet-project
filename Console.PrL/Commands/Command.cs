@@ -14,6 +14,6 @@ namespace Console.PrL.Commands
 
         protected IConsole Console { get; }
 
-        public abstract OptionalResult<string> Execute();
+        public abstract OptionalResult<string> Execute(string token);
     }
 }
