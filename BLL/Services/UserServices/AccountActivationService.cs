@@ -1,8 +1,8 @@
-﻿using BLL.Abstractions.Interfaces;
+﻿using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.DataClasses;
 using Core.Exceptions;
 
-namespace BLL.Services
+namespace BLL.Services.UserServices
 {
     public class AccountActivationService : IAccountActivationService
     {

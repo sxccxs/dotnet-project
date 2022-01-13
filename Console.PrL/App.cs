@@ -1,4 +1,4 @@
-﻿using BLL.Abstractions.Interfaces;
+﻿using BLL.Abstractions.Interfaces.UserInterfaces;
 using Console.PrL.Commands;
 using Console.PrL.Interfaces;
 

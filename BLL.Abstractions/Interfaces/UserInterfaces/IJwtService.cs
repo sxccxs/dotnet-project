@@ -1,7 +1,7 @@
 ﻿using Core.DataClasses;
-using Core.Models;
+using Core.Models.UserModels;
 
-namespace BLL.Abstractions.Interfaces
+namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IJwtService
     {

@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using BLL.Abstractions.Interfaces;
-using Core.Models;
+using BLL.Abstractions.Interfaces.UserInterfaces;
+using Core.Models.UserModels;
 using Core.Settings;
 using Microsoft.Extensions.Options;
 
-namespace BLL.Services
+namespace BLL.Services.UserServices
 {
     internal class RegistrationService : IRegistrationService
     {

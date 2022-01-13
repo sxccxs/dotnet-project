@@ -1,9 +1,9 @@
 ﻿using System.Net.Mail;
-using BLL.Abstractions.Interfaces;
+using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.Exceptions;
-using Core.Models;
+using Core.Models.UserModels;
 
-namespace BLL.Services
+namespace BLL.Services.UserServices
 {
     internal class ValidationService : IValidationService
     {

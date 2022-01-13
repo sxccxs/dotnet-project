@@ -1,5 +1,5 @@
-﻿using BLL.Abstractions.Interfaces;
-using BLL.Services;
+﻿using BLL.Abstractions.Interfaces.UserInterfaces;
+using BLL.Services.UserServices;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BLL

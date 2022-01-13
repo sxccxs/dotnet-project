@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Net.Mail;
-using BLL.Abstractions.Interfaces;
+using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.Settings;
 using Microsoft.Extensions.Options;
 
-namespace BLL.Services
+namespace BLL.Services.UserServices
 {
     internal class EmailService : IEmailService
     {

@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using BLL.Abstractions.Interfaces;
+using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.Exceptions;
-using Core.Models;
+using Core.Models.UserModels;
 using DAL.Abstractions.Interfaces;
 
-namespace BLL.Services
+namespace BLL.Services.UserServices
 {
     internal class UserService : IUserService
     {

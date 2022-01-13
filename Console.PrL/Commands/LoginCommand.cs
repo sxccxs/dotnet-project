@@ -1,7 +1,7 @@
-﻿using BLL.Abstractions.Interfaces;
+﻿using BLL.Abstractions.Interfaces.UserInterfaces;
 using Console.PrL.Interfaces;
 using Core.DataClasses;
-using Core.Models;
+using Core.Models.UserModels;
 
 namespace Console.PrL.Commands
 {

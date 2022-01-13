@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using BLL.Abstractions.Interfaces;
+using BLL.Abstractions.Interfaces.UserInterfaces;
 
-namespace BLL.Services
+namespace BLL.Services.UserServices
 {
     internal class SHA256HashingService : IHashingService
     {

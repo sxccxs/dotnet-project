@@ -1,6 +1,6 @@
 ﻿using Core.DataClasses;
 
-namespace BLL.Abstractions.Interfaces
+namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IAccountActivationService
     {

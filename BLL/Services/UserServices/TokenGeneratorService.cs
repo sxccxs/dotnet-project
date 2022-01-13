@@ -1,11 +1,11 @@
-﻿using BLL.Abstractions.Interfaces;
+﻿using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.Exceptions;
-using Core.Models;
+using Core.Models.UserModels;
 using Core.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BLL.Services
+namespace BLL.Services.UserServices
 {
     internal class TokenGeneratorService : ITokenGeneratorService
     {
@@ -36,7 +36,7 @@ namespace BLL.Services
                     throw new InvalidTokenException("Invalid token given");
                 }
 
-                if ((this.GetNumberOfSeconds(DateTime.UtcNow) - timestamp) > this.appSettings.TokensExpirationTime * 24 * 3600)
+                if (this.GetNumberOfSeconds(DateTime.UtcNow) - timestamp > this.appSettings.TokensExpirationTime * 24 * 3600)
                 {
                     throw new InvalidTokenException("Token is outdated");
                 }

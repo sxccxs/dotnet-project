@@ -1,14 +1,14 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BLL.Abstractions.Interfaces;
+using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.DataClasses;
-using Core.Models;
+using Core.Models.UserModels;
 using Core.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BLL.Services
+namespace BLL.Services.UserServices
 {
     internal class JwtService : IJwtService
     {
