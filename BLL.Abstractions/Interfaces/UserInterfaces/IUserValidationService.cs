@@ -2,7 +2,7 @@
 
 namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
-    public interface IValidationService
+    public interface IUserValidationService
     {
         void Validate(UserRegistrationModel user);
     }

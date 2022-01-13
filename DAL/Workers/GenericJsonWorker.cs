@@ -30,7 +30,7 @@ namespace DAL.Workers
 
         public int GetNextId()
         {
-            return this.GetAll().OrderBy(x => x.Id).FirstOrDefault()?.Id + 1 ?? 1;
+            return this.GetAll().OrderBy(x => x.Id).LastOrDefault()?.Id + 1 ?? 1;
         }
 
         public void Create(T entity)

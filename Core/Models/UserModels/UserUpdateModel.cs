@@ -11,5 +11,9 @@
         public string Password { get; set; }
 
         public bool IsActive { get; set; }
+
+        public List<int> Rooms { get; set; }
+
+        public List<int> Roles { get; set; }
     }
 }

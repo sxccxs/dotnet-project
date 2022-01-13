@@ -8,7 +8,7 @@ namespace BLL.Services.UserServices
 {
     internal class RegistrationService : IRegistrationService
     {
-        private readonly IValidationService validationService;
+        private readonly IUserValidationService validationService;
 
         private readonly IUserService userService;
 
@@ -19,7 +19,7 @@ namespace BLL.Services.UserServices
         private readonly ITokenGeneratorService tokenGeneratorService;
 
         public RegistrationService(
-            IValidationService validationService,
+            IUserValidationService validationService,
             IUserService userService,
             IEmailService emailService,
             IOptions<AppSettings> appSettings,

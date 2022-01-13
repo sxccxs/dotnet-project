@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Core.Models.UserModels
+﻿namespace Core.Models.UserModels
 {
     public class UserModel : BaseModel
     {
+        public UserModel()
+        {
+            this.Rooms = new List<int>();
+            this.Roles = new List<int>();
+        }
+
         public string UserName { get; set; }
 
         public string Email { get; set; }
@@ -15,5 +15,9 @@ namespace Core.Models.UserModels
         public string HashedPassword { get; set; }
 
         public bool IsActive { get; set; }
+
+        public List<int> Rooms { get; set; }
+
+        public List<int> Roles { get; set; }
     }
 }

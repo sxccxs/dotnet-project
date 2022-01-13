@@ -5,7 +5,7 @@ using Core.Models.UserModels;
 
 namespace BLL.Services.UserServices
 {
-    internal class ValidationService : IValidationService
+    internal class UserValidationService : IUserValidationService
     {
         private char[] CapitalAlphabet => "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
@@ -15,9 +15,9 @@ namespace BLL.Services.UserServices
 
         private char[] Symbols => "_!@#$%^&*".ToCharArray();
 
-        private int MaxUserNameLength => 50;
+        private int MaxUserNameLength => 24;
 
-        private int MaxEmailLength => 255;
+        private int MaxEmailLength => 50;
 
         private int MaxPasswordLength => 80;
 
