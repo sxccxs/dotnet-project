@@ -4,7 +4,7 @@ using Console.PrL.Interfaces;
 using Core.DataClasses;
 using Core.Models.RoomModels;
 
-namespace Console.PrL.Commands
+namespace Console.PrL.Commands.RoomCommands
 {
     internal class DeleteRoomCommand : Command
     {
@@ -23,7 +23,14 @@ namespace Console.PrL.Commands
 
         public override OptionalResult<string> Execute(string token)
         {
-            var user = this.authenticationService.GetUserByToken(token);
+            var userResult = this.authenticationService.GetUserByToken(token);
+
+            if (!userResult.IsSuccess)
+            {
+                return new OptionalResult<string>(userResult);
+            }
+
+            var user = userResult.Value;
 
             var rooms = this.roomService.GetRoomsForUser(user).ToList();
 
@@ -32,7 +39,12 @@ namespace Console.PrL.Commands
 
             if (apply)
             {
-                this.roomService.DeleteRoomByUser(user, deletionId);
+                var deleteResult = this.roomService.DeleteRoomByUser(user, deletionId);
+
+                if (!deleteResult.IsSuccess)
+                {
+                    return new OptionalResult<string>(deleteResult);
+                }
 
                 this.Console.Print("Room deleted successfully\n");
             }

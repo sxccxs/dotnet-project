@@ -1,36 +1,64 @@
 ﻿using BLL.Abstractions.Interfaces.RoomInterfaces;
-using Core.Exceptions;
+using Core.DataClasses;
 using Core.Models.RoomModels;
 
 namespace BLL.Services.RoomServices
 {
     internal class RoomValidationService : IRoomValidationService
     {
-        private int MinNameLength => 8;
+        private const int MinNameLength = 3;
 
-        private int MaxNameLength => 24;
+        private const int MaxNameLength = 24;
 
-        public void ValidateCreateModel(RoomCreateModel createModel)
+        public ExceptionalResult ValidateCreateModel(RoomCreateModel createModel)
         {
-            this.ValidateName(createModel.Name);
-        }
-
-        public void ValidateUpdateModel(RoomUpdateModel updateModel)
-        {
-            this.ValidateName(updateModel.Name);
-        }
-
-        private void ValidateName(string name)
-        {
-            if (name is null || name.Length < this.MinNameLength)
+            var results = new ExceptionalResult[]
             {
-                throw new ValidationException($"Room name can't be less then {this.MinNameLength} symbols");
+                this.ValidateName(createModel.Name),
+            };
+
+            foreach (var result in results)
+            {
+                if (!result.IsSuccess)
+                {
+                    return result;
+                }
             }
 
-            if (name.Length > this.MaxNameLength)
+            return new ExceptionalResult();
+        }
+
+        public ExceptionalResult ValidateUpdateModel(RoomUpdateModel updateModel)
+        {
+            var results = new ExceptionalResult[]
             {
-                throw new ValidationException($"Room name can't be longer then {this.MaxNameLength} symbols");
+                this.ValidateName(updateModel.Name),
+            };
+
+            foreach (var result in results)
+            {
+                if (!result.IsSuccess)
+                {
+                    return result;
+                }
             }
+
+            return new ExceptionalResult();
+        }
+
+        private ExceptionalResult ValidateName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name) || name.Length < MinNameLength)
+            {
+                return new ExceptionalResult(false, $"Room name can't be less then {MinNameLength} symbols");
+            }
+
+            if (name.Length > MaxNameLength)
+            {
+                return new ExceptionalResult(false, $"Room name can't be longer then {MaxNameLength} symbols");
+            }
+
+            return new ExceptionalResult();
         }
     }
 }

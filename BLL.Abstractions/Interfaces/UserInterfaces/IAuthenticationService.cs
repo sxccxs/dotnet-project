@@ -1,9 +1,10 @@
-﻿using Core.Models.UserModels;
+﻿using Core.DataClasses;
+using Core.Models.UserModels;
 
 namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IAuthenticationService
     {
-        UserModel GetUserByToken(string jwtToken);
+        OptionalResult<UserModel> GetUserByToken(string jwtToken);
     }
 }

@@ -4,7 +4,7 @@ using Console.PrL.Interfaces;
 using Core.DataClasses;
 using Core.Models.RoomModels;
 
-namespace Console.PrL.Commands
+namespace Console.PrL.Commands.RoomCommands
 {
     internal class UpdateRoomCommand : Command
     {
@@ -23,7 +23,13 @@ namespace Console.PrL.Commands
 
         public override OptionalResult<string> Execute(string token)
         {
-            var user = this.authenticationService.GetUserByToken(token);
+            var userResult = this.authenticationService.GetUserByToken(token);
+            if (!userResult.IsSuccess)
+            {
+                return new OptionalResult<string>(userResult);
+            }
+
+            var user = userResult.Value;
 
             var rooms = this.roomService.GetRoomsForUser(user).ToList();
 

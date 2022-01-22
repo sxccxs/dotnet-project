@@ -1,5 +1,5 @@
 ﻿using BLL.Abstractions.Interfaces.UserInterfaces;
-using Core.Exceptions;
+using Core.DataClasses;
 using Core.Models.UserModels;
 
 namespace BLL.Services.UserServices
@@ -16,17 +16,17 @@ namespace BLL.Services.UserServices
             this.jwtService = jwtService;
         }
 
-        public UserModel GetUserByToken(string jwtToken)
+        public OptionalResult<UserModel> GetUserByToken(string jwtToken)
         {
             var result = this.jwtService.ValidateJwt(jwtToken);
-            if (!result.HasValue || !this.userService.GetByCondition(x => x.Id == result.Value).Any())
+            if (!result.IsSuccess || !this.userService.GetByCondition(x => x.Id == result.Value).Any())
             {
-                throw new AuthorizationException("You are not logged in");
+                return new OptionalResult<UserModel>(false, "You are not logged in");
             }
 
             var user = this.userService.GetByCondition(x => x.Id == result.Value).First();
 
-            return user;
+            return new OptionalResult<UserModel>(user);
         }
     }
 }

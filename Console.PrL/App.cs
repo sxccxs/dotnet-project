@@ -1,6 +1,8 @@
 ﻿using BLL.Abstractions.Interfaces.RoomInterfaces;
 using BLL.Abstractions.Interfaces.UserInterfaces;
 using Console.PrL.Commands;
+using Console.PrL.Commands.RoomCommands;
+using Console.PrL.Commands.UserCommands;
 using Console.PrL.Interfaces;
 
 namespace Console.PrL
@@ -28,6 +30,7 @@ namespace Console.PrL
                 new LoginCommand(console, loginService),
                 new RegistrationCommand(console, registrationService),
                 new ActivationCommand(console, accountActivationService),
+                new MeCommand(console, authenticationService),
                 new GetRoomsCommand(console, authenticationService, userRoomService),
                 new CreateRoomCommand(console, authenticationService, userRoomService),
                 new UpdateRoomCommand(console, authenticationService, userRoomService),
@@ -54,7 +57,7 @@ namespace Console.PrL
                 if (this.commands.ContainsKey(command))
                 {
                     var cmd = this.commands[command];
-                    var result = cmd.Execute();
+                    var result = cmd.Execute(this.authToken);
                     if (cmd is LoginCommand && result.IsSuccess)
                     {
                         this.authToken = result.Value;

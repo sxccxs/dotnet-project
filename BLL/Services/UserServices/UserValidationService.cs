@@ -44,9 +44,9 @@ namespace BLL.Services.UserServices
             {
                 return new ExceptionalResult(false, "User name can't be empty");
             }
-            else if (username.Length > ValidationService.MaxUserNameLength)
+            else if (username.Length > MaxUserNameLength)
             {
-                return new ExceptionalResult(false, $"User name can't be longer then {ValidationService.MaxUserNameLength} symbols");
+                return new ExceptionalResult(false, $"User name can't be longer then {MaxUserNameLength} symbols");
             }
 
             return new ExceptionalResult();
@@ -68,9 +68,9 @@ namespace BLL.Services.UserServices
                 return new ExceptionalResult(false, ex.Message);
             }
 
-            if (email.Length > ValidationService.MaxEmailLength)
+            if (email.Length > MaxEmailLength)
             {
-                return new ExceptionalResult(false, $"Email can't be longer then {ValidationService.MaxEmailLength} symbols");
+                return new ExceptionalResult(false, $"Email can't be longer then {MaxEmailLength} symbols");
             }
 
             return new ExceptionalResult();
@@ -78,9 +78,9 @@ namespace BLL.Services.UserServices
 
         private ExceptionalResult ValidatePassword(string password)
         {
-            if (password.Length < ValidationService.MinPasswordLength && password.Length > ValidationService.MaxPasswordLength)
+            if (password.Length < MinPasswordLength && password.Length > MaxPasswordLength)
             {
-                return new ExceptionalResult(false, $"Password can't be less then {ValidationService.MinPasswordLength} or more then {ValidationService.MaxPasswordLength} symbols.");
+                return new ExceptionalResult(false, $"Password can't be less then {MinPasswordLength} or more then {MaxPasswordLength} symbols.");
             }
 
             if (!password.Any(this.IsUpperAsciiLetter) ||

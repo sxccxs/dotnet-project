@@ -1,6 +1,6 @@
 ﻿using BLL.Abstractions.Interfaces.RoomInterfaces;
 using BLL.Abstractions.Interfaces.UserInterfaces;
-using Core.Exceptions;
+using Core.DataClasses;
 using Core.Models.RoomModels;
 using Core.Models.UserModels;
 
@@ -31,12 +31,23 @@ namespace BLL.Services.RoomServices
             return room.Users.Select(id => this.userService.GetByCondition(x => x.Id == id).First());
         }
 
-        public void CreateRoomForUser(UserModel user, RoomCreateModel createModel)
+        public ExceptionalResult CreateRoomForUser(UserModel user, RoomCreateModel createModel)
         {
-            this.validationService.ValidateCreateModel(createModel);
+            var validationResult = this.validationService.ValidateCreateModel(createModel);
+            if (!validationResult.IsSuccess)
+            {
+                return validationResult;
+            }
+
             createModel.Users = new List<int> { user.Id };
 
-            var room = this.roomService.Create(createModel);
+            var roomResult = this.roomService.Create(createModel);
+            if (!roomResult.IsSuccess)
+            {
+                return roomResult;
+            }
+
+            var room = roomResult.Value;
             user.Rooms.Add(room.Id);
 
             var userUpdateData = new UserUpdateModel()
@@ -45,20 +56,26 @@ namespace BLL.Services.RoomServices
                 Rooms = user.Rooms,
             };
 
-            this.userService.Update(userUpdateData);
+            var updateResult = this.userService.Update(userUpdateData);
+            if (!updateResult.IsSuccess)
+            {
+                return updateResult;
+            }
+
+            return new ExceptionalResult();
         }
 
-        public void DeleteRoomByUser(UserModel user, int roomId)
+        public ExceptionalResult DeleteRoomByUser(UserModel user, int roomId)
         {
             var room = this.roomService.GetByCondition(x => x.Id == roomId).FirstOrDefault();
             if (room is null)
             {
-                throw new RoomDoesNotExistException($"Room with id {roomId} does not exist");
+                return new ExceptionalResult(false, $"Room with id {roomId} does not exist");
             }
 
             if (!room.Users.Contains(user.Id))
             {
-                throw new UserDoesNotBelongToRoomException($"User with id {user.Id} does not belong to room with id {room.Id}");
+                return new ExceptionalResult(false, $"User with id {user.Id} does not belong to room with id {room.Id}");
             }
 
             foreach (var roomUser in this.GetUsersInRoom(room))
@@ -68,28 +85,52 @@ namespace BLL.Services.RoomServices
                     Id = roomUser.Id,
                     Rooms = roomUser.Rooms.Where(x => x != room.Id).ToList(),
                 };
-                this.userService.Update(updateModel);
+
+                var updateResult = this.userService.Update(updateModel);
+
+                if (!updateResult.IsSuccess)
+                {
+                    return updateResult;
+                }
             }
 
-            this.roomService.Delete(room.Id);
+            var deleteResult = this.roomService.Delete(room.Id);
+            if (!deleteResult.IsSuccess)
+            {
+                return deleteResult;
+            }
+
+            return new ExceptionalResult();
         }
 
-        public void UpdateRoomForUser(UserModel user, RoomUpdateModel updateModel)
+        public ExceptionalResult UpdateRoomForUser(UserModel user, RoomUpdateModel updateModel)
         {
             var room = this.roomService.GetByCondition(x => x.Id == updateModel.Id).FirstOrDefault();
             if (room is null)
             {
-                throw new RoomDoesNotExistException($"Room with id {updateModel.Id} does not exist");
+                return new ExceptionalResult(false, $"Room with id {updateModel.Id} does not exist");
             }
 
             if (!room.Users.Contains(user.Id))
             {
-                throw new UserDoesNotBelongToRoomException($"User with id {user.Id} does not belong to room with id {room.Id}");
+                return new ExceptionalResult(false, $"User with id {user.Id} does not belong to room with id {room.Id}");
             }
 
-            this.validationService.ValidateUpdateModel(updateModel);
+            var validationResult = this.validationService.ValidateUpdateModel(updateModel);
 
-            this.roomService.Update(updateModel);
+            if (!validationResult.IsSuccess)
+            {
+                return validationResult;
+            }
+
+            var updateResult = this.roomService.Update(updateModel);
+
+            if (!updateResult.IsSuccess)
+            {
+                return updateResult;
+            }
+
+            return new ExceptionalResult();
         }
     }
 }

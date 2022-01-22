@@ -3,7 +3,7 @@ using Console.PrL.Interfaces;
 using Core.DataClasses;
 using Core.Models.UserModels;
 
-namespace Console.PrL.Commands
+namespace Console.PrL.Commands.UserCommands
 {
     internal class LoginCommand : Command
     {

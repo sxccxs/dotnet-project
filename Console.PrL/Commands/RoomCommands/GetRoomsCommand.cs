@@ -5,7 +5,7 @@ using Core.DataClasses;
 using Core.Models.RoomModels;
 using Core.Models.UserModels;
 
-namespace Console.PrL.Commands
+namespace Console.PrL.Commands.RoomCommands
 {
     internal class GetRoomsCommand : Command
     {
@@ -24,7 +24,13 @@ namespace Console.PrL.Commands
 
         public override OptionalResult<string> Execute(string token)
         {
-            var user = this.authenticationService.GetUserByToken(token);
+            var userResult = this.authenticationService.GetUserByToken(token);
+            if (!userResult.IsSuccess)
+            {
+                return new OptionalResult<string>(userResult);
+            }
+
+            var user = userResult.Value;
             var rooms = this.roomService.GetRoomsForUser(user).ToList();
             this.Output(rooms);
             return new OptionalResult<string>();

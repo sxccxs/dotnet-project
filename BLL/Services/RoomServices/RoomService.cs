@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BLL.Abstractions.Interfaces.RoomInterfaces;
-using Core.Exceptions;
+using Core.DataClasses;
 using Core.Models.RoomModels;
 using DAL.Abstractions.Interfaces;
 
@@ -25,38 +25,38 @@ namespace BLL.Services.RoomServices
             return this.storage.GetByCondition(condition);
         }
 
-        public RoomModel Create(RoomCreateModel roomModel)
+        public OptionalResult<RoomModel> Create(RoomCreateModel roomModel)
         {
             var room = this.MapRoomCreateModelToRoomModel(roomModel);
             this.storage.Create(room);
 
-            return room;
+            return new OptionalResult<RoomModel>(room);
         }
 
-        public RoomModel Delete(int id)
+        public OptionalResult<RoomModel> Delete(int id)
         {
             var room = this.storage.GetByCondition(x => x.Id == id).FirstOrDefault();
             if (room is null)
             {
-                throw new RoomDoesNotExistException($"Room with id {id} does not exist");
+                return new OptionalResult<RoomModel>(false, $"Room with id {id} does not exist");
             }
 
             this.storage.Delete(room);
 
-            return room;
+            return new OptionalResult<RoomModel>(room);
         }
 
-        public RoomModel Update(RoomUpdateModel roomModel)
+        public OptionalResult<RoomModel> Update(RoomUpdateModel roomModel)
         {
             if (!this.storage.GetByCondition(x => x.Id == roomModel.Id).Any())
             {
-                throw new RoomDoesNotExistException($"Room with id {roomModel.Id} does not exist");
+                return new OptionalResult<RoomModel>(false, $"Room with id {roomModel.Id} does not exist");
             }
 
             var room = this.MapRoomUpdateModelToRoomModel(roomModel);
             this.storage.Update(room);
 
-            return room;
+            return new OptionalResult<RoomModel>(room);
         }
 
         private RoomModel MapRoomCreateModelToRoomModel(RoomCreateModel createModel)
@@ -65,7 +65,6 @@ namespace BLL.Services.RoomServices
             var mapper = new Mapper(mapperConfiguration);
             var room = mapper.Map<RoomModel>(createModel);
             room.Id = this.storage.GetNextId();
-            Console.WriteLine(room.Id);
 
             foreach (var prop in room.GetType().GetProperties())
             {

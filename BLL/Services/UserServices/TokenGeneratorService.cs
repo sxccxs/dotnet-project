@@ -15,7 +15,7 @@ namespace BLL.Services.UserServices
 
         public TokenGeneratorService(IHashingService hashingService, IOptions<AppSettings> appSettings)
         {
-            this.appSettings = appSettings?.Value ?? throw new ArgumentNullException(nameof(appSettings));
+            this.appSettings = appSettings.Value;
             this.hashingService = hashingService;
         }
 

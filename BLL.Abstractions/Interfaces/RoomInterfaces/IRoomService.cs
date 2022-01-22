@@ -1,4 +1,5 @@
-﻿using Core.Models.RoomModels;
+﻿using Core.DataClasses;
+using Core.Models.RoomModels;
 
 namespace BLL.Abstractions.Interfaces.RoomInterfaces
 {
@@ -8,10 +9,10 @@ namespace BLL.Abstractions.Interfaces.RoomInterfaces
 
         IEnumerable<RoomModel> GetByCondition(Func<RoomModel, bool> condition);
 
-        RoomModel Create(RoomCreateModel roomModel);
+        OptionalResult<RoomModel> Create(RoomCreateModel roomModel);
 
-        RoomModel Update(RoomUpdateModel roomModel);
+        OptionalResult<RoomModel> Update(RoomUpdateModel roomModel);
 
-        RoomModel Delete(int id);
+        OptionalResult<RoomModel> Delete(int id);
     }
 }

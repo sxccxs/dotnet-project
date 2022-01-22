@@ -2,7 +2,7 @@
 using Console.PrL.Interfaces;
 using Core.DataClasses;
 
-namespace Console.PrL.Commands
+namespace Console.PrL.Commands.UserCommands
 {
     internal class ActivationCommand : Command
     {

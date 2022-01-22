@@ -1,15 +1,16 @@
-﻿using Core.Models.RoomModels;
+﻿using Core.DataClasses;
+using Core.Models.RoomModels;
 using Core.Models.UserModels;
 
 namespace BLL.Abstractions.Interfaces.RoomInterfaces
 {
     public interface IUserRoomService
     {
-        void CreateRoomForUser(UserModel user, RoomCreateModel createModel);
+        ExceptionalResult CreateRoomForUser(UserModel user, RoomCreateModel createModel);
 
-        void UpdateRoomForUser(UserModel user, RoomUpdateModel updateModel);
+        ExceptionalResult UpdateRoomForUser(UserModel user, RoomUpdateModel updateModel);
 
-        void DeleteRoomByUser(UserModel user, int roomId);
+        ExceptionalResult DeleteRoomByUser(UserModel user, int roomId);
 
         IEnumerable<RoomModel> GetRoomsForUser(UserModel user);
 
