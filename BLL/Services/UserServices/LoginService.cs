@@ -1,5 +1,5 @@
 ﻿using BLL.Abstractions.Interfaces.UserInterfaces;
-using Core.Exceptions;
+using Core.DataClasses;
 using Core.Models.UserModels;
 
 namespace BLL.Services.UserServices
@@ -16,15 +16,15 @@ namespace BLL.Services.UserServices
             this.jwtService = jwtService;
         }
 
-        public string Login(UserLoginModel userData)
+        public OptionalResult<string> Login(UserLoginModel userData)
         {
             var user = this.userService.GetByCondition(x => x.Email == userData.Email && x.IsActive).FirstOrDefault();
             if (user is null || this.userService.HashingService.Hash(userData.Password) != user.HashedPassword)
             {
-                throw new UserDoesNotExistException($"User with given credantials does not exist.");
+                return new OptionalResult<string>(false, $"User with given credantials does not exist.");
             }
 
-            return this.jwtService.GenerateJwt(user);
+            return new OptionalResult<string>(this.jwtService.GenerateJwt(user));
         }
     }
 }

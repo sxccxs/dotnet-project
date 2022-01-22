@@ -1,5 +1,5 @@
 ﻿using BLL.Abstractions.Interfaces.UserInterfaces;
-using Core.Exceptions;
+using Core.DataClasses;
 using Core.Models.UserModels;
 using Core.Settings;
 using Microsoft.Extensions.Options;
@@ -19,37 +19,46 @@ namespace BLL.Services.UserServices
             this.hashingService = hashingService;
         }
 
-        public void CheckToken(UserModel user, string token)
+        public ExceptionalResult CheckToken(UserModel user, string token)
         {
-            if (user is null || token is null)
+            if (user is null || string.IsNullOrWhiteSpace(token))
             {
-                throw new ArgumentNullException("User or token is null");
+                return new ExceptionalResult(false, "User or token is null");
             }
+
+            long timestamp;
 
             try
             {
                 var timestampBase64 = token.Split("-")[0];
-                var timestamp = long.Parse(Base64UrlEncoder.Decode(timestampBase64));
-
-                if (this.MakeTokenWithTimeStamp(user, timestamp) != token)
-                {
-                    throw new InvalidTokenException("Invalid token given");
-                }
-
-                if (this.GetNumberOfSeconds(DateTime.UtcNow) - timestamp > this.appSettings.TokensExpirationTime * 24 * 3600)
-                {
-                    throw new InvalidTokenException("Token is outdated");
-                }
+                timestamp = long.Parse(Base64UrlEncoder.Decode(timestampBase64));
             }
             catch (Exception ex)
             {
-                throw new InvalidTokenException(ex.Message);
+                return new ExceptionalResult(false, ex.Message);
             }
+
+            if (this.MakeTokenWithTimeStamp(user, timestamp) != token)
+            {
+                return new ExceptionalResult(false, "Invalid token given");
+            }
+
+            if (this.GetNumberOfSeconds(DateTime.UtcNow) - timestamp > this.appSettings.TokensExpirationTime * 24 * 3600)
+            {
+                return new ExceptionalResult(false, "Token is outdated");
+            }
+
+            return new ExceptionalResult();
         }
 
-        public int GetIdFromUidb64(string uidb64)
+        public OptionalResult<int> GetIdFromUidb64(string uidb64)
         {
-            return int.Parse(Base64UrlEncoder.Decode(uidb64));
+            if (int.TryParse(Base64UrlEncoder.Decode(uidb64), out int result))
+            {
+                return new OptionalResult<int>(result);
+            }
+
+            return new OptionalResult<int>(false, "Invalid uidb64");
         }
 
         public string GetToken(UserModel user)

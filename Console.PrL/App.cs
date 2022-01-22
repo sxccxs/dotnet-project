@@ -51,28 +51,22 @@ namespace Console.PrL
                     continue;
                 }
 
-                try
+                if (this.commands.ContainsKey(command))
                 {
-                    if (this.commands.ContainsKey(command))
+                    var cmd = this.commands[command];
+                    var result = cmd.Execute();
+                    if (cmd is LoginCommand && result.IsSuccess)
                     {
-                        var cmd = this.commands[command];
-                        if (cmd is LoginCommand)
-                        {
-                            this.authToken = cmd.Execute(this.authToken).Value;
-                        }
-                        else
-                        {
-                            cmd.Execute(this.authToken);
-                        }
+                        this.authToken = result.Value;
                     }
-                    else
+                    else if (!result.IsSuccess)
                     {
-                        this.console.Print($"Invalid command {command}.\n");
+                        this.console.Print($"{result.ExceptionMessage}\n");
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    this.console.Print($"{ex.Message}\n");
+                    this.console.Print($"Invalid command {command}.\n");
                 }
             }
         }

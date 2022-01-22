@@ -1,9 +1,10 @@
-﻿using Core.Models.UserModels;
+﻿using Core.DataClasses;
+using Core.Models.UserModels;
 
 namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IUserValidationService
     {
-        void Validate(UserRegistrationModel user);
+        ExceptionalResult Validate(UserRegistrationModel user);
     }
 }

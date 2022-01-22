@@ -12,7 +12,7 @@ namespace BLL.Services.UserServices
 
         public EmailService(IOptions<EmailSettings> emailSettings)
         {
-            this.emailSettings = emailSettings?.Value ?? throw new ArgumentNullException(nameof(emailSettings));
+            this.emailSettings = emailSettings.Value;
         }
 
         public void SendEmail(string toEmail, string emailSubject, string emailHtmlBody)

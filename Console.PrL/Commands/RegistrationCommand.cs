@@ -21,7 +21,12 @@ namespace Console.PrL.Commands
         {
             var userRegistration = this.GetRegistrationInfo();
 
-            this.registrationService.Register(userRegistration);
+            var registrationResult = this.registrationService.Register(userRegistration);
+            if (!registrationResult.IsSuccess)
+            {
+                return new OptionalResult<string>(registrationResult);
+            }
+
             this.Console.Print("You registered successfully. Account activation email was sent to your address\n");
 
             return new OptionalResult<string>();

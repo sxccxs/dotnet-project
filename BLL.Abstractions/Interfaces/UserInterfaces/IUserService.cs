@@ -1,4 +1,5 @@
-﻿using Core.Models.UserModels;
+﻿using Core.DataClasses;
+using Core.Models.UserModels;
 
 namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
@@ -6,13 +7,13 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
     {
         IHashingService HashingService { get; }
 
-        UserModel CreateNonActiveUser(UserCreateModel user);
+        OptionalResult<UserModel> CreateNonActiveUser(UserCreateModel user);
 
-        UserModel ActivateUser(int id);
+        OptionalResult<UserModel> ActivateUser(int id);
 
-        UserModel Delete(int id);
+        OptionalResult<UserModel> Delete(int id);
 
-        UserModel Update(UserUpdateModel user);
+        OptionalResult<UserModel> Update(UserUpdateModel user);
 
         IEnumerable<UserModel> Get();
 
