@@ -15,7 +15,7 @@ namespace BLL.Services.UserServices
 
         private const int MinPasswordLength = 8;
 
-        private char[] Symbols => "_!@#$%^&*".ToCharArray();
+        private char[] PasswordSpecialCharacters => "_!@#$%^&*".ToCharArray();
 
         public ExceptionalResult Validate(UserRegistrationModel user)
         {
@@ -44,9 +44,9 @@ namespace BLL.Services.UserServices
             {
                 return new ExceptionalResult(false, "User name can't be empty");
             }
-            else if (username.Length > this.MaxUserNameLength)
+            else if (username.Length > ValidationService.MaxUserNameLength)
             {
-                return new ExceptionalResult(false, $"User name can't be longer then {this.MaxUserNameLength} symbols");
+                return new ExceptionalResult(false, $"User name can't be longer then {ValidationService.MaxUserNameLength} symbols");
             }
 
             return new ExceptionalResult();
@@ -68,9 +68,9 @@ namespace BLL.Services.UserServices
                 return new ExceptionalResult(false, ex.Message);
             }
 
-            if (email.Length > this.MaxEmailLength)
+            if (email.Length > ValidationService.MaxEmailLength)
             {
-                return new ExceptionalResult(false, $"Email can't be longer then {this.MaxEmailLength} symbols");
+                return new ExceptionalResult(false, $"Email can't be longer then {ValidationService.MaxEmailLength} symbols");
             }
 
             return new ExceptionalResult();
@@ -78,24 +78,24 @@ namespace BLL.Services.UserServices
 
         private ExceptionalResult ValidatePassword(string password)
         {
-            if (password.Length < this.MinPasswordLength && password.Length > this.MaxPasswordLength)
+            if (password.Length < ValidationService.MinPasswordLength && password.Length > ValidationService.MaxPasswordLength)
             {
-                return new ExceptionalResult(false, $"Password can't be less then {this.MinPasswordLength} or more then {this.MaxPasswordLength} symbols.");
+                return new ExceptionalResult(false, $"Password can't be less then {ValidationService.MinPasswordLength} or more then {ValidationService.MaxPasswordLength} symbols.");
             }
 
             if (!password.Any(this.IsUpperAsciiLetter) ||
                 !password.Any(this.IsLowerAsciiLetter) ||
                 !password.Any(this.IsAsciiDigit) ||
-                !password.Any(this.Symbols.Contains))
+                !password.Any(this.PasswordSpecialCharacters.Contains))
             {
                 return new ExceptionalResult(false, "Password must contain at least one capital, one small letter, one number and one symbol.");
             }
             else if (password.Any(x => !(this.IsUpperAsciiLetter(x) ||
                                         this.IsLowerAsciiLetter(x) ||
                                         this.IsAsciiDigit(x) ||
-                                        this.Symbols.Contains(x))))
+                                        this.PasswordSpecialCharacters.Contains(x))))
             {
-                return new ExceptionalResult(false, $"Password can contain only capital and small letter, numbers and {string.Join(", ", this.Symbols)}.");
+                return new ExceptionalResult(false, $"Password can contain only capital and small letter, numbers and {string.Join(", ", this.PasswordSpecialCharacters)}.");
             }
 
             return new ExceptionalResult();
