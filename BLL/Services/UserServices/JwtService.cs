@@ -16,7 +16,7 @@ namespace BLL.Services.UserServices
 
         public JwtService(IOptions<AppSettings> appSettings)
         {
-            this.appSettings = appSettings?.Value ?? throw new ArgumentNullException(nameof(appSettings));
+            this.appSettings = appSettings.Value;
         }
 
         public string GenerateJwt(UserModel user)

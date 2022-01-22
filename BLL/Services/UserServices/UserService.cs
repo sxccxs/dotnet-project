@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BLL.Abstractions.Interfaces.UserInterfaces;
-using Core.Exceptions;
+using Core.DataClasses;
 using Core.Models.UserModels;
 using DAL.Abstractions.Interfaces;
 
@@ -28,52 +28,47 @@ namespace BLL.Services.UserServices
             return this.storage.GetByCondition(condition);
         }
 
-        public UserModel CreateNonActiveUser(UserCreateModel user)
+        public OptionalResult<UserModel> CreateNonActiveUser(UserCreateModel user)
         {
             if (this.storage.GetByCondition(x => x.Email == user.Email).Any())
             {
-                throw new UserAlreadyExistsException($"User with email {user.Email} already exists");
+                return new OptionalResult<UserModel>(false, $"User with email {user.Email} already exists");
             }
 
             var userModel = this.MapUserCreateModel(user);
             this.storage.Create(userModel);
 
-            return userModel;
+            return new OptionalResult<UserModel>(userModel);
         }
 
-        public UserModel Delete(int id)
+        public OptionalResult<UserModel> Delete(int id)
         {
             var user = this.storage.GetByCondition(x => x.Id == id).FirstOrDefault();
             if (user is null)
             {
-                throw new UserDoesNotExistException($"User with id {id} does not exist");
+                return new OptionalResult<UserModel>(false, $"User with id {id} does not exist");
             }
 
             this.storage.Delete(user);
 
-            return user;
+            return new OptionalResult<UserModel>(user);
         }
 
-        public UserModel Update(UserUpdateModel user)
+        public OptionalResult<UserModel> Update(UserUpdateModel user)
         {
             if (!this.storage.GetByCondition(x => x.Id == user.Id).Any())
             {
-                throw new UserDoesNotExistException($"User with id {user.Id} does not exist");
+                return new OptionalResult<UserModel>(false, $"User with id {user.Id} does not exist");
             }
 
             var userModel = this.MapUserUpdateModel(user);
             this.storage.Update(userModel);
 
-            return userModel;
+            return new OptionalResult<UserModel>(userModel);
         }
 
-        public UserModel ActivateUser(int id)
+        public OptionalResult<UserModel> ActivateUser(int id)
         {
-            if (!this.storage.GetByCondition(x => x.Id == id).Any())
-            {
-                throw new UserDoesNotExistException($"User with id {id} does not exist");
-            }
-
             var userData = new UserUpdateModel()
             {
                 Id = id,

@@ -1,6 +1,5 @@
 ﻿using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.DataClasses;
-using Core.Exceptions;
 
 namespace BLL.Services.UserServices
 {
@@ -16,34 +15,36 @@ namespace BLL.Services.UserServices
             this.userService = userService;
         }
 
-        public void Activate(AccountActivationPayload activationPayload)
+        public ExceptionalResult Activate(AccountActivationPayload activationPayload)
         {
-            var id = this.tokenGeneratorService.GetIdFromUidb64(activationPayload.Uidb64);
+            var idResult = this.tokenGeneratorService.GetIdFromUidb64(activationPayload.Uidb64);
+            if (!idResult.IsSuccess)
+            {
+                return idResult;
+            }
+
+            var id = idResult.Value;
             var user = this.userService.GetByCondition(x => x.Id == id).FirstOrDefault();
             if (user is null)
             {
-                throw new UserDoesNotExistException($"User with id {id} does not exist");
+                return new ExceptionalResult(false, $"User with id {id} does not exist");
             }
 
-            try
-            {
-                this.tokenGeneratorService.CheckToken(user, activationPayload.Token);
-            }
-            catch (InvalidTokenException ex)
-            {
-                if (ex.Message == "Token is outdated")
-                {
-                    this.userService.Delete(id);
-                }
+            var tokenResult = this.tokenGeneratorService.CheckToken(user, activationPayload.Token);
 
-                throw new InvalidTokenException("Token is outdated. You have to register again");
-            }
-            catch (Exception)
+            if (!tokenResult.IsSuccess && tokenResult.ExceptionMessage == "Token is outdated")
             {
-                throw;
+                this.userService.Delete(id);
+                return new ExceptionalResult(false, "Token is outdated. You have to register again");
+            }
+
+            if (!tokenResult.IsSuccess)
+            {
+                return tokenResult;
             }
 
             this.userService.ActivateUser(id);
+            return new ExceptionalResult();
         }
     }
 }

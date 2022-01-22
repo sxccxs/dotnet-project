@@ -7,4 +7,4 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Naming", "CA1704:Identifiers should be spelled correctly", Justification = "<>", Scope = "type", Target = "~T:BLL.Abstractions.Interfaces.UserInterfaces.IJwtService")]
 [assembly: SuppressMessage("Naming", "CA1704:Identifiers should be spelled correctly", Justification = "<>", Scope = "member", Target = "~M:BLL.Abstractions.Interfaces.UserInterfaces.ITokenGeneratorService.GetUidb64(Core.Models.UserModels.UserModel)~System.String")]
-[assembly: SuppressMessage("Naming", "CA1704:Identifiers should be spelled correctly", Justification = "<>", Scope = "member", Target = "~M:BLL.Abstractions.Interfaces.UserInterfaces.ITokenGeneratorService.GetIdFromUidb64(System.String)~System.Int32")]
+[assembly: SuppressMessage("Naming", "CA1704:Identifiers should be spelled correctly", Justification = "<>", Scope = "member", Target = "~M:BLL.Abstractions.Interfaces.UserInterfaces.ITokenGeneratorService.GetIdFromUidb64(System.String)~Core.DataClasses.OptionalResult{System.Int32}")]

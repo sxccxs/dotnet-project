@@ -1,12 +1,13 @@
-﻿using Core.Models.UserModels;
+﻿using Core.DataClasses;
+using Core.Models.UserModels;
 
 namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface ITokenGeneratorService
     {
-        void CheckToken(UserModel user, string token);
+        ExceptionalResult CheckToken(UserModel user, string token);
 
-        int GetIdFromUidb64(string uidb64);
+        OptionalResult<int> GetIdFromUidb64(string uidb64);
 
         string GetToken(UserModel user);
 

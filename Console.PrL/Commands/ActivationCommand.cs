@@ -20,7 +20,11 @@ namespace Console.PrL.Commands
         {
             var payload = this.GetActivationInfo();
 
-            this.accountActivationService.Activate(payload);
+            var activationResult = this.accountActivationService.Activate(payload);
+            if (!activationResult.IsSuccess)
+            {
+                return new OptionalResult<string>(activationResult);
+            }
 
             this.Console.Print("Your account has been successfully actived. You can login now.\n");
 

@@ -1,30 +1,25 @@
 ﻿namespace Core.DataClasses
 {
-    public class OptionalResult<T>
+    public class OptionalResult<T> : ExceptionalResult
     {
         private readonly T value;
 
-        public OptionalResult()
+        public OptionalResult(bool isSuccess = true, string exceptionMessage = null)
+            : base(isSuccess, exceptionMessage)
         {
         }
 
         public OptionalResult(T value)
+            : base()
         {
             this.value = value;
         }
 
-        public bool HasValue
+        public OptionalResult(ExceptionalResult exceptionalResult)
+            : this(exceptionalResult.IsSuccess, exceptionalResult.ExceptionMessage)
         {
-            get { return this.value is not null; }
         }
 
-        public T Value
-        {
-            get
-            {
-                return this.value is not null ? this.value :
-                                            throw new InvalidOperationException("Can't get value from empty result.");
-            }
-        }
+        public T Value => this.value;
     }
 }

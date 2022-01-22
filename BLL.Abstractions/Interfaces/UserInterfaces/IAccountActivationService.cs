@@ -4,6 +4,6 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IAccountActivationService
     {
-        void Activate(AccountActivationPayload activationPayload);
+        ExceptionalResult Activate(AccountActivationPayload activationPayload);
     }
 }

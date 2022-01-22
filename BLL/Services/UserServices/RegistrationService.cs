@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BLL.Abstractions.Interfaces.UserInterfaces;
+using Core.DataClasses;
 using Core.Models.UserModels;
 using Core.Settings;
 using Microsoft.Extensions.Options;
@@ -28,17 +29,27 @@ namespace BLL.Services.UserServices
             this.validationService = validationService;
             this.userService = userService;
             this.emailService = emailService;
-            this.appSettings = appSettings?.Value ?? throw new ArgumentNullException(nameof(appSettings));
+            this.appSettings = appSettings.Value;
             this.tokenGeneratorService = tokenGeneratorService;
         }
 
-        public void Register(UserRegistrationModel userData)
+        public ExceptionalResult Register(UserRegistrationModel userData)
         {
-            this.validationService.Validate(userData);
-            var userModel = this.MapUserRegistrationModel(userData);
-            var user = this.userService.CreateNonActiveUser(userModel);
+            var result = this.validationService.Validate(userData);
+            if (!result.IsSuccess)
+            {
+                return result;
+            }
 
-            this.SendActivationEmail(user);
+            var userModel = this.MapUserRegistrationModel(userData);
+            var userResult = this.userService.CreateNonActiveUser(userModel);
+            if (!userResult.IsSuccess)
+            {
+                return userResult;
+            }
+
+            this.SendActivationEmail(userResult.Value);
+            return new ExceptionalResult();
         }
 
         private UserCreateModel MapUserRegistrationModel(UserRegistrationModel user)

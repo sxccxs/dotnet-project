@@ -20,11 +20,13 @@ namespace Console.PrL.Commands
         public override OptionalResult<string> Execute()
         {
             var userData = this.GetLoginInfo();
-            var token = this.loginService.Login(userData);
+            var tokenResult = this.loginService.Login(userData);
+            if (tokenResult.IsSuccess)
+            {
+                this.Console.Print("Logged in successfully\n");
+            }
 
-            this.Console.Print("Logged in successfully\n");
-
-            return new OptionalResult<string>(token);
+            return tokenResult;
         }
 
         private UserLoginModel GetLoginInfo()
