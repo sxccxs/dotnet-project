@@ -23,7 +23,7 @@ namespace BLL.Services.RoomServices
 
         public async Task<IEnumerable<RoomModel>> GetRoomsForUser(UserModel user)
         {
-            var tasks = await Task.WhenAll(user.Rooms.Select(id => this.roomService.GetByCondition(x => id == user.Id)));
+            var tasks = await Task.WhenAll(user.Rooms.Select(id => this.roomService.GetByCondition(x => id == x.Id)));
             return tasks.Where(result => result is not null).Select(result => result.First());
         }
 
