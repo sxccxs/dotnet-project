@@ -17,6 +17,8 @@ namespace Console.PrL.Commands.UserCommands
 
         public override string Name => "/login";
 
+        public override string Description => "Login to app";
+
         public async override Task<OptionalResult<string>> Execute(string token)
         {
             var userData = this.GetLoginInfo();

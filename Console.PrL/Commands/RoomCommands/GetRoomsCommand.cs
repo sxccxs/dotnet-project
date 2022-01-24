@@ -22,6 +22,8 @@ namespace Console.PrL.Commands.RoomCommands
 
         public override string Name => "/rooms";
 
+        public override string Description => "Get all rooms you are in. You must be logged in";
+
         public async override Task<OptionalResult<string>> Execute(string token)
         {
             var userResult = await this.authenticationService.GetUserByToken(token);

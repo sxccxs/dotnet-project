@@ -22,6 +22,8 @@ namespace Console.PrL.Commands.UserCommands
 
         public override string Name => "/me";
 
+        public override string Description => "Get info about account. You must be logged in.";
+
         public async override Task<OptionalResult<string>> Execute(string token)
         {
             var userResult = await this.authenticationService.GetUserByToken(token);

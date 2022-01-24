@@ -12,6 +12,8 @@ namespace Console.PrL.Commands
 
         public abstract string Name { get; }
 
+        public abstract string Description { get; }
+
         protected IConsole Console { get; }
 
         public abstract Task<OptionalResult<string>> Execute(string token);

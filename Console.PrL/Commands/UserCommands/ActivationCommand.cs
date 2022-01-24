@@ -16,6 +16,8 @@ namespace Console.PrL.Commands.UserCommands
 
         public override string Name => "/activate";
 
+        public override string Description => "Activate your account after registration";
+
         public async override Task<OptionalResult<string>> Execute(string token)
         {
             var payload = this.GetActivationInfo();

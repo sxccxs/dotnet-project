@@ -21,6 +21,8 @@ namespace Console.PrL.Commands.RoomCommands
 
         public override string Name => "/createRoom";
 
+        public override string Description => "Create new room. You must be logged in.";
+
         public async override Task<OptionalResult<string>> Execute(string token)
         {
             var userResult = await this.authenticationService.GetUserByToken(token);

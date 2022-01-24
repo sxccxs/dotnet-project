@@ -21,6 +21,8 @@ namespace Console.PrL.Commands.RoomCommands
 
         public override string Name => "/editRoom";
 
+        public override string Description => "Edit room info. You must be logged";
+
         public async override Task<OptionalResult<string>> Execute(string token)
         {
             var userResult = await this.authenticationService.GetUserByToken(token);

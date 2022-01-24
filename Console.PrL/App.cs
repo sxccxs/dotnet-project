@@ -37,6 +37,8 @@ namespace Console.PrL
                 new DeleteRoomCommand(console, authenticationService, userRoomService),
             };
 
+            commandsArray = commandsArray.Append(new HelpCommand(console, commandsArray)).ToArray();
+
             this.commands = new Dictionary<string, Command>();
             foreach (var command in commandsArray)
             {

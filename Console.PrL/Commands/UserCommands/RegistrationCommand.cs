@@ -17,6 +17,8 @@ namespace Console.PrL.Commands.UserCommands
 
         public override string Name => "/register";
 
+        public override string Description => "Register in app";
+
         public async override Task<OptionalResult<string>> Execute(string token)
         {
             var userRegistration = this.GetRegistrationInfo();
