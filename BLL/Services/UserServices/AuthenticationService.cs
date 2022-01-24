@@ -16,15 +16,15 @@ namespace BLL.Services.UserServices
             this.jwtService = jwtService;
         }
 
-        public OptionalResult<UserModel> GetUserByToken(string jwtToken)
+        public async Task<OptionalResult<UserModel>> GetUserByToken(string jwtToken)
         {
             var result = this.jwtService.ValidateJwt(jwtToken);
-            if (!result.IsSuccess || !this.userService.GetByCondition(x => x.Id == result.Value).Any())
+            if (!result.IsSuccess || !(await this.userService.GetByCondition(x => x.Id == result.Value)).Any())
             {
                 return new OptionalResult<UserModel>(false, "You are not logged in");
             }
 
-            var user = this.userService.GetByCondition(x => x.Id == result.Value).First();
+            var user = (await this.userService.GetByCondition(x => x.Id == result.Value)).First();
 
             return new OptionalResult<UserModel>(user);
         }

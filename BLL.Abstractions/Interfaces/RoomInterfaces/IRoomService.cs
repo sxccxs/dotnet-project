@@ -5,14 +5,14 @@ namespace BLL.Abstractions.Interfaces.RoomInterfaces
 {
     public interface IRoomService
     {
-        IEnumerable<RoomModel> GetAll();
+        Task<IEnumerable<RoomModel>> GetAll();
 
-        IEnumerable<RoomModel> GetByCondition(Func<RoomModel, bool> condition);
+        Task<IEnumerable<RoomModel>> GetByCondition(Func<RoomModel, bool> condition);
 
-        OptionalResult<RoomModel> Create(RoomCreateModel roomModel);
+        Task<OptionalResult<RoomModel>> Create(RoomCreateModel roomModel);
 
-        OptionalResult<RoomModel> Update(RoomUpdateModel roomModel);
+        Task<OptionalResult<RoomModel>> Update(RoomUpdateModel roomModel);
 
-        OptionalResult<RoomModel> Delete(int id);
+        Task<OptionalResult<RoomModel>> Delete(int id);
     }
 }

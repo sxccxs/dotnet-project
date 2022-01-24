@@ -7,16 +7,16 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
     {
         IHashingService HashingService { get; }
 
-        OptionalResult<UserModel> CreateNonActiveUser(UserCreateModel user);
+        Task<OptionalResult<UserModel>> CreateNonActiveUser(UserCreateModel user);
 
-        OptionalResult<UserModel> ActivateUser(int id);
+        Task<OptionalResult<UserModel>> ActivateUser(int id);
 
-        OptionalResult<UserModel> Delete(int id);
+        Task<OptionalResult<UserModel>> Delete(int id);
 
-        OptionalResult<UserModel> Update(UserUpdateModel user);
+        Task<OptionalResult<UserModel>> Update(UserUpdateModel user);
 
-        IEnumerable<UserModel> Get();
+        Task<IEnumerable<UserModel>> Get();
 
-        IEnumerable<UserModel> GetByCondition(Func<UserModel, bool> condition);
+        Task<IEnumerable<UserModel>> GetByCondition(Func<UserModel, bool> condition);
     }
 }

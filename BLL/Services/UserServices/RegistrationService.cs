@@ -33,7 +33,7 @@ namespace BLL.Services.UserServices
             this.tokenGeneratorService = tokenGeneratorService;
         }
 
-        public ExceptionalResult Register(UserRegistrationModel userData)
+        public async Task<ExceptionalResult> Register(UserRegistrationModel userData)
         {
             var result = this.validationService.Validate(userData);
             if (!result.IsSuccess)
@@ -42,13 +42,13 @@ namespace BLL.Services.UserServices
             }
 
             var userModel = this.MapUserRegistrationModel(userData);
-            var userResult = this.userService.CreateNonActiveUser(userModel);
+            var userResult = await this.userService.CreateNonActiveUser(userModel);
             if (!userResult.IsSuccess)
             {
                 return userResult;
             }
 
-            this.SendActivationEmail(userResult.Value);
+            await this.SendActivationEmail(userResult.Value);
             return new ExceptionalResult();
         }
 
@@ -61,7 +61,7 @@ namespace BLL.Services.UserServices
             return userObject;
         }
 
-        private void SendActivationEmail(UserModel user)
+        private async Task SendActivationEmail(UserModel user)
         {
             if (user is null)
             {
@@ -75,7 +75,7 @@ namespace BLL.Services.UserServices
             var body = File.ReadAllText(this.appSettings.AccountActivationEmailTemplate)
                            .Replace("{UserName}", user.UserName)
                            .Replace("{url}", url);
-            this.emailService.SendEmail(user.Email, subject, body);
+            await this.emailService.SendEmail(user.Email, subject, body);
         }
     }
 }

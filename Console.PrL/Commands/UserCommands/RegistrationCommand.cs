@@ -17,11 +17,11 @@ namespace Console.PrL.Commands.UserCommands
 
         public override string Name => "/register";
 
-        public override OptionalResult<string> Execute(string token)
+        public async override Task<OptionalResult<string>> Execute(string token)
         {
             var userRegistration = this.GetRegistrationInfo();
 
-            var registrationResult = this.registrationService.Register(userRegistration);
+            var registrationResult = await this.registrationService.Register(userRegistration);
             if (!registrationResult.IsSuccess)
             {
                 return new OptionalResult<string>(registrationResult);

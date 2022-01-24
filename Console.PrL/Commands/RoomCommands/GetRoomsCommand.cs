@@ -22,16 +22,16 @@ namespace Console.PrL.Commands.RoomCommands
 
         public override string Name => "/rooms";
 
-        public override OptionalResult<string> Execute(string token)
+        public async override Task<OptionalResult<string>> Execute(string token)
         {
-            var userResult = this.authenticationService.GetUserByToken(token);
+            var userResult = await this.authenticationService.GetUserByToken(token);
             if (!userResult.IsSuccess)
             {
                 return new OptionalResult<string>(userResult);
             }
 
             var user = userResult.Value;
-            var rooms = this.roomService.GetRoomsForUser(user).ToList();
+            var rooms = (await this.roomService.GetRoomsForUser(user)).ToList();
             this.Output(rooms);
             return new OptionalResult<string>();
         }

@@ -15,56 +15,56 @@ namespace BLL.Services.RoomServices
             this.storage = storage;
         }
 
-        public IEnumerable<RoomModel> GetAll()
+        public async Task<IEnumerable<RoomModel>> GetAll()
         {
-            return this.storage.GetAll();
+            return await this.storage.GetAll();
         }
 
-        public IEnumerable<RoomModel> GetByCondition(Func<RoomModel, bool> condition)
+        public async Task<IEnumerable<RoomModel>> GetByCondition(Func<RoomModel, bool> condition)
         {
-            return this.storage.GetByCondition(condition);
+            return await this.storage.GetByCondition(condition);
         }
 
-        public OptionalResult<RoomModel> Create(RoomCreateModel roomModel)
+        public async Task<OptionalResult<RoomModel>> Create(RoomCreateModel roomModel)
         {
-            var room = this.MapRoomCreateModelToRoomModel(roomModel);
-            this.storage.Create(room);
+            var room = await this.MapRoomCreateModelToRoomModel(roomModel);
+            await this.storage.Create(room);
 
             return new OptionalResult<RoomModel>(room);
         }
 
-        public OptionalResult<RoomModel> Delete(int id)
+        public async Task<OptionalResult<RoomModel>> Delete(int id)
         {
-            var room = this.storage.GetByCondition(x => x.Id == id).FirstOrDefault();
+            var room = (await this.storage.GetByCondition(x => x.Id == id)).FirstOrDefault();
             if (room is null)
             {
                 return new OptionalResult<RoomModel>(false, $"Room with id {id} does not exist");
             }
 
-            this.storage.Delete(room);
+            await this.storage.Delete(room);
 
             return new OptionalResult<RoomModel>(room);
         }
 
-        public OptionalResult<RoomModel> Update(RoomUpdateModel roomModel)
+        public async Task<OptionalResult<RoomModel>> Update(RoomUpdateModel roomModel)
         {
-            if (!this.storage.GetByCondition(x => x.Id == roomModel.Id).Any())
+            if (!(await this.storage.GetByCondition(x => x.Id == roomModel.Id)).Any())
             {
                 return new OptionalResult<RoomModel>(false, $"Room with id {roomModel.Id} does not exist");
             }
 
-            var room = this.MapRoomUpdateModelToRoomModel(roomModel);
-            this.storage.Update(room);
+            var room = await this.MapRoomUpdateModelToRoomModel(roomModel);
+            await this.storage.Update(room);
 
             return new OptionalResult<RoomModel>(room);
         }
 
-        private RoomModel MapRoomCreateModelToRoomModel(RoomCreateModel createModel)
+        private async Task<RoomModel> MapRoomCreateModelToRoomModel(RoomCreateModel createModel)
         {
             var mapperConfiguration = new MapperConfiguration(cfg => cfg.CreateMap<RoomCreateModel, RoomModel>());
             var mapper = new Mapper(mapperConfiguration);
             var room = mapper.Map<RoomModel>(createModel);
-            room.Id = this.storage.GetNextId();
+            room.Id = await this.storage.GetNextId();
 
             foreach (var prop in room.GetType().GetProperties())
             {
@@ -77,7 +77,7 @@ namespace BLL.Services.RoomServices
             return room;
         }
 
-        private RoomModel MapRoomUpdateModelToRoomModel(RoomUpdateModel updateModel)
+        private async Task<RoomModel> MapRoomUpdateModelToRoomModel(RoomUpdateModel updateModel)
         {
             var mapperConfiguration = new MapperConfiguration(cfg =>
             {
@@ -85,7 +85,7 @@ namespace BLL.Services.RoomServices
             });
             var mapper = new Mapper(mapperConfiguration);
             var room = mapper.Map<RoomModel>(updateModel);
-            var changingRoom = this.storage.GetByCondition(x => x.Id == updateModel.Id).First();
+            var changingRoom = (await this.storage.GetByCondition(x => x.Id == updateModel.Id)).First();
 
             foreach (var prop in room.GetType().GetProperties())
             {

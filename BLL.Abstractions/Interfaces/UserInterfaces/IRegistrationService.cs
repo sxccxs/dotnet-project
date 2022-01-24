@@ -5,6 +5,6 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IRegistrationService
     {
-        ExceptionalResult Register(UserRegistrationModel userData);
+        Task<ExceptionalResult> Register(UserRegistrationModel userData);
     }
 }

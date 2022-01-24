@@ -5,6 +5,6 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface ILoginService
     {
-        OptionalResult<string> Login(UserLoginModel userData);
+        Task<OptionalResult<string>> Login(UserLoginModel userData);
     }
 }

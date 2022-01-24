@@ -5,6 +5,6 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IAuthenticationService
     {
-        OptionalResult<UserModel> GetUserByToken(string jwtToken);
+        Task<OptionalResult<UserModel>> GetUserByToken(string jwtToken);
     }
 }

@@ -21,9 +21,9 @@ namespace Console.PrL.Commands.RoomCommands
 
         public override string Name => "/createRoom";
 
-        public override OptionalResult<string> Execute(string token)
+        public async override Task<OptionalResult<string>> Execute(string token)
         {
-            var userResult = this.authenticationService.GetUserByToken(token);
+            var userResult = await this.authenticationService.GetUserByToken(token);
 
             if (!userResult.IsSuccess)
             {
@@ -34,7 +34,7 @@ namespace Console.PrL.Commands.RoomCommands
 
             var roomData = this.GetNewRoomData();
 
-            var createResult = this.roomService.CreateRoomForUser(user, roomData);
+            var createResult = await this.roomService.CreateRoomForUser(user, roomData);
 
             if (!createResult.IsSuccess)
             {

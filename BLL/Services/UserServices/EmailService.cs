@@ -15,7 +15,7 @@ namespace BLL.Services.UserServices
             this.emailSettings = emailSettings.Value;
         }
 
-        public void SendEmail(string toEmail, string emailSubject, string emailHtmlBody)
+        public async Task SendEmail(string toEmail, string emailSubject, string emailHtmlBody)
         {
             var message = new MailMessage
             {
@@ -36,7 +36,7 @@ namespace BLL.Services.UserServices
                 DeliveryMethod = SmtpDeliveryMethod.Network,
             };
 
-            smtp.Send(message);
+            await smtp.SendMailAsync(message);
         }
     }
 }

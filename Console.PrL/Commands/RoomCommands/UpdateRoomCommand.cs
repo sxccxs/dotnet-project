@@ -21,9 +21,9 @@ namespace Console.PrL.Commands.RoomCommands
 
         public override string Name => "/editRoom";
 
-        public override OptionalResult<string> Execute(string token)
+        public async override Task<OptionalResult<string>> Execute(string token)
         {
-            var userResult = this.authenticationService.GetUserByToken(token);
+            var userResult = await this.authenticationService.GetUserByToken(token);
             if (!userResult.IsSuccess)
             {
                 return new OptionalResult<string>(userResult);
@@ -31,7 +31,7 @@ namespace Console.PrL.Commands.RoomCommands
 
             var user = userResult.Value;
 
-            var rooms = this.roomService.GetRoomsForUser(user).ToList();
+            var rooms = (await this.roomService.GetRoomsForUser(user)).ToList();
 
             var roomUpdateData = new RoomUpdateModel();
 
@@ -39,7 +39,7 @@ namespace Console.PrL.Commands.RoomCommands
 
             if (apply)
             {
-                this.roomService.UpdateRoomForUser(user, roomUpdateData);
+                await this.roomService.UpdateRoomForUser(user, roomUpdateData);
 
                 this.Console.Print("Room updated successfully\n");
             }

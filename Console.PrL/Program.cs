@@ -9,12 +9,12 @@ namespace Console.PrL
 {
     public class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
             var services = new ServiceCollection();
             ConfigureServices(services);
             var serviceProvider = services.BuildServiceProvider();
-            serviceProvider.GetService<App>()?.StartApp();
+            await serviceProvider.GetService<App>()?.StartApp();
         }
 
         private static void ConfigureServices(IServiceCollection services)

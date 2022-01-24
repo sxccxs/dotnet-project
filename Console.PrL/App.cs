@@ -44,7 +44,7 @@ namespace Console.PrL
             }
         }
 
-        public void StartApp()
+        public async Task StartApp()
         {
             while (true)
             {
@@ -57,7 +57,7 @@ namespace Console.PrL
                 if (this.commands.ContainsKey(command))
                 {
                     var cmd = this.commands[command];
-                    var result = cmd.Execute(this.authToken);
+                    var result = await cmd.Execute(this.authToken);
                     if (cmd is LoginCommand && result.IsSuccess)
                     {
                         this.authToken = result.Value;

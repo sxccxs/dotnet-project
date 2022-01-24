@@ -22,9 +22,9 @@ namespace Console.PrL.Commands.UserCommands
 
         public override string Name => "/me";
 
-        public override OptionalResult<string> Execute(string token)
+        public async override Task<OptionalResult<string>> Execute(string token)
         {
-            var userResult = this.authenticationService.GetUserByToken(token);
+            var userResult = await this.authenticationService.GetUserByToken(token);
             if (!userResult.IsSuccess)
             {
                 return new OptionalResult<string>(userResult);

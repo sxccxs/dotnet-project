@@ -17,10 +17,10 @@ namespace Console.PrL.Commands.UserCommands
 
         public override string Name => "/login";
 
-        public override OptionalResult<string> Execute(string token)
+        public async override Task<OptionalResult<string>> Execute(string token)
         {
             var userData = this.GetLoginInfo();
-            var tokenResult = this.loginService.Login(userData);
+            var tokenResult = await this.loginService.Login(userData);
             if (tokenResult.IsSuccess)
             {
                 this.Console.Print("Logged in successfully\n");

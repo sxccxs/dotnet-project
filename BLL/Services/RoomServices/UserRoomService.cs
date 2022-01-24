@@ -21,17 +21,19 @@ namespace BLL.Services.RoomServices
             this.validationService = validationService;
         }
 
-        public IEnumerable<RoomModel> GetRoomsForUser(UserModel user)
+        public async Task<IEnumerable<RoomModel>> GetRoomsForUser(UserModel user)
         {
-            return user.Rooms.Select(id => this.roomService.GetByCondition(x => x.Id == id).First());
+            var tasks = await Task.WhenAll(user.Rooms.Select(id => this.roomService.GetByCondition(x => id == user.Id)));
+            return tasks.Where(result => result is not null).Select(result => result.First());
         }
 
-        public IEnumerable<UserModel> GetUsersInRoom(RoomModel room)
+        public async Task<IEnumerable<UserModel>> GetUsersInRoom(RoomModel room)
         {
-            return room.Users.Select(id => this.userService.GetByCondition(x => x.Id == id).First());
+            var tasks = await Task.WhenAll(room.Users.Select(id => this.userService.GetByCondition(x => x.Id == id)));
+            return tasks.Where(result => result is not null).Select(result => result.First());
         }
 
-        public ExceptionalResult CreateRoomForUser(UserModel user, RoomCreateModel createModel)
+        public async Task<ExceptionalResult> CreateRoomForUser(UserModel user, RoomCreateModel createModel)
         {
             var validationResult = this.validationService.ValidateCreateModel(createModel);
             if (!validationResult.IsSuccess)
@@ -41,7 +43,7 @@ namespace BLL.Services.RoomServices
 
             createModel.Users = new List<int> { user.Id };
 
-            var roomResult = this.roomService.Create(createModel);
+            var roomResult = await this.roomService.Create(createModel);
             if (!roomResult.IsSuccess)
             {
                 return roomResult;
@@ -56,7 +58,7 @@ namespace BLL.Services.RoomServices
                 Rooms = user.Rooms,
             };
 
-            var updateResult = this.userService.Update(userUpdateData);
+            var updateResult = await this.userService.Update(userUpdateData);
             if (!updateResult.IsSuccess)
             {
                 return updateResult;
@@ -65,9 +67,9 @@ namespace BLL.Services.RoomServices
             return new ExceptionalResult();
         }
 
-        public ExceptionalResult DeleteRoomByUser(UserModel user, int roomId)
+        public async Task<ExceptionalResult> DeleteRoomByUser(UserModel user, int roomId)
         {
-            var room = this.roomService.GetByCondition(x => x.Id == roomId).FirstOrDefault();
+            var room = (await this.roomService.GetByCondition(x => x.Id == roomId)).FirstOrDefault();
             if (room is null)
             {
                 return new ExceptionalResult(false, $"Room with id {roomId} does not exist");
@@ -78,7 +80,7 @@ namespace BLL.Services.RoomServices
                 return new ExceptionalResult(false, $"User with id {user.Id} does not belong to room with id {room.Id}");
             }
 
-            foreach (var roomUser in this.GetUsersInRoom(room))
+            foreach (var roomUser in await this.GetUsersInRoom(room))
             {
                 var updateModel = new UserUpdateModel()
                 {
@@ -86,7 +88,7 @@ namespace BLL.Services.RoomServices
                     Rooms = roomUser.Rooms.Where(x => x != room.Id).ToList(),
                 };
 
-                var updateResult = this.userService.Update(updateModel);
+                var updateResult = await this.userService.Update(updateModel);
 
                 if (!updateResult.IsSuccess)
                 {
@@ -94,7 +96,7 @@ namespace BLL.Services.RoomServices
                 }
             }
 
-            var deleteResult = this.roomService.Delete(room.Id);
+            var deleteResult = await this.roomService.Delete(room.Id);
             if (!deleteResult.IsSuccess)
             {
                 return deleteResult;
@@ -103,9 +105,9 @@ namespace BLL.Services.RoomServices
             return new ExceptionalResult();
         }
 
-        public ExceptionalResult UpdateRoomForUser(UserModel user, RoomUpdateModel updateModel)
+        public async Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomUpdateModel updateModel)
         {
-            var room = this.roomService.GetByCondition(x => x.Id == updateModel.Id).FirstOrDefault();
+            var room = (await this.roomService.GetByCondition(x => x.Id == updateModel.Id)).FirstOrDefault();
             if (room is null)
             {
                 return new ExceptionalResult(false, $"Room with id {updateModel.Id} does not exist");
@@ -123,7 +125,7 @@ namespace BLL.Services.RoomServices
                 return validationResult;
             }
 
-            var updateResult = this.roomService.Update(updateModel);
+            var updateResult = await this.roomService.Update(updateModel);
 
             if (!updateResult.IsSuccess)
             {
