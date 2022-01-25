@@ -18,11 +18,10 @@ namespace Console.PrL.Commands
 
         public override string Description => "Get info about commands.";
 
-        public async override Task<OptionalResult<string>> Execute(string token)
+        public override Task<OptionalResult<string>> Execute(string token)
         {
             this.Output();
-            await Task.Run(() => { });
-            return new OptionalResult<string>();
+            return Task.FromResult(new OptionalResult<string>());
         }
 
         private void Output()
