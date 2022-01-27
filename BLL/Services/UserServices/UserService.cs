@@ -20,12 +20,12 @@ namespace BLL.Services.UserServices
 
         public async Task<IEnumerable<UserModel>> Get()
         {
-            return await this.storage.GetAll();
+            return (await this.storage.GetAll()).Where(x => x.IsActive);
         }
 
         public async Task<IEnumerable<UserModel>> GetByCondition(Func<UserModel, bool> condition)
         {
-            return await this.storage.GetByCondition(condition);
+            return (await this.Get()).Where(condition);
         }
 
         public async Task<OptionalResult<UserModel>> CreateNonActiveUser(UserCreateModel user)

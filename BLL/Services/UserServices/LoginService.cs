@@ -18,7 +18,7 @@ namespace BLL.Services.UserServices
 
         public async Task<OptionalResult<string>> Login(UserLoginModel userData)
         {
-            var user = (await this.userService.GetByCondition(x => x.Email == userData.Email && x.IsActive)).FirstOrDefault();
+            var user = (await this.userService.GetByCondition(x => x.Email == userData.Email)).FirstOrDefault();
             if (user is null || this.userService.HashingService.Hash(userData.Password) != user.HashedPassword)
             {
                 return new OptionalResult<string>(false, $"User with given credantials does not exist.");
