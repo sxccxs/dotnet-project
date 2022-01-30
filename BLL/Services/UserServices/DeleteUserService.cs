@@ -13,16 +13,10 @@ namespace BLL.Services.UserServices
             this.userService = userService;
         }
 
-        public async Task<OptionalResult<string>> DeleteUser(OptionalResult<int> userId)
+        public async Task<ExceptionalResult> DeleteUser(UserModel user)
         {
-            var user = (await this.userService.GetByCondition(x => x.Id == userId)).FirstOrDefault();
-            if (user.Id.IsSuccess)
-            {
-                await this.userService.Delete(user.Id.Value);
-                return new OptionalResult<string>();
-            }
-
-            return new OptionalResult<string>(false, "user id is wrong");
+            await this.userService.Delete(user.Id);
+            return new ExceptionalResult();
         }
     }
 }

@@ -11,5 +11,7 @@
         public string Domain { get; set; }
 
         public string AccountActivationEmailTemplate { get; set; }
+
+        public string EmailChangeEmailTemplate { get; set; }
     }
 }

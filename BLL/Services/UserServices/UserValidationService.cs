@@ -38,6 +38,35 @@ namespace BLL.Services.UserServices
             return new ExceptionalResult();
         }
 
+        public ExceptionalResult ValidateUpdateModel(UserEditModel user)
+        {
+            var results = new List<ExceptionalResult>();
+            if (user.UserName is not null)
+            {
+                results.Add(this.ValidateUserName(user.UserName));
+            }
+
+            if (user.Email is not null)
+            {
+                results.Add(this.ValidateEmail(user.Email));
+            }
+
+            if (user.Password is not null)
+            {
+                results.Add(this.ValidatePassword(user.Password));
+            }
+
+            foreach (var result in results)
+            {
+                if (!result.IsSuccess)
+                {
+                    return result;
+                }
+            }
+
+            return new ExceptionalResult();
+        }
+
         private ExceptionalResult ValidateUserName(string username)
         {
             if (username is null || string.IsNullOrWhiteSpace(username))

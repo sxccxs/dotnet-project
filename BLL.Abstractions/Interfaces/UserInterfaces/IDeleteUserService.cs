@@ -5,6 +5,6 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IDeleteUserService
     {
-        Task<OptionalResult<string>> DeleteUser(OptionalResult<int> userId);
+        Task<ExceptionalResult> DeleteUser(UserModel user);
     }
 }

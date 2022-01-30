@@ -35,7 +35,7 @@ namespace Console.PrL.Commands.RoomCommands
 
             var rooms = (await this.roomService.GetRoomsForUser(user)).ToList();
 
-            var roomUpdateData = new RoomUpdateModel();
+            var roomUpdateData = new RoomEditModel();
 
             var apply = this.GetRoomUpdateData(rooms, roomUpdateData);
 
@@ -49,7 +49,7 @@ namespace Console.PrL.Commands.RoomCommands
             return new OptionalResult<string>();
         }
 
-        private bool GetRoomUpdateData(List<RoomModel> rooms, RoomUpdateModel roomUpdateData)
+        private bool GetRoomUpdateData(List<RoomModel> rooms, RoomEditModel roomUpdateData)
         {
             var apply = this.OutputAvailableRooms(rooms);
 
@@ -84,7 +84,7 @@ namespace Console.PrL.Commands.RoomCommands
             return apply;
         }
 
-        private void SetEditingRoomId(List<RoomModel> rooms, RoomUpdateModel roomUpdateData)
+        private void SetEditingRoomId(List<RoomModel> rooms, RoomEditModel roomUpdateData)
         {
             int index;
             while (true)
@@ -108,7 +108,7 @@ namespace Console.PrL.Commands.RoomCommands
             roomUpdateData.Id = rooms[index].Id;
         }
 
-        private void SetNewName(RoomUpdateModel roomUpdateData)
+        private void SetNewName(RoomEditModel roomUpdateData)
         {
             var newName = this.Console.Input("New Name(leave blank to not change): ");
 

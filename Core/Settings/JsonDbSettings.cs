@@ -6,5 +6,7 @@
         public string UserDirectory { get; set; }
 
         public string RoomDirectory { get; set; }
+
+        public string RoleDirectory { get; set; }
     }
 }

@@ -4,6 +4,6 @@ namespace Core.Models
 {
     public class BaseModel
     {
-        public OptionalResult<int> Id { get; set; }
+        public int Id { get; set; }
     }
 }

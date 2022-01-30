@@ -8,7 +8,7 @@ namespace BLL.Services.RoomServices
     {
         private const int MinNameLength = 3;
 
-        private const int MaxNameLength = 24;
+        private const int MaxNameLength = 32;
 
         public ExceptionalResult ValidateCreateModel(RoomCreateModel createModel)
         {

@@ -92,7 +92,10 @@ namespace BLL.Services.UserServices
 
         private async Task<UserModel> MapUserUpdateModel(UserUpdateModel user)
         {
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<UserUpdateModel, UserModel>(MemberList.Source));
+            var mapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<UserUpdateModel, UserModel>(MemberList.Source).ForAllMembers(opt => opt.AllowNull());
+            });
             var mapper = new Mapper(mapperConfig);
             var userObject = mapper.Map<UserModel>(user);
             var changingUser = (await this.GetByCondition(x => x.Id == user.Id)).First();
@@ -109,8 +112,6 @@ namespace BLL.Services.UserServices
             {
                 userObject.HashedPassword = this.HashingService.Hash(user.Password);
             }
-
-            userObject.IsActive = changingUser.IsActive || user.IsActive;
 
             return userObject;
         }

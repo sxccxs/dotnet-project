@@ -12,19 +12,13 @@ namespace Console.PrL.Commands.RoomCommands
     {
         private readonly IUserRoomService userRoomService;
         private readonly IAuthenticationService authenticationService;
-        private readonly IRoomService roomService;
-        private readonly IUserService userService;
 
         public AddUserToRoomCommand(
             IConsole console,
             IAuthenticationService authenticationService,
-            IRoomService roomService,
-            IUserService userService,
             IUserRoomService userRoomService)
             : base(console)
         {
-            this.roomService = roomService;
-            this.userService = userService;
             this.userRoomService = userRoomService;
             this.authenticationService = authenticationService;
         }
@@ -46,31 +40,25 @@ namespace Console.PrL.Commands.RoomCommands
 
             var rooms = (await this.userRoomService.GetRoomsForUser(user)).ToList();
             var apply = this.OutputAvailableRooms(rooms);
-
-            if (apply)
+            if (!apply)
             {
-                var roomIdResult = this.GetRoom(rooms);
-                if (!roomIdResult.IsSuccess)
-                {
-                    return new OptionalResult<string>(roomIdResult);
-                }
+                return new OptionalResult<string>();
+            }
 
-                var room = (await this.roomService.GetByCondition(x => x.Id.Value == roomIdResult.Value)).FirstOrDefault();
-                var users = (await this.userRoomService.GetUsersInRoom(room)).ToList();
+            var room = this.GetRoom(rooms);
 
-                var addUserId = this.GetUserToBeAddedId(users);
+            var users = (await this.userRoomService.GetUsersInRoom(room)).ToList();
 
-                var result = await this.userRoomService.AddUserToRoom(roomIdResult.Value, addUserId.Id);
-                if (result.IsSuccess)
-                {
-                    this.Console.Print($"User {addUserId} added successfully\n");
-                    return new OptionalResult<string>();
-                }
-
+            var email = this.Console.Input("What is the e-mail of the user you would like to add?: ");
+            var result = await this.userRoomService.AddUserToRoom(email, room);
+            if (!result.IsSuccess)
+            {
                 return new OptionalResult<string>(result);
             }
 
-            return new OptionalResult<string>(false);
+            this.Console.Print($"User with email {email} added successfully\n");
+
+            return new OptionalResult<string>();
         }
 
         private bool OutputAvailableRooms(List<RoomModel> rooms)
@@ -94,37 +82,29 @@ namespace Console.PrL.Commands.RoomCommands
             return apply;
         }
 
-        private OptionalResult<int> GetRoom(List<RoomModel> rooms)
+        private RoomModel GetRoom(List<RoomModel> rooms)
         {
+            int number;
             while (true)
             {
                 var parsed = int.TryParse(
-                    this.Console.Input("Which room would you like to add a user to? "), out var number);
-                if (rooms[number - 1].Id.IsSuccess)
+                    this.Console.Input("Which room would you like to add a user to? "), out number);
+                number--;
+                if (!parsed)
                 {
-                    return rooms[number - 1].Id;
+                    this.Console.Print("Enter a valid number");
                 }
-
-                this.Console.Print("Enter a valid number.");
-            }
-        }
-
-        private async Task<OptionalResult<int>> GetUserToBeAddedId(List<UserModel> users)
-        {
-            while (true)
-            {
-                var email = this.Console.Input("What is the e-mail of the user you would like to add?: ");
-                if (!string.IsNullOrWhiteSpace(email))
+                else if (number < 0 || number > rooms.Count)
                 {
-                    var user = (await this.userService.GetByCondition(x => x.Email == email)).FirstOrDefault();
-                    if (user.Id.IsSuccess)
-                    {
-                        return user.Id;
-                    }
+                    this.Console.Print("Enter valid in valid range.");
                 }
-
-                this.Console.Print("Enter a valid e-mail.");
+                else
+                {
+                    break;
+                }
             }
+
+            return rooms[number];
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BLL.Abstractions.Interfaces.RoomInterfaces;
+﻿using BLL.Abstractions.Interfaces.RoleInterfaces;
+using BLL.Abstractions.Interfaces.RoomInterfaces;
 using BLL.Abstractions.Interfaces.UserInterfaces;
 using Console.PrL.Commands;
 using Console.PrL.Commands.RoomCommands;
@@ -21,9 +22,10 @@ namespace Console.PrL
             IRegistrationService registrationService,
             IAccountActivationService accountActivationService,
             IAuthenticationService authenticationService,
+            IEditUserInfoService editUserInfoService,
+            IDeleteUserService deleteUserService,
             IUserRoomService userRoomService,
-            IUserService userService,
-            IRoomService roomService)
+            IUserRoomRoleService userRoomRoleService)
         {
             this.console = console;
 
@@ -33,12 +35,15 @@ namespace Console.PrL
                 new RegistrationCommand(console, registrationService),
                 new ActivationCommand(console, accountActivationService),
                 new MeCommand(console, authenticationService),
+                new EditAccountCommand(console, authenticationService, editUserInfoService),
+                new DeleteAccountCommand(console, authenticationService, deleteUserService),
                 new GetRoomsCommand(console, authenticationService, userRoomService),
                 new CreateRoomCommand(console, authenticationService, userRoomService),
                 new UpdateRoomCommand(console, authenticationService, userRoomService),
                 new DeleteRoomCommand(console, authenticationService, userRoomService),
-                new DeleteUserFromRoomCommand(console, userService, userRoomService, authenticationService, roomService),
-                new AddUserToRoomCommand(console, authenticationService, roomService, userService, userRoomService),
+                new DeleteUserFromRoomCommand(console, userRoomService, authenticationService),
+                new AddUserToRoomCommand(console, authenticationService, userRoomService),
+                new ChangeRoleCommand(console, authenticationService, userRoomService, userRoomRoleService),
             };
 
             commandsArray = commandsArray.Append(new HelpCommand(console, commandsArray)).ToArray();

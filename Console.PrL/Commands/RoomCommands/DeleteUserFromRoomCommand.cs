@@ -9,23 +9,17 @@ namespace Console.PrL.Commands
 {
     internal class DeleteUserFromRoomCommand : Command
     {
-        private readonly IUserService userService;
         private readonly IUserRoomService roomService;
-        private readonly IRoomService room1Service;
         private readonly IAuthenticationService authenticationService;
 
         public DeleteUserFromRoomCommand(
             IConsole console,
-            IUserService userService,
             IUserRoomService roomService,
-            IAuthenticationService authenticationService,
-            IRoomService room1Service)
+            IAuthenticationService authenticationService)
             : base(console)
         {
-            this.userService = userService;
             this.roomService = roomService;
             this.authenticationService = authenticationService;
-            this.room1Service = room1Service;
             this.Console = console;
         }
 
@@ -47,29 +41,21 @@ namespace Console.PrL.Commands
             var rooms = (await this.roomService.GetRoomsForUser(user)).ToList();
             var apply = this.OutputAvailableRooms(rooms);
 
-            if (apply)
+            if (!apply)
             {
-                var roomIdResult = this.GetRoom(rooms);
-                if (!roomIdResult.IsSuccess)
-                {
-                    return new OptionalResult<string>(roomIdResult);
-                }
+                return new OptionalResult<string>();
+            }
 
-                var room = (await this.room1Service.GetByCondition(x => x.Id.Value == roomIdResult.Value)).FirstOrDefault();
+            var room = this.GetSelectedItem(rooms);
+            var users = (await this.roomService.GetUsersInRoom(room)).ToList();
+            this.OutputAvailableUsers(users);
 
-                var users = (await this.roomService.GetUsersInRoom(room)).ToList();
-                var apply1 = this.OutputAvailableUsers(users);
+            var deleteUser = this.GetSelectedItem(users);
 
-                if (apply1)
-                {
-                    var deleteUserId = this.GetUserToBeDeletedId(users);
-
-                    var result = await this.roomService.DeleteUserFromRoom(deleteUserId.Result.Value, roomIdResult.Value);
-                    if (result.IsSuccess)
-                    {
-                        this.Console.Print($"User {deleteUserId} deleted from room {roomIdResult.Value} successfully\n");
-                    }
-                }
+            var result = await this.roomService.DeleteUserFromRoom(deleteUser, room);
+            if (result.IsSuccess)
+            {
+                this.Console.Print($"User {deleteUser.Id} deleted from room {room.Id} successfully\n");
             }
 
             return new OptionalResult<string>();
@@ -96,9 +82,8 @@ namespace Console.PrL.Commands
             return apply;
         }
 
-        private bool OutputAvailableUsers(List<UserModel> users)
+        private void OutputAvailableUsers(List<UserModel> users)
         {
-            var apply = true;
             this.Console.Print("Users in the room:\n");
             this.Console.Print("\n");
 
@@ -109,39 +94,30 @@ namespace Console.PrL.Commands
             }
 
             this.Console.Print("\n");
-            return apply;
         }
 
-        private OptionalResult<int> GetRoom(List<RoomModel> rooms)
+        private T GetSelectedItem<T>(List<T> rooms)
         {
+            int index;
             while (true)
             {
-                int.TryParse(this.Console.Input("Which room would you like to delete a user from? "), out var number);
-                if (rooms[number - 1].Id.IsSuccess)
+                var parsed = int.TryParse(this.Console.Input("Enter number of item to select: "), out index);
+                index--;
+                if (!parsed)
                 {
-                    return rooms[number - 1].Id;
+                    this.Console.Print("Enter a valid number.\n");
                 }
-
-                this.Console.Print("Enter a valid number.");
-            }
-        }
-
-        private async Task<OptionalResult<int>> GetUserToBeDeletedId(List<UserModel> users)
-        {
-            while (true)
-            {
-                var email = this.Console.Input("What is the username of the user you would like to delete?: ");
-                if (!string.IsNullOrWhiteSpace(email))
+                else if (index < 0 || index >= rooms.Count)
                 {
-                    var user = (await this.userService.GetByCondition(x => x.UserName == email)).FirstOrDefault();
-                    if (user.Id.IsSuccess)
-                    {
-                        return user.Id;
-                    }
+                    this.Console.Print("Enter a number, that is in range.\n");
                 }
-
-                this.Console.Print("Enter a valid username.");
+                else
+                {
+                    break;
+                }
             }
+
+            return rooms[index];
         }
     }
-    }
+}
