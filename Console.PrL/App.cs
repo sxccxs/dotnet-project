@@ -21,7 +21,9 @@ namespace Console.PrL
             IRegistrationService registrationService,
             IAccountActivationService accountActivationService,
             IAuthenticationService authenticationService,
-            IUserRoomService userRoomService)
+            IUserRoomService userRoomService,
+            IUserService userService,
+            IRoomService roomService)
         {
             this.console = console;
 
@@ -35,6 +37,8 @@ namespace Console.PrL
                 new CreateRoomCommand(console, authenticationService, userRoomService),
                 new UpdateRoomCommand(console, authenticationService, userRoomService),
                 new DeleteRoomCommand(console, authenticationService, userRoomService),
+                new DeleteUserFromRoomCommand(console, userService, userRoomService, authenticationService, roomService),
+                new AddUserToRoomCommand(console, authenticationService, roomService, userService, userRoomService),
             };
 
             commandsArray = commandsArray.Append(new HelpCommand(console, commandsArray)).ToArray();

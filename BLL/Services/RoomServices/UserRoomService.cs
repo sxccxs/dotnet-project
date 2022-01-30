@@ -1,4 +1,5 @@
-﻿using BLL.Abstractions.Interfaces.RoomInterfaces;
+﻿using System.Linq;
+using BLL.Abstractions.Interfaces.RoomInterfaces;
 using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.DataClasses;
 using Core.Models.RoomModels;
@@ -23,13 +24,13 @@ namespace BLL.Services.RoomServices
 
         public async Task<IEnumerable<RoomModel>> GetRoomsForUser(UserModel user)
         {
-            var tasks = await Task.WhenAll(user.Rooms.Select(id => this.roomService.GetByCondition(x => id == x.Id)));
+            var tasks = await Task.WhenAll(user.Rooms.Select(id => this.roomService.GetByCondition(x => id == x.Id.Value)));
             return tasks.Where(result => result is not null).Select(result => result.First());
         }
 
         public async Task<IEnumerable<UserModel>> GetUsersInRoom(RoomModel room)
         {
-            var tasks = await Task.WhenAll(room.Users.Select(id => this.userService.GetByCondition(x => x.Id == id)));
+            var tasks = await Task.WhenAll(room.Users.Select(id => this.userService.GetByCondition(x => x.Id.Value == id)));
             return tasks.Where(result => result is not null).Select(result => result.First());
         }
 
@@ -105,15 +106,87 @@ namespace BLL.Services.RoomServices
             return new ExceptionalResult();
         }
 
+        public async Task<ExceptionalResult> DeleteUserFromRoom(int roomId, int userId)
+        {
+            var room = (await this.roomService.GetByCondition(x => x.Id.Value == roomId)).FirstOrDefault();
+            var user = (await this.userService.GetByCondition(x => x.Id.Value == userId)).FirstOrDefault();
+
+            if (room is null)
+            {
+                return new ExceptionalResult(false, $"Room with id {room.Id} does not exist");
+            }
+
+            if (user is null)
+            {
+                return new ExceptionalResult(false, $"User with id {user.Id} does not exist");
+            }
+
+            if (!room.Users.Contains(user.Id.Value))
+            {
+                return new ExceptionalResult(false, $"User with id {user.Id} does not belong to room with id {room.Id}");
+            }
+
+            var userUpdateModel = new UserUpdateModel()
+            {
+                Id = user.Id.Value,
+                Rooms = user.Rooms.Where(x => x != room.Id.Value).ToList(),
+            };
+            await this.userService.Update(userUpdateModel);
+            var roomUpdateModel = new RoomUpdateModel()
+            {
+                Id = room.Id.Value,
+                Users = room.Users.Where(x => x != user.Id.Value).ToList(),
+            };
+            await this.roomService.Update(roomUpdateModel);
+            return new ExceptionalResult();
+        }
+
+        public async Task<ExceptionalResult> AddUserToRoom(int roomId, int userId)
+        {
+            var room = (await this.roomService.GetByCondition(x => x.Id.Value == roomId)).FirstOrDefault();
+            var user = (await this.userService.GetByCondition(x => x.Id.Value == userId)).FirstOrDefault();
+
+            if (room is null)
+            {
+                return new ExceptionalResult(false, $"Room with id {room.Id} does not exist");
+            }
+
+            if (user is null)
+            {
+                return new ExceptionalResult(false, $"User with id {user.Id} does not exist");
+            }
+
+            if (room!.Users.Contains(user!.Id.Value))
+            {
+                return new ExceptionalResult(false, $"User with id {user.Id} already belongs to room with id {room.Id}");
+            }
+
+            user.Rooms.Add(room.Id.Value);
+            var updateModel = new UserUpdateModel()
+            {
+                Id = user.Id.Value,
+                Rooms = user.Rooms,
+            };
+            await this.userService.Update(updateModel);
+            room.Users.Add(userId);
+            var roomUpdateModel = new RoomUpdateModel()
+            {
+                Id = room.Id.Value,
+                Users = room.Users,
+            };
+            await this.roomService.Update(roomUpdateModel);
+            return new ExceptionalResult();
+        }
+
         public async Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomUpdateModel updateModel)
         {
-            var room = (await this.roomService.GetByCondition(x => x.Id == updateModel.Id)).FirstOrDefault();
+            var room = (await this.roomService.GetByCondition(x => x.Id.Value == updateModel.Id)).FirstOrDefault();
             if (room is null)
             {
                 return new ExceptionalResult(false, $"Room with id {updateModel.Id} does not exist");
             }
 
-            if (!room.Users.Contains(user.Id))
+            if (!room.Users.Contains(user.Id.Value))
             {
                 return new ExceptionalResult(false, $"User with id {user.Id} does not belong to room with id {room.Id}");
             }

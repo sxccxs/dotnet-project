@@ -30,7 +30,7 @@ namespace DAL.Workers
 
         public async Task<int> GetNextId()
         {
-            return (await this.GetAll()).OrderBy(x => x.Id).LastOrDefault()?.Id + 1 ?? 1;
+            return (await this.GetAll()).OrderBy(x => x.Id).LastOrDefault()?.Id.Value + 1 ?? 1;
         }
 
         public async Task Create(T entity)

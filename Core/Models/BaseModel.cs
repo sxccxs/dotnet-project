@@ -1,7 +1,9 @@
-﻿namespace Core.Models
+﻿using Core.DataClasses;
+
+namespace Core.Models
 {
     public class BaseModel
     {
-        public int Id { get; set; }
+        public OptionalResult<int> Id { get; set; }
     }
 }

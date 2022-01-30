@@ -28,6 +28,8 @@ namespace BLL
             services.AddScoped<IAccountActivationService, AccountActivationService>();
             services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IDeleteUserService, DeleteUserService>();
+            services.AddScoped<IEditUserInfoService, EditUserInfoService>();
         }
 
         private static void ConfigureRoomServices(IServiceCollection services)

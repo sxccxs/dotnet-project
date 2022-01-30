@@ -15,5 +15,9 @@ namespace BLL.Abstractions.Interfaces.RoomInterfaces
         Task<IEnumerable<RoomModel>> GetRoomsForUser(UserModel user);
 
         Task<IEnumerable<UserModel>> GetUsersInRoom(RoomModel room);
+
+        Task<ExceptionalResult> AddUserToRoom(int userId, int roomId);
+
+        Task<ExceptionalResult> DeleteUserFromRoom(int userId, int roomId);
     }
 }
