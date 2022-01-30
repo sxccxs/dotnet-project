@@ -5,6 +5,6 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IEditUserInfoService
     {
-        Task<OptionalResult<string>> EditUser(OptionalResult<int> userId);
+        Task<OptionalResult<string>> EditUser(OptionalResult<UserUpdateModel> user, string updatedInfo);
     }
 }

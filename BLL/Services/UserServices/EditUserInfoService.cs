@@ -17,21 +17,47 @@ namespace BLL.Services.UserServices
 
         private readonly ITokenGeneratorService tokenGeneratorService;
 
-        public EditUserInfoService(IUserService userService, IAuthenticationService authenticationService, IEmailService emailService, AppSettings appSettings, ITokenGeneratorService tokenGeneratorService)
+        private readonly IUpdateValidationService updateValidationService;
+
+        public EditUserInfoService(
+            IUserService userService,
+            IAuthenticationService authenticationService,
+            IEmailService emailService,
+            AppSettings appSettings,
+            ITokenGeneratorService tokenGeneratorService,
+            IUpdateValidationService updateValidationService)
         {
             this.userService = userService;
             this.authenticationService = authenticationService;
             this.emailService = emailService;
             this.appSettings = appSettings;
             this.tokenGeneratorService = tokenGeneratorService;
+            this.updateValidationService = updateValidationService;
         }
 
-        public async Task<OptionalResult<string>> EditUser(OptionalResult<int> userId)
+        public async Task<OptionalResult<string>> EditUser(OptionalResult<UserUpdateModel> user, string updatedInfo)
         {
-            var user = (await this.userService.GetByCondition(x => x.Id == userId)).FirstOrDefault();
-            if (user.Id.IsSuccess)
+            switch (updatedInfo)
             {
+                case "password": this.updateValidationService.ValidatePassword(user.Value.Password);
+                    break;
+
+                case "email": this.updateValidationService.ValidatePassword(user.Value.Email);
+                    break;
+
+                case "username": this.updateValidationService.ValidatePassword(user.Value.UserName);
+                    break;
+                default: return new OptionalResult<string>("wrong info");
             }
+
+            var result = await this.userService.Update(user.Value);
+            if (result.IsSuccess)
+            {
+                await this.SendChangesEmail(result.Value);
+                return new OptionalResult<string>(true, "Successfully changed user information.");
+            }
+
+            return new OptionalResult<string>(false, "User Information was not changed.");
         }
 
         private async Task SendChangesEmail(UserModel user)
