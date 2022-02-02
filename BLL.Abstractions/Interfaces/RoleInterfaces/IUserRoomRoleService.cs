@@ -19,5 +19,7 @@ namespace BLL.Abstractions.Interfaces.RoleInterfaces
         Task<OptionalResult<RoleModel>> DeleteRoleForUserAndRoom(UserModel user, RoomModel room);
 
         Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, Role role);
+
+        Task<ExceptionalResult> CheckOneAdminInRoom(UserModel user, RoomModel room);
     }
 }

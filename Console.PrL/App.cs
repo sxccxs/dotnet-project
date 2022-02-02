@@ -5,6 +5,7 @@ using Console.PrL.Commands;
 using Console.PrL.Commands.RoomCommands;
 using Console.PrL.Commands.UserCommands;
 using Console.PrL.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Console.PrL
 {
@@ -12,21 +13,25 @@ namespace Console.PrL
     {
         private readonly IConsole console;
 
+        private readonly ILogger logger;
+
         private readonly Dictionary<string, Command> commands;
 
         private string authToken;
 
         public App(
+            ILogger<App> logger,
             IConsole console,
             ILoginService loginService,
             IRegistrationService registrationService,
             IAccountActivationService accountActivationService,
             IAuthenticationService authenticationService,
             IEditUserInfoService editUserInfoService,
-            IDeleteUserService deleteUserService,
+            IUserService userService,
             IUserRoomService userRoomService,
             IUserRoomRoleService userRoomRoleService)
         {
+            this.logger = logger;
             this.console = console;
 
             var commandsArray = new Command[]
@@ -36,7 +41,7 @@ namespace Console.PrL
                 new ActivationCommand(console, accountActivationService),
                 new MeCommand(console, authenticationService),
                 new EditAccountCommand(console, authenticationService, editUserInfoService),
-                new DeleteAccountCommand(console, authenticationService, deleteUserService),
+                new DeleteAccountCommand(console, authenticationService, userService),
                 new GetRoomsCommand(console, authenticationService, userRoomService),
                 new CreateRoomCommand(console, authenticationService, userRoomService),
                 new UpdateRoomCommand(console, authenticationService, userRoomService),
@@ -67,20 +72,28 @@ namespace Console.PrL
 
                 if (this.commands.ContainsKey(command))
                 {
-                    var cmd = this.commands[command];
-                    var result = await cmd.Execute(this.authToken);
-                    if (cmd is LoginCommand && result.IsSuccess)
+                    try
                     {
-                        this.authToken = result.Value;
+                        var cmd = this.commands[command];
+                        var result = await cmd.Execute(this.authToken);
+                        if (cmd is LoginCommand && result.IsSuccess)
+                        {
+                            this.authToken = result.Value;
+                        }
+                        else if (!result.IsSuccess)
+                        {
+                            this.console.Print($"{result.ExceptionMessage}");
+                        }
                     }
-                    else if (!result.IsSuccess)
+                    catch (Exception ex)
                     {
-                        this.console.Print($"{result.ExceptionMessage}\n");
+                        this.logger.LogError(ex.Message);
+                        throw;
                     }
                 }
                 else
                 {
-                    this.console.Print($"Invalid command {command}.\n");
+                    this.console.Print($"Invalid command {command}.");
                 }
             }
         }

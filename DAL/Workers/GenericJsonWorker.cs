@@ -1,6 +1,7 @@
 ﻿using Core.Models;
 using Core.Settings;
 using DAL.Abstractions.Interfaces;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace DAL.Workers
@@ -9,18 +10,24 @@ namespace DAL.Workers
         where T : BaseModel
     {
         private readonly IReaderWriter readerWriter;
+
         private readonly string storagePath;
 
-        public GenericJsonWorker(IReaderWriter readerWriter, IOptions<JsonDbSettings> settings)
-        {
-            this.readerWriter = readerWriter;
-            this.storagePath = settings.Value is not null ? this.GetFilePath(settings.Value)
-                                                          : throw new ArgumentNullException(nameof(settings));
-        }
+        private readonly ILogger logger;
 
-        public async Task<IEnumerable<T>> GetAll()
+        public GenericJsonWorker(ILogger<GenericJsonWorker<T>> logger, IReaderWriter readerWriter, IOptions<JsonDbSettings> settings)
         {
-            return await this.readerWriter.Read<IEnumerable<T>>(this.storagePath);
+            this.logger = logger;
+            this.readerWriter = readerWriter;
+            try
+            {
+                this.storagePath = this.GetFilePath(settings.Value);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogCritical(ex.Message);
+                throw;
+            }
         }
 
         public async Task<IEnumerable<T>> GetByCondition(Func<T, bool> condition)
@@ -56,7 +63,7 @@ namespace DAL.Workers
             await this.readerWriter.Write(this.storagePath, data);
         }
 
-        public string GetFilePath(JsonDbSettings settings)
+        private string GetFilePath(JsonDbSettings settings)
         {
             string removePostfix = "Model", addPostfix = "Directory";
             var propertyName = typeof(T).Name.Replace(removePostfix, addPostfix);
@@ -64,7 +71,12 @@ namespace DAL.Workers
                            .GetProperty(propertyName)
                            ?.GetValue(settings)
                            ?.ToString()
-                           ?? throw new ArgumentNullException(nameof(settings));
+                           ?? throw new ArgumentNullException($"There are no settings config or no json file for {typeof(T).FullName}");
+        }
+
+        private async Task<IEnumerable<T>> GetAll()
+        {
+            return await this.readerWriter.Read<IEnumerable<T>>(this.storagePath);
         }
     }
 }

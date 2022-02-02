@@ -66,27 +66,27 @@ namespace Console.PrL.Commands.RoomCommands
                 return new OptionalResult<string>(updateResult);
             }
 
-            this.Console.Print("Role changes successfuly\n");
+            this.Console.Print("Role changes successfuly");
 
             return new OptionalResult<string>();
         }
 
         private bool ListRooms(List<RoomModel> rooms)
         {
-            this.Console.Print("Select room:\n");
-            this.Console.Print("\n");
+            this.Console.Print("Select room:");
+            this.Console.Print();
             if (rooms.Count == 0)
             {
-                this.Console.Print("<It's empty here...>\n");
+                this.Console.Print("<It's empty here...>");
             }
 
             for (int i = 0; i < rooms.Count; i++)
             {
                 var room = rooms[i];
-                this.Console.Print($"{i + 1}) {room.Name}\n");
+                this.Console.Print($"{i + 1}) {room.Name}");
             }
 
-            this.Console.Print("\n");
+            this.Console.Print();
 
             return rooms.Count != 0;
         }
@@ -100,11 +100,11 @@ namespace Console.PrL.Commands.RoomCommands
                 index--;
                 if (!parsed)
                 {
-                    this.Console.Print("Enter a valid number.\n");
+                    this.Console.Print("Enter a valid number.");
                 }
                 else if (index < 0 || index >= rooms.Count)
                 {
-                    this.Console.Print("Enter a number, that is in range.\n");
+                    this.Console.Print("Enter a number, that is in range.");
                 }
                 else
                 {
@@ -117,27 +117,27 @@ namespace Console.PrL.Commands.RoomCommands
 
         private async Task ListUsers(List<UserModel> users, RoomModel room)
         {
-            this.Console.Print("Select room:\n");
-            this.Console.Print("\n");
+            this.Console.Print("Select room:");
+            this.Console.Print();
 
             for (int i = 0; i < users.Count; i++)
             {
                 var user = users[i];
                 var role = await this.roleService.GetRoleForUserAndRoom(user, room);
-                this.Console.Print($"{i + 1}) {user.UserName} {user.Email} {role.Role}\n");
+                this.Console.Print($"{i + 1}) {user.UserName} {user.Email} {role.Role}");
             }
 
-            this.Console.Print("\n");
+            this.Console.Print();
         }
 
         private void ListRoles(UserModel user)
         {
-            this.Console.Print($"Select new role for user {user.UserName}:\n");
+            this.Console.Print($"Select new role for user {user.UserName}:");
             var values = Enum.GetValues(typeof(Role)).Cast<Role>().ToList();
             for (var i = 0; i < values.Count(); i++)
             {
                 var role = values[i];
-                this.Console.Print($"{i + 1}) {role}\n");
+                this.Console.Print($"{i + 1}) {role}");
             }
         }
     }

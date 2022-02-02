@@ -103,15 +103,26 @@ namespace BLL.Services.RoleServices
 
             if (role == Role.MEMBER)
             {
-                var roomRoles = await this.GetRolesForRoom(room);
-                if (!roomRoles.Any(x => x.Role == Role.ADMIN && x.UserId != user.Id))
+                var checkResult = await this.CheckOneAdminInRoom(user, room);
+                if (!checkResult.IsSuccess)
                 {
-                    return new ExceptionalResult(false, "Room must have at least one admin. Make someone else admin first");
+                    return checkResult;
                 }
             }
 
             userRole.Role = role;
             await this.roleService.Update(userRole);
+
+            return new ExceptionalResult();
+        }
+
+        public async Task<ExceptionalResult> CheckOneAdminInRoom(UserModel user, RoomModel room)
+        {
+            var roomRoles = await this.GetRolesForRoom(room);
+            if (!roomRoles.Any(x => x.Role == Role.ADMIN && x.UserId != user.Id))
+            {
+                return new ExceptionalResult(false, "Room must have at least one admin. Make someone else admin first");
+            }
 
             return new ExceptionalResult();
         }

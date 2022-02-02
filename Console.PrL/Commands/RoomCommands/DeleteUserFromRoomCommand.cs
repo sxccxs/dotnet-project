@@ -53,10 +53,12 @@ namespace Console.PrL.Commands
             var deleteUser = this.GetSelectedItem(users);
 
             var result = await this.roomService.DeleteUserFromRoom(deleteUser, room);
-            if (result.IsSuccess)
+            if (!result.IsSuccess)
             {
-                this.Console.Print($"User {deleteUser.Id} deleted from room {room.Id} successfully\n");
+                return new OptionalResult<string>(result);
             }
+
+            this.Console.Print($"User {deleteUser.Id} deleted from room {room.Id} successfully");
 
             return new OptionalResult<string>();
         }
@@ -64,36 +66,36 @@ namespace Console.PrL.Commands
         private bool OutputAvailableRooms(List<RoomModel> rooms)
         {
             var apply = true;
-            this.Console.Print("Rooms you are in:\n");
-            this.Console.Print("\n");
+            this.Console.Print("Rooms you are in:");
+            this.Console.Print();
             if (rooms.Count == 0)
             {
-                this.Console.Print("<You don't have any rooms to edit>\n");
+                this.Console.Print("<You don't have any rooms to edit>");
                 apply = false;
             }
 
             for (int i = 0; i < rooms.Count; i++)
             {
                 var room = rooms[i];
-                this.Console.Print($"{i + 1}) {room.Name}\n");
+                this.Console.Print($"{i + 1}) {room.Name}");
             }
 
-            this.Console.Print("\n");
+            this.Console.Print();
             return apply;
         }
 
         private void OutputAvailableUsers(List<UserModel> users)
         {
-            this.Console.Print("Users in the room:\n");
-            this.Console.Print("\n");
+            this.Console.Print("Users in the room:");
+            this.Console.Print();
 
             for (int i = 0; i < users.Count; i++)
             {
                 var user = users[i];
-                this.Console.Print($"{i + 1}) {user.UserName}\n");
+                this.Console.Print($"{i + 1}) {user.UserName} {user.Email}");
             }
 
-            this.Console.Print("\n");
+            this.Console.Print();
         }
 
         private T GetSelectedItem<T>(List<T> rooms)
@@ -105,11 +107,11 @@ namespace Console.PrL.Commands
                 index--;
                 if (!parsed)
                 {
-                    this.Console.Print("Enter a valid number.\n");
+                    this.Console.Print("Enter a valid number.");
                 }
                 else if (index < 0 || index >= rooms.Count)
                 {
-                    this.Console.Print("Enter a number, that is in range.\n");
+                    this.Console.Print("Enter a number, that is in range.");
                 }
                 else
                 {

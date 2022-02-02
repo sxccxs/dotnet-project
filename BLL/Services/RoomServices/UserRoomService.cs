@@ -134,6 +134,15 @@ namespace BLL.Services.RoomServices
                 return new ExceptionalResult(false, $"User with id {user.Id} does not belong to room with id {room.Id}");
             }
 
+            if (userRole.Role == Role.ADMIN)
+            {
+                var checkResult = await this.roleService.CheckOneAdminInRoom(user, room);
+                if (!checkResult.IsSuccess)
+                {
+                    return checkResult;
+                }
+            }
+
             var deleteResult = await this.roleService.DeleteRoleForUserAndRoom(user, room);
             if (!deleteResult.IsSuccess)
             {
@@ -159,10 +168,16 @@ namespace BLL.Services.RoomServices
 
         public async Task<ExceptionalResult> AddUserToRoom(string email, RoomModel room)
         {
-            var user = (await this.userService.GetByCondition(x => x.Email == email)).FirstOrDefault();
+            var user = (await this.userService.GetActiveUsers(x => x.Email == email)).FirstOrDefault();
             if (user is null)
             {
                 return new ExceptionalResult(false, $"User with email {email} does not exist");
+            }
+
+            var userRole = await this.roleService.GetRoleForUserAndRoom(user, room);
+            if (userRole is not null)
+            {
+                return new ExceptionalResult(false, $"User with email {email} already in room {room.Id}");
             }
 
             user.Rooms.Add(room.Id);
@@ -224,7 +239,7 @@ namespace BLL.Services.RoomServices
 
             if (!room.Users.Contains(user.Id) || userRole.Role != Role.ADMIN)
             {
-                return new OptionalResult<RoomModel>(false, $"User with id {user.Id} does not have rights to delete room or does not belong to room with id {room.Id}");
+                return new OptionalResult<RoomModel>(false, $"User with id {user.Id} does not have rights for this operation or does not belong to room with id {room.Id}");
             }
 
             return new OptionalResult<RoomModel>(room);

@@ -10,6 +10,6 @@ namespace Console.PrL.Interfaces
     {
         string Input(string text);
 
-        void Print(string text);
+        void Print(string text = "", string end = "\n");
     }
 }

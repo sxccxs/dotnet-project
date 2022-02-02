@@ -26,10 +26,10 @@ namespace Console.PrL.Commands
 
         private void Output()
         {
-            this.Console.Print("Possible commands:\n");
+            this.Console.Print("Possible commands:");
             foreach (var command in this.commands)
             {
-                this.Console.Print($"    {command.Name}: {command.Description}\n");
+                this.Console.Print($"    {command.Name}: {command.Description}");
             }
         }
     }

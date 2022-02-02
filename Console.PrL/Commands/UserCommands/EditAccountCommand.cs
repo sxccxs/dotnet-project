@@ -38,7 +38,7 @@ namespace Console.PrL.Commands.UserCommands
                 return new OptionalResult<string>(result);
             }
 
-            this.Console.Print("Updated successfully\n");
+            this.Console.Print("Updated successfully");
 
             return new OptionalResult<string>();
         }
@@ -58,7 +58,7 @@ namespace Console.PrL.Commands.UserCommands
             var email = this.Console.Input("Enter new email(leave blank to leave previous): ");
             if (!string.IsNullOrWhiteSpace(email))
             {
-                this.Console.Print("You will have to confirm your email again. Activation email will be sent to you\n");
+                this.Console.Print("You will have to confirm your email again. Activation email will be sent to you");
                 editModel.Email = email;
             }
 
@@ -67,7 +67,7 @@ namespace Console.PrL.Commands.UserCommands
             {
                 if (!this.CheckOldPassword(user))
                 {
-                    this.Console.Print("Old password is incorrect\n");
+                    this.Console.Print("Old password is incorrect");
                 }
                 else
                 {

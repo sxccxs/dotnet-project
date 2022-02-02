@@ -29,14 +29,14 @@ namespace Console.PrL.Commands.UserCommands
                 return new OptionalResult<string>(registrationResult);
             }
 
-            this.Console.Print("You registered successfully. Account activation email was sent to your address\n");
+            this.Console.Print("You registered successfully. Account activation email was sent to your address");
 
             return new OptionalResult<string>();
         }
 
         private UserRegistrationModel GetRegistrationInfo()
         {
-            this.Console.Print("\n");
+            this.Console.Print();
             var registrationModel = new UserRegistrationModel()
             {
                 UserName = this.Console.Input("Username: "),
@@ -44,7 +44,7 @@ namespace Console.PrL.Commands.UserCommands
                 Password = this.Console.Input("Password: "),
                 RePassword = this.Console.Input("Repeat password: "),
             };
-            this.Console.Print("\n");
+            this.Console.Print();
 
             return registrationModel;
         }

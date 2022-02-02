@@ -21,9 +21,9 @@ namespace Console.PrL.Utilities
             return System.Console.ReadLine().Trim();
         }
 
-        public void Print(string text)
+        public void Print(string text = "", string end = "\n")
         {
-            System.Console.Write($"{this.outputPrefix} {text}");
+            System.Console.Write($"{this.outputPrefix} {text}{end}");
         }
     }
 }

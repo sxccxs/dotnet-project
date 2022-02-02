@@ -11,8 +11,6 @@ namespace BLL.Abstractions.Interfaces.RoleInterfaces
 
         Task<OptionalResult<RoleModel>> Update(RoleModel role);
 
-        Task<IEnumerable<RoleModel>> Get();
-
         Task<IEnumerable<RoleModel>> GetByCondition(Func<RoleModel, bool> condition);
     }
 }

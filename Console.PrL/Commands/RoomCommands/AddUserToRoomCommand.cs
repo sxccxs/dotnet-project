@@ -56,7 +56,7 @@ namespace Console.PrL.Commands.RoomCommands
                 return new OptionalResult<string>(result);
             }
 
-            this.Console.Print($"User with email {email} added successfully\n");
+            this.Console.Print($"User with email {email} added successfully");
 
             return new OptionalResult<string>();
         }
@@ -64,21 +64,21 @@ namespace Console.PrL.Commands.RoomCommands
         private bool OutputAvailableRooms(List<RoomModel> rooms)
         {
             var apply = true;
-            this.Console.Print("Rooms you are in:\n");
-            this.Console.Print("\n");
+            this.Console.Print("Rooms you are in:");
+            this.Console.Print();
             if (rooms.Count == 0)
             {
-                this.Console.Print("<You don't have any rooms to edit>\n");
+                this.Console.Print("<You don't have any rooms to edit>");
                 apply = false;
             }
 
             for (int i = 0; i < rooms.Count; i++)
             {
                 var room = rooms[i];
-                this.Console.Print($"{i + 1}) {room.Name}\n");
+                this.Console.Print($"{i + 1}) {room.Name}");
             }
 
-            this.Console.Print("\n");
+            this.Console.Print();
             return apply;
         }
 

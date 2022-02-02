@@ -4,6 +4,7 @@ using Console.PrL.Utilities;
 using Core.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace Console.PrL
 {
@@ -11,6 +12,9 @@ namespace Console.PrL
     {
         public static async Task Main()
         {
+            Log.Logger = new LoggerConfiguration()
+                             .WriteTo.File("applog.log")
+                             .CreateLogger();
             var services = new ServiceCollection();
             ConfigureServices(services);
             var serviceProvider = services.BuildServiceProvider();
@@ -32,6 +36,7 @@ namespace Console.PrL
             DependencyRegistrar.ConfigureServices(services);
             services.AddScoped<IConsole, CustomConsole>();
             services.AddScoped<App>();
+            services.AddLogging(configure => configure.AddSerilog());
         }
     }
 }

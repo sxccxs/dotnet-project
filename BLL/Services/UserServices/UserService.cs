@@ -18,14 +18,14 @@ namespace BLL.Services.UserServices
 
         public IHashingService HashingService { get; private set; }
 
-        public async Task<IEnumerable<UserModel>> Get()
-        {
-            return (await this.storage.GetAll()).Where(x => x.IsActive);
-        }
-
         public async Task<IEnumerable<UserModel>> GetByCondition(Func<UserModel, bool> condition)
         {
-            return (await this.Get()).Where(condition);
+            return await this.storage.GetByCondition(condition);
+        }
+
+        public async Task<IEnumerable<UserModel>> GetActiveUsers(Func<UserModel, bool> additionalCondition)
+        {
+            return await this.GetByCondition(x => x.IsActive && additionalCondition(x));
         }
 
         public async Task<OptionalResult<UserModel>> CreateNonActiveUser(UserCreateModel user)

@@ -41,9 +41,13 @@ namespace Console.PrL.Commands.RoomCommands
 
             if (apply)
             {
-                await this.roomService.UpdateRoomForUser(user, roomUpdateData);
+                var result = await this.roomService.UpdateRoomForUser(user, roomUpdateData);
+                if (!result.IsSuccess)
+                {
+                    return new OptionalResult<string>(result);
+                }
 
-                this.Console.Print("Room updated successfully\n");
+                this.Console.Print("Room updated successfully");
             }
 
             return new OptionalResult<string>();
@@ -66,21 +70,21 @@ namespace Console.PrL.Commands.RoomCommands
         private bool OutputAvailableRooms(List<RoomModel> rooms)
         {
             var apply = true;
-            this.Console.Print("Rooms you are in:\n");
-            this.Console.Print("\n");
+            this.Console.Print("Rooms you are in:");
+            this.Console.Print();
             if (rooms.Count == 0)
             {
-                this.Console.Print("<You don't have any rooms to edit>\n");
+                this.Console.Print("<You don't have any rooms to edit>");
                 apply = false;
             }
 
             for (int i = 0; i < rooms.Count; i++)
             {
                 var room = rooms[i];
-                this.Console.Print($"{i + 1}) {room.Name}\n");
+                this.Console.Print($"{i + 1}) {room.Name}");
             }
 
-            this.Console.Print("\n");
+            this.Console.Print();
             return apply;
         }
 
@@ -93,11 +97,11 @@ namespace Console.PrL.Commands.RoomCommands
                 index--;
                 if (!parsed)
                 {
-                    this.Console.Print("Enter a valid number.\n");
+                    this.Console.Print("Enter a valid number.");
                 }
                 else if (index < 0 || index >= rooms.Count)
                 {
-                    this.Console.Print("Enter a number, that is in range of rooms.\n");
+                    this.Console.Print("Enter a number, that is in range of rooms.");
                 }
                 else
                 {

@@ -25,7 +25,7 @@ namespace Console.PrL.Commands.UserCommands
             var tokenResult = await this.loginService.Login(userData);
             if (tokenResult.IsSuccess)
             {
-                this.Console.Print("Logged in successfully\n");
+                this.Console.Print("Logged in successfully");
             }
 
             return tokenResult;
@@ -33,13 +33,13 @@ namespace Console.PrL.Commands.UserCommands
 
         private UserLoginModel GetLoginInfo()
         {
-            this.Console.Print("\n");
+            this.Console.Print();
             var userLoginModel = new UserLoginModel
             {
                 Email = this.Console.Input("Email: "),
                 Password = this.Console.Input("Password: "),
             };
-            this.Console.Print("\n");
+            this.Console.Print();
             return userLoginModel;
         }
     }

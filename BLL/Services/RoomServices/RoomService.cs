@@ -15,11 +15,6 @@ namespace BLL.Services.RoomServices
             this.storage = storage;
         }
 
-        public async Task<IEnumerable<RoomModel>> GetAll()
-        {
-            return await this.storage.GetAll();
-        }
-
         public async Task<IEnumerable<RoomModel>> GetByCondition(Func<RoomModel, bool> condition)
         {
             return await this.storage.GetByCondition(condition);

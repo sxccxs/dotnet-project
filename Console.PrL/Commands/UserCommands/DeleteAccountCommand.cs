@@ -8,13 +8,13 @@ namespace Console.PrL.Commands.UserCommands
     {
         private readonly IAuthenticationService authenticationService;
 
-        private readonly IDeleteUserService deleteService;
+        private readonly IUserService userService;
 
-        public DeleteAccountCommand(IConsole console, IAuthenticationService authenticationService, IDeleteUserService deleteService)
+        public DeleteAccountCommand(IConsole console, IAuthenticationService authenticationService, IUserService userService)
             : base(console)
         {
             this.authenticationService = authenticationService;
-            this.deleteService = deleteService;
+            this.userService = userService;
         }
 
         public override string Name => "/deleteAccount";
@@ -35,7 +35,7 @@ namespace Console.PrL.Commands.UserCommands
                 return new OptionalResult<string>();
             }
 
-            var deleteResult = await this.deleteService.DeleteUser(userResult.Value);
+            var deleteResult = await this.userService.Delete(userResult.Value.Id);
             if (!deleteResult.IsSuccess)
             {
                 return new OptionalResult<string>(deleteResult);
@@ -48,7 +48,7 @@ namespace Console.PrL.Commands.UserCommands
 
         private bool Ask()
         {
-            var input = this.Console.Input("Are you sure you want to delete your account?[y/N]").ToLower();
+            var input = this.Console.Input("Are you sure you want to delete your account?[y/N]: ").ToLower();
             return (new string[] { "yes", "y" }).Contains(input);
         }
     }
