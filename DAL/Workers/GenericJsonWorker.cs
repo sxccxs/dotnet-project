@@ -1,4 +1,5 @@
-﻿using Core.Models;
+﻿using System.Linq.Expressions;
+using Core.Models;
 using Core.Settings;
 using DAL.Abstractions.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -13,11 +14,8 @@ namespace DAL.Workers
 
         private readonly string storagePath;
 
-        private readonly ILogger logger;
-
         public GenericJsonWorker(ILogger<GenericJsonWorker<T>> logger, IReaderWriter readerWriter, IOptions<JsonDbSettings> settings)
         {
-            this.logger = logger;
             this.readerWriter = readerWriter;
             try
             {
@@ -25,23 +23,25 @@ namespace DAL.Workers
             }
             catch (Exception ex)
             {
-                this.logger.LogCritical(ex.Message);
+                logger.LogCritical(ex.Message);
                 throw;
             }
         }
 
-        public async Task<IEnumerable<T>> GetByCondition(Func<T, bool> condition)
+        public async Task<IEnumerable<T>> GetByConditions(Expression<Func<T, bool>>[] conditions, params Expression<Func<T, object>>[] includes)
         {
-            return (await this.GetAll()).Where(condition);
-        }
+            var result = await this.GetAll();
+            foreach (var condition in conditions)
+            {
+                result = result.Where(condition.Compile());
+            }
 
-        public async Task<int> GetNextId()
-        {
-            return (await this.GetAll()).OrderBy(x => x.Id).LastOrDefault()?.Id + 1 ?? 1;
+            return result;
         }
 
         public async Task Create(T entity)
         {
+            entity.Id = await this.GetNextId();
             var data = (await this.GetAll()).ToList();
             data.Add(entity);
             await this.readerWriter.Write(this.storagePath, data);
@@ -61,6 +61,11 @@ namespace DAL.Workers
             var index = data.IndexOf(data.FirstOrDefault(x => x.Id == entity.Id));
             data[index] = entity;
             await this.readerWriter.Write(this.storagePath, data);
+        }
+
+        private async Task<int> GetNextId()
+        {
+            return (await this.GetAll()).OrderBy(x => x.Id).LastOrDefault()?.Id + 1 ?? 1;
         }
 
         private string GetFilePath(JsonDbSettings settings)

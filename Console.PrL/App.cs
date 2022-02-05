@@ -27,7 +27,6 @@ namespace Console.PrL
             IAccountActivationService accountActivationService,
             IAuthenticationService authenticationService,
             IEditUserInfoService editUserInfoService,
-            IUserService userService,
             IUserRoomService userRoomService,
             IUserRoomRoleService userRoomRoleService)
         {
@@ -41,7 +40,7 @@ namespace Console.PrL
                 new ActivationCommand(console, accountActivationService),
                 new MeCommand(console, authenticationService),
                 new EditAccountCommand(console, authenticationService, editUserInfoService),
-                new DeleteAccountCommand(console, authenticationService, userService),
+                new DeleteAccountCommand(console, authenticationService, userRoomService),
                 new GetRoomsCommand(console, authenticationService, userRoomService),
                 new CreateRoomCommand(console, authenticationService, userRoomService),
                 new UpdateRoomCommand(console, authenticationService, userRoomService),

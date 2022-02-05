@@ -1,13 +1,13 @@
-﻿namespace Core.Models.RoomModels
+﻿using Core.Models.UserModels;
+
+namespace Core.Models.RoomModels
 {
     public class RoomModel : BaseModel
     {
         public string Name { get; set; }
 
-        public List<int> Users { get; set; }
+        public ICollection<RoleModel> Roles { get; set; } = new HashSet<RoleModel>();
 
-        public List<int> Roles { get; set; }
-
-        public List<int> Chats { get; set; }
+        public ICollection<UserModel> Users { get; set; } = new HashSet<UserModel>();
     }
 }

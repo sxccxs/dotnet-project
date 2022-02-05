@@ -34,10 +34,9 @@ namespace Console.PrL.Commands.RoomCommands
 
             var user = userResult.Value;
 
-            var rooms = (await this.roomService.GetRoomsForUser(user)).ToList();
+            var rooms = user.Rooms.ToHashSet().ToList();
 
-            int deletionId;
-            var apply = this.GetDeleteRoomId(rooms, out deletionId);
+            var apply = this.GetDeleteRoomId(rooms, out int deletionId);
 
             if (apply)
             {

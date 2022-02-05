@@ -12,6 +12,7 @@
 
 	<ItemGroup>
 	  <Content Include="appsettings.json" />
+	  <Content Include="bin\Debug\net6.0\applog.log" />
 	  <Content Include="bin\Debug\net6.0\appsettings.json" />
 	</ItemGroup>
 

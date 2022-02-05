@@ -21,7 +21,7 @@ namespace BLL.Services.UserServices
             var user = (await this.userService.GetActiveUsers(x => x.Email == userData.Email)).FirstOrDefault();
             if (user is null || this.userService.HashingService.Hash(userData.Password) != user.HashedPassword)
             {
-                return new OptionalResult<string>(false, $"User with given credantials does not exist.");
+                return new OptionalResult<string>(false, $"User with given credentials does not exist.");
             }
 
             return new OptionalResult<string>(this.jwtService.GenerateJwt(user));

@@ -1,4 +1,5 @@
-﻿using BLL.Abstractions.Interfaces.RoleInterfaces;
+﻿using System.Linq.Expressions;
+using BLL.Abstractions.Interfaces.RoleInterfaces;
 using Core.DataClasses;
 using Core.Models;
 using DAL.Abstractions.Interfaces;
@@ -14,14 +15,13 @@ namespace BLL.Services.RoleServices
             this.storage = storage;
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByCondition(Func<RoleModel, bool> condition)
+        public async Task<IEnumerable<RoleModel>> GetByConditions(params Expression<Func<RoleModel, bool>>[] conditions)
         {
-            return await this.storage.GetByCondition(condition);
+            return await this.storage.GetByConditions(conditions, r => r.Room, r => r.User, r => r.RoleType);
         }
 
         public async Task<OptionalResult<RoleModel>> CreateRole(RoleModel role)
         {
-            role.Id = await this.storage.GetNextId();
             await this.storage.Create(role);
 
             return new OptionalResult<RoleModel>(role);
@@ -29,29 +29,29 @@ namespace BLL.Services.RoleServices
 
         public async Task<OptionalResult<RoleModel>> Update(RoleModel role)
         {
-            var changingRole = (await this.storage.GetByCondition(x => x.Id == role.Id)).FirstOrDefault();
+            var changingRole = (await this.GetByConditions(x => x.Id == role.Id)).FirstOrDefault();
             if (changingRole is null)
             {
                 return new OptionalResult<RoleModel>(false, $"Role with id {role.Id} does not exist.");
             }
 
-            changingRole.Role = role.Role;
+            changingRole.RoleType = role.RoleType;
             await this.storage.Update(changingRole);
 
-            return new OptionalResult<RoleModel>(changingRole);
+            return new OptionalResult<RoleModel>(role);
         }
 
-        public async Task<OptionalResult<RoleModel>> Delete(int id)
+        public async Task<ExceptionalResult> Delete(int id)
         {
-            var role = (await this.storage.GetByCondition(x => x.Id == id)).FirstOrDefault();
+            var role = (await this.GetByConditions(x => x.Id == id)).FirstOrDefault();
             if (role is null)
             {
-                return new OptionalResult<RoleModel>(false, $"Role with id {id} does not exist.");
+                return new ExceptionalResult(false, $"Role with id {id} does not exist.");
             }
 
             await this.storage.Delete(role);
 
-            return new OptionalResult<RoleModel>(role);
+            return new ExceptionalResult();
         }
     }
 }

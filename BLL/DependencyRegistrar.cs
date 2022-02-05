@@ -4,19 +4,20 @@ using BLL.Abstractions.Interfaces.UserInterfaces;
 using BLL.Services.RoleServices;
 using BLL.Services.RoomServices;
 using BLL.Services.UserServices;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BLL
 {
     public static class DependencyRegistrar
     {
-        public static void ConfigureServices(IServiceCollection services)
+        public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
             ConfigureUserServices(services);
             ConfigureRoomServices(services);
             ConfigureRoleServices(services);
 
-            DAL.DependencyRegistrar.ConfigureServices(services);
+            DAL.DependencyRegistrar.ConfigureServices(services, configuration);
         }
 
         private static void ConfigureUserServices(IServiceCollection services)
@@ -36,6 +37,7 @@ namespace BLL
 
         private static void ConfigureRoomServices(IServiceCollection services)
         {
+            services.AddScoped<IRoleTypeService, RoleTypeService>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IUserRoomService, UserRoomService>();
             services.AddScoped<IRoomValidationService, RoomValidationService>();

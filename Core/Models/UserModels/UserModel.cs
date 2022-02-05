@@ -1,13 +1,9 @@
-﻿namespace Core.Models.UserModels
+﻿using Core.Models.RoomModels;
+
+namespace Core.Models.UserModels
 {
     public class UserModel : BaseModel
     {
-        public UserModel()
-        {
-            this.Rooms = new List<int>();
-            this.Roles = new List<int>();
-        }
-
         public string UserName { get; set; }
 
         public string Email { get; set; }
@@ -16,8 +12,8 @@
 
         public bool IsActive { get; set; }
 
-        public List<int> Rooms { get; set; }
+        public ICollection<RoomModel> Rooms { get; set; } = new HashSet<RoomModel>();
 
-        public List<int> Roles { get; set; }
+        public ICollection<RoleModel> Roles { get; set; } = new HashSet<RoleModel>();
     }
 }

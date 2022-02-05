@@ -1,16 +1,17 @@
-﻿using Core.DataClasses;
+﻿using System.Linq.Expressions;
+using Core.DataClasses;
 using Core.Models.RoomModels;
 
 namespace BLL.Abstractions.Interfaces.RoomInterfaces
 {
     public interface IRoomService
     {
-        Task<IEnumerable<RoomModel>> GetByCondition(Func<RoomModel, bool> condition);
+        Task<IEnumerable<RoomModel>> GetByConditions(params Expression<Func<RoomModel, bool>>[] conditions);
 
         Task<OptionalResult<RoomModel>> Create(RoomCreateModel roomModel);
 
         Task<OptionalResult<RoomModel>> Update(RoomUpdateModel roomModel);
 
-        Task<OptionalResult<RoomModel>> Delete(int id);
+        Task<ExceptionalResult> Delete(int id);
     }
 }

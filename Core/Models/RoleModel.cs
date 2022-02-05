@@ -1,13 +1,14 @@
-﻿using Core.Enums;
+﻿using Core.Models.RoomModels;
+using Core.Models.UserModels;
 
 namespace Core.Models
 {
     public class RoleModel : BaseModel
     {
-        public Role Role { get; set; }
+        public RoleTypeModel RoleType { get; set; }
 
-        public int UserId { get; set; }
+        public UserModel User { get; set; }
 
-        public int RoomId { get; set; }
+        public RoomModel Room { get; set; }
     }
 }

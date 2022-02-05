@@ -33,7 +33,7 @@ namespace Console.PrL
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
 
-            DependencyRegistrar.ConfigureServices(services);
+            DependencyRegistrar.ConfigureServices(services, configuration);
             services.AddScoped<IConsole, CustomConsole>();
             services.AddScoped<App>();
             services.AddLogging(configure => configure.AddSerilog());
