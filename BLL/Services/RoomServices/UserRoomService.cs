@@ -3,9 +3,9 @@ using BLL.Abstractions.Interfaces.RoomInterfaces;
 using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.DataClasses;
 using Core.Enums;
-using Core.Models;
 using Core.Models.RoomModels;
 using Core.Models.UserModels;
+using DAL.Abstractions.Interfaces;
 
 namespace BLL.Services.RoomServices
 {
@@ -19,102 +19,55 @@ namespace BLL.Services.RoomServices
 
         private readonly IRoomValidationService validationService;
 
-        public UserRoomService(IRoomService roomService, IUserService userService, IUserRoomRoleService roleService, IRoomValidationService validationService)
+        private readonly ITransactionsWorker transactionsWorker;
+
+        public UserRoomService(
+            IRoomService roomService,
+            IUserService userService,
+            IUserRoomRoleService roleService,
+            IRoomValidationService validationService,
+            ITransactionsWorker transactionsWorker)
         {
+            this.transactionsWorker = transactionsWorker;
             this.roomService = roomService;
             this.userService = userService;
             this.roleService = roleService;
             this.validationService = validationService;
         }
 
-        public async Task<ExceptionalResult> CreateRoomForUser(UserModel user, RoomCreateModel createModel)
+        public async Task<ExceptionalResult> CreateRoomForUser(UserModel user, RoomCreateModel createModel, bool asTransaction = true)
         {
-            var validationResult = this.validationService.ValidateCreateModel(createModel);
-            if (!validationResult.IsSuccess)
-            {
-                return validationResult;
-            }
-
-            var roomResult = await this.CreateRoom(createModel, user);
-            if (!roomResult.IsSuccess)
-            {
-                return roomResult;
-            }
-
-            var room = roomResult.Value;
-            user.Rooms.Add(room);
-            var updateResult = await this.UpdateUserRooms(user);
-            if (!updateResult.IsSuccess)
-            {
-                return updateResult;
-            }
-
-            return await this.roleService.AddRoleForUserAndRoom(user, room, Role.ADMIN.ToString());
+            return asTransaction
+                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerCreateRoomForUser(user, createModel))
+                : await this.CreateRoomForUser(user, createModel);
         }
 
-        public async Task<ExceptionalResult> DeleteRoomByUser(UserModel user, int roomId)
+        public async Task<ExceptionalResult> DeleteRoomByUser(UserModel user, int roomId, bool asTransaction = true)
         {
-            var roomResult = await this.ValidateUserAndRoomId(user, roomId);
-            if (!roomResult.IsSuccess)
-            {
-                return roomResult;
-            }
-
-            var room = roomResult.Value;
-            foreach (var roomUser in room.Users.ToHashSet())
-            {
-                var roleResult = await this.roleService.DeleteRoleForUserAndRoom(roomUser, room);
-                if (!roleResult.IsSuccess)
-                {
-                    return roleResult;
-                }
-
-                roomUser.Rooms.Remove(room);
-                var updateResult = await this.UpdateUserRooms(roomUser);
-                if (!updateResult.IsSuccess)
-                {
-                    return updateResult;
-                }
-            }
-
-            var deleteResult = await this.roomService.Delete(room.Id);
-
-            return !deleteResult.IsSuccess ? deleteResult : new ExceptionalResult();
+            return asTransaction
+                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteRoomByUser(user, roomId))
+                : await this.InnerDeleteRoomByUser(user, roomId);
         }
 
-        public async Task<ExceptionalResult> DeleteUserAndRooms(UserModel user)
+        public async Task<ExceptionalResult> DeleteUserAndRooms(UserModel user, bool asTransaction = true)
         {
-            var rooms = user.Rooms.ToHashSet();
-            foreach (var room in rooms)
-            {
-                if (room.Users.ToHashSet().Count == 1 || await this.roleService.IsUserLastAdminInRoom(user, room))
-                {
-                    var deletionResult = await this.DeleteRoomByUser(user, room.Id);
-                    if (!deletionResult.IsSuccess)
-                    {
-                        return deletionResult;
-                    }
-                }
-                else
-                {
-                    room.Users.Remove(user);
-                    var updateResult = await this.UpdateRoomUsers(room);
-                    if (!updateResult.IsSuccess)
-                    {
-                        return updateResult;
-                    }
+            return asTransaction
+                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteUserAndRooms(user))
+                : await this.InnerDeleteUserAndRooms(user);
+        }
 
-                    var roleResult = await this.roleService.DeleteRoleForUserAndRoom(user, room);
-                    if (!roleResult.IsSuccess)
-                    {
-                        return roleResult;
-                    }
-                }
-            }
+        public async Task<ExceptionalResult> DeleteUserFromRoom(UserModel user, RoomModel room, bool asTransaction = true)
+        {
+            return asTransaction
+                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteUserFromRoom(user, room))
+                : await this.InnerDeleteUserFromRoom(user, room);
+        }
 
-            var deleteResult = await this.userService.Delete(user.Id);
-
-            return !deleteResult.IsSuccess ? deleteResult : new ExceptionalResult();
+        public async Task<ExceptionalResult> AddUserToRoom(string email, RoomModel room, bool asTransaction = true)
+        {
+            return asTransaction
+                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerAddUserToRoom(email, room))
+                : await this.InnerAddUserToRoom(email, room);
         }
 
         public async Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomEditModel editModel)
@@ -137,15 +90,101 @@ namespace BLL.Services.RoomServices
             }
 
             var updateResult = await this.roomService.Update(updateModel);
+
+            return !updateResult.IsSuccess ? updateResult : new ExceptionalResult();
+        }
+
+        private async Task<ExceptionalResult> InnerCreateRoomForUser(UserModel user, RoomCreateModel createModel)
+        {
+            var validationResult = this.validationService.ValidateCreateModel(createModel);
+            if (!validationResult.IsSuccess)
+            {
+                return validationResult;
+            }
+
+            var roomResult = await this.CreateRoom(createModel, user);
+            if (!roomResult.IsSuccess)
+            {
+                return roomResult;
+            }
+
+            var room = roomResult.Value;
+            user.Rooms.Add(room);
+            var updateResult = await this.UpdateUserRooms(user);
             if (!updateResult.IsSuccess)
             {
                 return updateResult;
             }
 
-            return new ExceptionalResult();
+            return await this.roleService.AddRoleForUserAndRoom(user, room, Role.ADMIN.ToString(), false);
         }
 
-        public async Task<ExceptionalResult> DeleteUserFromRoom(UserModel user, RoomModel room)
+        private async Task<ExceptionalResult> InnerDeleteRoomByUser(UserModel user, int roomId)
+        {
+            var roomResult = await this.ValidateUserAndRoomId(user, roomId);
+            if (!roomResult.IsSuccess)
+            {
+                return roomResult;
+            }
+
+            var room = roomResult.Value;
+            foreach (var roomUser in room.Users.ToHashSet())
+            {
+                var roleResult = await this.roleService.DeleteRoleForUserAndRoom(roomUser, room, false);
+                if (!roleResult.IsSuccess)
+                {
+                    return roleResult;
+                }
+
+                roomUser.Rooms.Remove(room);
+                var updateResult = await this.UpdateUserRooms(roomUser);
+                if (!updateResult.IsSuccess)
+                {
+                    return updateResult;
+                }
+            }
+
+            var deleteResult = await this.roomService.Delete(room.Id);
+
+            return !deleteResult.IsSuccess ? deleteResult : new ExceptionalResult();
+        }
+
+        private async Task<ExceptionalResult> InnerDeleteUserAndRooms(UserModel user)
+        {
+            var rooms = user.Rooms.ToHashSet();
+            foreach (var room in rooms)
+            {
+                if (room.Users.ToHashSet().Count == 1 || await this.roleService.IsUserLastAdminInRoom(user, room))
+                {
+                    var deletionResult = await this.InnerDeleteRoomByUser(user, room.Id);
+                    if (!deletionResult.IsSuccess)
+                    {
+                        return deletionResult;
+                    }
+                }
+                else
+                {
+                    room.Users.Remove(user);
+                    var updateResult = await this.UpdateRoomUsers(room);
+                    if (!updateResult.IsSuccess)
+                    {
+                        return updateResult;
+                    }
+
+                    var roleResult = await this.roleService.DeleteRoleForUserAndRoom(user, room, false);
+                    if (!roleResult.IsSuccess)
+                    {
+                        return roleResult;
+                    }
+                }
+            }
+
+            var deleteResult = await this.userService.Delete(user.Id);
+
+            return !deleteResult.IsSuccess ? deleteResult : new ExceptionalResult();
+        }
+
+        private async Task<ExceptionalResult> InnerDeleteUserFromRoom(UserModel user, RoomModel room)
         {
             var userRole = await this.roleService.GetRoleForUserAndRoom(user, room);
             if (userRole is null)
@@ -161,7 +200,7 @@ namespace BLL.Services.RoomServices
                 }
             }
 
-            var deleteResult = await this.roleService.DeleteRoleForUserAndRoom(user, room);
+            var deleteResult = await this.roleService.DeleteRoleForUserAndRoom(user, room, false);
             if (!deleteResult.IsSuccess)
             {
                 return deleteResult;
@@ -176,15 +215,11 @@ namespace BLL.Services.RoomServices
 
             room.Users.Remove(user);
             var roomResult = await this.UpdateRoomUsers(room);
-            if (!roomResult.IsSuccess)
-            {
-                return roomResult;
-            }
 
-            return new ExceptionalResult();
+            return !roomResult.IsSuccess ? roomResult : new ExceptionalResult();
         }
 
-        public async Task<ExceptionalResult> AddUserToRoom(string email, RoomModel room)
+        private async Task<ExceptionalResult> InnerAddUserToRoom(string email, RoomModel room)
         {
             var user = (await this.userService.GetActiveUsers(x => x.Email == email)).FirstOrDefault();
             if (user is null)
@@ -212,7 +247,7 @@ namespace BLL.Services.RoomServices
                 return roomResult;
             }
 
-            return await this.roleService.AddRoleForUserAndRoom(user, room, Role.MEMBER.ToString());
+            return await this.roleService.AddRoleForUserAndRoom(user, room, Role.MEMBER.ToString(), false);
         }
 
         private async Task<OptionalResult<RoomModel>> CreateRoom(RoomCreateModel createModel, UserModel user)
@@ -225,6 +260,7 @@ namespace BLL.Services.RoomServices
 
             var room = creationResult.Value;
             room.Users.Add(user);
+
             return await this.UpdateRoomUsers(room);
         }
 

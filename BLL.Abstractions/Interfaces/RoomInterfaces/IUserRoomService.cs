@@ -6,16 +6,16 @@ namespace BLL.Abstractions.Interfaces.RoomInterfaces
 {
     public interface IUserRoomService
     {
-        Task<ExceptionalResult> CreateRoomForUser(UserModel user, RoomCreateModel createModel);
+        Task<ExceptionalResult> CreateRoomForUser(UserModel user, RoomCreateModel createModel, bool asTransaction = true);
 
         Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomEditModel editModel);
 
-        Task<ExceptionalResult> DeleteRoomByUser(UserModel user, int roomId);
+        Task<ExceptionalResult> DeleteRoomByUser(UserModel user, int roomId, bool asTransaction = true);
 
-        Task<ExceptionalResult> AddUserToRoom(string email, RoomModel room);
+        Task<ExceptionalResult> AddUserToRoom(string email, RoomModel room, bool asTransaction = true);
 
-        Task<ExceptionalResult> DeleteUserFromRoom(UserModel user, RoomModel room);
+        Task<ExceptionalResult> DeleteUserFromRoom(UserModel user, RoomModel room, bool asTransaction = true);
 
-        Task<ExceptionalResult> DeleteUserAndRooms(UserModel user);
+        Task<ExceptionalResult> DeleteUserAndRooms(UserModel user, bool asTransaction = true);
     }
 }

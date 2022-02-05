@@ -10,9 +10,9 @@ namespace BLL.Abstractions.Interfaces.RoleInterfaces
     {
         Task<RoleModel> GetRoleForUserAndRoom(UserModel user, RoomModel room);
 
-        Task<ExceptionalResult> AddRoleForUserAndRoom(UserModel user, RoomModel room, string roleName);
+        Task<ExceptionalResult> AddRoleForUserAndRoom(UserModel user, RoomModel room, string roleName, bool asTransaction = true);
 
-        Task<OptionalResult<RoleModel>> DeleteRoleForUserAndRoom(UserModel user, RoomModel room);
+        Task<OptionalResult<RoleModel>> DeleteRoleForUserAndRoom(UserModel user, RoomModel room, bool asTransaction = true);
 
         Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, string roleName);
 
