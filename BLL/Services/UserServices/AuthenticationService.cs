@@ -19,13 +19,13 @@ namespace BLL.Services.UserServices
         public async Task<OptionalResult<UserModel>> GetUserByToken(string jwtToken)
         {
             var result = this.jwtService.ValidateJwt(jwtToken);
-            var activeUsers = await this.userService.GetActiveUsers(x => x.Id == result.Value);
-            if (!result.IsSuccess || !activeUsers.Any())
+            var query = (await this.userService.GetActiveUsers(x => x.Id == result.Value)).ToHashSet();
+            if (!result.IsSuccess || !query.Any())
             {
                 return new OptionalResult<UserModel>(false, "You are not logged in");
             }
 
-            var user = await this.userService.GetUserById(result.Value);
+            var user = query.First();
 
             return new OptionalResult<UserModel>(user);
         }

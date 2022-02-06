@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
 using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.DataClasses;
 using Core.Models.UserModels;
@@ -18,45 +19,46 @@ namespace BLL.Services.UserServices
             this.hashingService = hashingService;
         }
 
-        public async Task<IEnumerable<UserModel>> GetByCondition(Func<UserModel, bool> condition)
+        public async Task<IEnumerable<UserModel>> GetByConditions(params Expression<Func<UserModel, bool>>[] conditions)
         {
-            return await this.storage.GetByCondition(condition);
+            return await this.storage.GetByConditions(conditions, u => u.Rooms, u => u.Roles);
         }
 
-        public async Task<IEnumerable<UserModel>> GetActiveUsers(Func<UserModel, bool> additionalCondition)
+        public async Task<IEnumerable<UserModel>> GetActiveUsers(params Expression<Func<UserModel, bool>>[] additionalConditions)
         {
-            return await this.GetByCondition(x => x.IsActive && additionalCondition(x));
+            additionalConditions = additionalConditions.Append(x => x.IsActive).ToArray();
+            return await this.GetByConditions(additionalConditions);
         }
 
         public async Task<UserModel> GetUserById(int id)
         {
-            return (await this.GetByCondition(u => u.Id == id)).FirstOrDefault();
+            return (await this.GetByConditions(u => u.Id == id)).FirstOrDefault();
         }
 
         public async Task<OptionalResult<UserModel>> CreateNonActiveUser(UserCreateModel user)
         {
-            if ((await this.storage.GetByCondition(x => x.Email == user.Email)).Any())
+            if ((await this.GetByConditions(x => x.Email == user.Email)).Any())
             {
                 return new OptionalResult<UserModel>(false, $"User with email {user.Email} already exists");
             }
 
-            var userModel = await this.MapUserCreateModel(user);
+            var userModel = this.MapUserCreateModel(user);
             await this.storage.Create(userModel);
 
             return new OptionalResult<UserModel>(userModel);
         }
 
-        public async Task<OptionalResult<UserModel>> Delete(int id)
+        public async Task<ExceptionalResult> Delete(int id)
         {
             var user = await this.GetUserById(id);
             if (user is null)
             {
-                return new OptionalResult<UserModel>(false, $"User with id {id} does not exist");
+                return new ExceptionalResult(false, $"User with id {id} does not exist");
             }
 
             await this.storage.Delete(user);
 
-            return new OptionalResult<UserModel>(user);
+            return new ExceptionalResult();
         }
 
         public async Task<OptionalResult<UserModel>> Update(UserUpdateModel user)
@@ -83,12 +85,11 @@ namespace BLL.Services.UserServices
             return await this.Update(userData);
         }
 
-        private async Task<UserModel> MapUserCreateModel(UserCreateModel user)
+        private UserModel MapUserCreateModel(UserCreateModel user)
         {
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<UserCreateModel, UserModel>());
-            var mapper = new Mapper(mapperConfig);
+            var mapperConfiguration = new MapperConfiguration(cfg => cfg.CreateMap<UserCreateModel, UserModel>());
+            var mapper = new Mapper(mapperConfiguration);
             var userObject = mapper.Map<UserModel>(user);
-            userObject.Id = await this.storage.GetNextId();
             userObject.HashedPassword = this.hashingService.Hash(user.Password);
             userObject.IsActive = false;
 
@@ -103,22 +104,22 @@ namespace BLL.Services.UserServices
             });
             var mapper = new Mapper(mapperConfig);
             var userObject = mapper.Map<UserModel>(user);
-            var changingUser = (await this.GetByCondition(x => x.Id == user.Id)).First();
+            var changingUser = await this.GetUserById(user.Id);
 
             foreach (var field in userObject.GetType().GetProperties())
             {
-                if (field.GetValue(userObject) is null)
+                if (field.GetValue(userObject) is not null)
                 {
-                    field.SetValue(userObject, field.GetValue(changingUser));
+                    field.SetValue(changingUser, field.GetValue(userObject));
                 }
             }
 
             if (user.Password is not null)
             {
-                userObject.HashedPassword = this.hashingService.Hash(user.Password);
+                changingUser.HashedPassword = this.hashingService.Hash(user.Password);
             }
 
-            return userObject;
+            return changingUser;
         }
     }
 }

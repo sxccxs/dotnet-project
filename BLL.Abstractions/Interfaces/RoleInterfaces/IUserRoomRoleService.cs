@@ -8,18 +8,14 @@ namespace BLL.Abstractions.Interfaces.RoleInterfaces
 {
     public interface IUserRoomRoleService
     {
-        Task<IEnumerable<RoleModel>> GetRolesForUser(UserModel user);
-
-        Task<IEnumerable<RoleModel>> GetRolesForRoom(RoomModel room);
-
         Task<RoleModel> GetRoleForUserAndRoom(UserModel user, RoomModel room);
 
-        Task<ExceptionalResult> AddRoleForUserAndRoom(UserModel user, RoomModel room, Role roleType);
+        Task<ExceptionalResult> AddRoleForUserAndRoom(UserModel user, RoomModel room, string roleName, bool asTransaction = true);
 
-        Task<OptionalResult<RoleModel>> DeleteRoleForUserAndRoom(UserModel user, RoomModel room);
+        Task<ExceptionalResult> DeleteRoleForUserAndRoom(UserModel user, RoomModel room, bool asTransaction = true);
 
-        Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, Role role);
+        Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, string roleName);
 
-        Task<ExceptionalResult> CheckOneAdminInRoom(UserModel user, RoomModel room);
+        Task<bool> IsUserLastAdminInRoom(UserModel user, RoomModel room);
     }
 }

@@ -27,7 +27,7 @@ namespace Console.PrL.Commands.RoomCommands
 
         public override string Description => "Add a new user to room. You must be logged in.";
 
-        public async override Task<OptionalResult<string>> Execute(string token)
+        public override async Task<OptionalResult<string>> Execute(string token)
         {
             var userResult = await this.authenticationService.GetUserByToken(token);
 
@@ -38,7 +38,7 @@ namespace Console.PrL.Commands.RoomCommands
 
             var user = userResult.Value;
 
-            var rooms = (await this.userRoomService.GetRoomsForUser(user)).ToList();
+            var rooms = user.Rooms.ToHashSet().ToList();
             var apply = this.OutputAvailableRooms(rooms);
             if (!apply)
             {
@@ -47,7 +47,7 @@ namespace Console.PrL.Commands.RoomCommands
 
             var room = this.GetRoom(rooms);
 
-            var users = (await this.userRoomService.GetUsersInRoom(room)).ToList();
+            var users = room.Users.ToHashSet().ToList();
 
             var email = this.Console.Input("What is the e-mail of the user you would like to add?: ");
             var result = await this.userRoomService.AddUserToRoom(email, room);

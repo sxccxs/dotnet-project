@@ -6,6 +6,7 @@ using Core.Enums;
 using Core.Models;
 using Core.Models.RoomModels;
 using Core.Models.UserModels;
+using DAL.Abstractions.Interfaces;
 
 namespace BLL.Services.RoleServices
 {
@@ -17,37 +18,97 @@ namespace BLL.Services.RoleServices
 
         private readonly IRoleService roleService;
 
-        public UserRoomRoleService(IRoomService roomService, IUserService userService, IRoleService roleService)
+        private readonly IRoleTypeService roleTypeService;
+
+        private readonly ITransactionsWorker transactionsWorker;
+
+        public UserRoomRoleService(
+            IRoomService roomService,
+            IUserService userService,
+            IRoleService roleService,
+            IRoleTypeService roleTypeService,
+            ITransactionsWorker transactionsWorker)
         {
+            this.transactionsWorker = transactionsWorker;
             this.roomService = roomService;
             this.userService = userService;
             this.roleService = roleService;
-        }
-
-        public async Task<IEnumerable<RoleModel>> GetRolesForUser(UserModel user)
-        {
-            var tasks = await Task.WhenAll(user.Roles.Select(id => this.roleService.GetByCondition(x => x.Id == id)));
-            return tasks.Where(result => result is not null).Select(result => result.First());
-        }
-
-        public async Task<IEnumerable<RoleModel>> GetRolesForRoom(RoomModel room)
-        {
-            var tasks = await Task.WhenAll(room.Roles.Select(id => this.roleService.GetByCondition(x => x.Id == id)));
-            return tasks.Where(result => result is not null).Select(result => result.First());
+            this.roleTypeService = roleTypeService;
         }
 
         public async Task<RoleModel> GetRoleForUserAndRoom(UserModel user, RoomModel room)
         {
-            return (await this.GetRolesForUser(user)).Where(x => x.RoomId == room.Id).FirstOrDefault();
+            return (await this.roleService.GetByConditions(r => r.User == user, r => r.Room == room)).FirstOrDefault();
         }
 
-        public async Task<ExceptionalResult> AddRoleForUserAndRoom(UserModel user, RoomModel room, Role roleType)
+        public async Task<ExceptionalResult> AddRoleForUserAndRoom(
+            UserModel user,
+            RoomModel room,
+            string roleName,
+            bool asTransaction = true)
         {
+            return asTransaction
+                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerAddRoleForUserAndRoom(user, room, roleName))
+                : await this.InnerAddRoleForUserAndRoom(user, room, roleName);
+        }
+
+        public async Task<ExceptionalResult> DeleteRoleForUserAndRoom(UserModel user, RoomModel room, bool asTransaction = true)
+        {
+            return asTransaction
+                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteRoleForUserAndRoom(user, room))
+                : await this.InnerDeleteRoleForUserAndRoom(user, room);
+        }
+
+        public async Task<bool> IsUserLastAdminInRoom(UserModel user, RoomModel room)
+        {
+            return !(await this.roleService.GetByConditions(r => r.Room == room)).Any(r =>
+                r.RoleType.Name == Role.ADMIN.ToString() && r.User != user);
+        }
+
+        public async Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, string roleName)
+        {
+            var roleTypeResult = await this.GetRoleTypeByName(roleName);
+            if (!roleTypeResult.IsSuccess)
+            {
+                return roleTypeResult;
+            }
+
+            var roleType = roleTypeResult.Value;
+
+            var userRole = await this.GetRoleForUserAndRoom(user, room);
+            if (userRole is null)
+            {
+                return new ExceptionalResult(false, $"User or room does not exist or user {user.Id} does not belong to room {room.Id}");
+            }
+
+            if (roleType.Name != Role.ADMIN.ToString())
+            {
+                if (await this.IsUserLastAdminInRoom(user, room))
+                {
+                    return new ExceptionalResult(false, "Room must have at least one admin. Make someone else admin first");
+                }
+            }
+
+            userRole.RoleType = roleType;
+            await this.roleService.Update(userRole);
+
+            return new ExceptionalResult();
+        }
+
+        private async Task<ExceptionalResult> InnerAddRoleForUserAndRoom(UserModel user, RoomModel room, string roleName)
+        {
+            var roleTypeResult = await this.GetRoleTypeByName(roleName);
+            if (!roleTypeResult.IsSuccess)
+            {
+                return roleTypeResult;
+            }
+
+            var roleType = roleTypeResult.Value;
             var role = new RoleModel()
             {
-                Role = roleType,
-                UserId = user.Id,
-                RoomId = room.Id,
+                RoleType = roleType,
+                User = user,
+                Room = room,
             };
 
             var roleResult = await this.roleService.CreateRole(role);
@@ -66,77 +127,33 @@ namespace BLL.Services.RoleServices
             return new ExceptionalResult();
         }
 
-        public async Task<OptionalResult<RoleModel>> DeleteRoleForUserAndRoom(UserModel user, RoomModel room)
+        private async Task<ExceptionalResult> InnerDeleteRoleForUserAndRoom(UserModel user, RoomModel room)
         {
             var role = await this.GetRoleForUserAndRoom(user, room);
 
-            user.Roles.Remove(role.Id);
+            user.Roles.Remove(role);
             var userResult = await this.UpdateUserRoles(user);
             if (!userResult.IsSuccess)
             {
-                return new OptionalResult<RoleModel>(userResult);
+                return userResult;
             }
 
-            room.Roles.Remove(role.Id);
+            room.Roles.Remove(role);
             var roomResult = await this.UpdateRoomRoles(room);
-            if (!roomResult.IsSuccess)
-            {
-                return new OptionalResult<RoleModel>(roomResult);
-            }
 
-            var roleResult = await this.roleService.Delete(role.Id);
-            if (!roleResult.IsSuccess)
-            {
-                return roleResult;
-            }
-
-            return new OptionalResult<RoleModel>(role);
-        }
-
-        public async Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, Role role)
-        {
-            var userRole = await this.GetRoleForUserAndRoom(user, room);
-            if (userRole is null)
-            {
-                return new ExceptionalResult(false, $"User or room does not exist or user {user.Id} does not belong to room {room.Id}");
-            }
-
-            if (role == Role.MEMBER)
-            {
-                var checkResult = await this.CheckOneAdminInRoom(user, room);
-                if (!checkResult.IsSuccess)
-                {
-                    return checkResult;
-                }
-            }
-
-            userRole.Role = role;
-            await this.roleService.Update(userRole);
-
-            return new ExceptionalResult();
-        }
-
-        public async Task<ExceptionalResult> CheckOneAdminInRoom(UserModel user, RoomModel room)
-        {
-            var roomRoles = await this.GetRolesForRoom(room);
-            if (!roomRoles.Any(x => x.Role == Role.ADMIN && x.UserId != user.Id))
-            {
-                return new ExceptionalResult(false, "Room must have at least one admin. Make someone else admin first");
-            }
-
-            return new ExceptionalResult();
+            return !roomResult.IsSuccess ? roomResult : new ExceptionalResult();
         }
 
         private async Task<ExceptionalResult> AddRoleModelToUserAndRoom(UserModel user, RoomModel room, RoleModel role)
         {
-            user.Roles.Add(role.Id);
+            user.Roles.Add(role);
             var userUpdateResult = await this.UpdateUserRoles(user);
             if (!userUpdateResult.IsSuccess)
             {
                 return userUpdateResult;
             }
 
-            room.Roles.Add(role.Id);
+            room.Roles.Add(role);
             var roomUpdateResult = await this.UpdateRoomRoles(room);
             if (!roomUpdateResult.IsSuccess)
             {
@@ -165,6 +182,17 @@ namespace BLL.Services.RoleServices
                 Roles = room.Roles,
             };
             return await this.roomService.Update(roomUpdate);
+        }
+
+        private async Task<OptionalResult<RoleTypeModel>> GetRoleTypeByName(string name)
+        {
+            var result = (await this.roleTypeService.GetByCondition(x => x.Name == name)).FirstOrDefault();
+            if (result is null)
+            {
+                return new OptionalResult<RoleTypeModel>(false, $"Role type with name {name} does not exist");
+            }
+
+            return new OptionalResult<RoleTypeModel>(result);
         }
     }
 }

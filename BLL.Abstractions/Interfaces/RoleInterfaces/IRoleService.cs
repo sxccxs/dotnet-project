@@ -1,4 +1,5 @@
-﻿using Core.DataClasses;
+﻿using System.Linq.Expressions;
+using Core.DataClasses;
 using Core.Models;
 
 namespace BLL.Abstractions.Interfaces.RoleInterfaces
@@ -7,10 +8,10 @@ namespace BLL.Abstractions.Interfaces.RoleInterfaces
     {
         Task<OptionalResult<RoleModel>> CreateRole(RoleModel role);
 
-        Task<OptionalResult<RoleModel>> Delete(int id);
+        Task<ExceptionalResult> Delete(int id);
 
         Task<OptionalResult<RoleModel>> Update(RoleModel role);
 
-        Task<IEnumerable<RoleModel>> GetByCondition(Func<RoleModel, bool> condition);
+        Task<IEnumerable<RoleModel>> GetByConditions(params Expression<Func<RoleModel, bool>>[] conditions);
     }
 }

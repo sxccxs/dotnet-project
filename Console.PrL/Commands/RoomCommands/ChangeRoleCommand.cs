@@ -33,7 +33,7 @@ namespace Console.PrL.Commands.RoomCommands
 
         public override string Description => "Changes role for selected user in room";
 
-        public async override Task<OptionalResult<string>> Execute(string token)
+        public override async Task<OptionalResult<string>> Execute(string token)
         {
             var userResult = await this.authenticationService.GetUserByToken(token);
             if (!userResult.IsSuccess)
@@ -42,7 +42,7 @@ namespace Console.PrL.Commands.RoomCommands
             }
 
             var user = userResult.Value;
-            var rooms = (await this.userRoomService.GetRoomsForUser(user)).ToList();
+            var rooms = user.Rooms.ToHashSet().ToList();
             var isContinue = this.ListRooms(rooms);
             if (!isContinue)
             {
@@ -50,17 +50,17 @@ namespace Console.PrL.Commands.RoomCommands
             }
 
             var room = this.GetSelectedItem(rooms);
-            if ((await this.roleService.GetRoleForUserAndRoom(user, room)).Role != Role.ADMIN)
+            if ((await this.roleService.GetRoleForUserAndRoom(user, room)).RoleType.Name != Role.ADMIN.ToString())
             {
-                return new OptionalResult<string>(false, $"You dont have rights to chage roles in room {room.Name}");
+                return new OptionalResult<string>(false, $"You dont have rights to change roles in room {room.Name}");
             }
 
-            var users = (await this.userRoomService.GetUsersInRoom(room)).ToList();
+            var users = room.Users.ToHashSet().ToList();
             await this.ListUsers(users, room);
             var editUser = this.GetSelectedItem(users);
             this.ListRoles(editUser);
             var role = this.GetSelectedItem(Enum.GetValues(typeof(Role)).Cast<Role>().ToList());
-            var updateResult = await this.roleService.UpdateRoleForUser(editUser, room, role);
+            var updateResult = await this.roleService.UpdateRoleForUser(editUser, room, role.ToString());
             if (!updateResult.IsSuccess)
             {
                 return new OptionalResult<string>(updateResult);
@@ -124,7 +124,7 @@ namespace Console.PrL.Commands.RoomCommands
             {
                 var user = users[i];
                 var role = await this.roleService.GetRoleForUserAndRoom(user, room);
-                this.Console.Print($"{i + 1}) {user.UserName} {user.Email} {role.Role}");
+                this.Console.Print($"{i + 1}) {user.UserName} {user.Email} {role.RoleType.Name}");
             }
 
             this.Console.Print();

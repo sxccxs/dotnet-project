@@ -30,7 +30,7 @@ namespace Console.PrL
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
             services.AddLogging(configure => configure.AddSerilog());
-            DependencyRegistrar.ConfigureServices(services);
+            DependencyRegistrar.ConfigureServices(services, configuration);
         }
     }
 }

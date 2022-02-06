@@ -1,13 +1,18 @@
-﻿using Core.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using Core.Models.RoomModels;
+using Core.Models.UserModels;
 
 namespace Core.Models
 {
     public class RoleModel : BaseModel
     {
-        public Role Role { get; set; }
+        [Required]
+        public RoleTypeModel RoleType { get; set; }
 
-        public int UserId { get; set; }
+        [Required]
+        public UserModel User { get; set; }
 
-        public int RoomId { get; set; }
+        [Required]
+        public RoomModel Room { get; set; }
     }
 }

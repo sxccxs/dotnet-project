@@ -1,4 +1,6 @@
-﻿namespace Core.Models.UserModels
+﻿using Core.Models.RoomModels;
+
+namespace Core.Models.UserModels
 {
     public class UserUpdateModel
     {
@@ -12,8 +14,8 @@
 
         public bool IsActive { get; set; }
 
-        public List<int> Rooms { get; set; }
+        public ICollection<RoomModel> Rooms { get; set; }
 
-        public List<int> Roles { get; set; }
+        public ICollection<RoleModel> Roles { get; set; }
     }
 }

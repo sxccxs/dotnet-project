@@ -3,15 +3,16 @@ using Console.PrL.Commands.RoomCommands;
 using Console.PrL.Commands.UserCommands;
 using Console.PrL.Interfaces;
 using Console.PrL.Utilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Console.PrL;
 
 public static class DependencyRegistrar
 {
-    public static void ConfigureServices(IServiceCollection services)
+    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        BLL.DependencyRegistrar.ConfigureServices(services);
+        BLL.DependencyRegistrar.ConfigureServices(services, configuration);
         services.AddScoped<IConsole, CustomConsole>();
         services.AddScoped<App>();
         ConfigureUserCommands(services);
