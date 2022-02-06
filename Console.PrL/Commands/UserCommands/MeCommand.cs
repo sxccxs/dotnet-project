@@ -41,10 +41,10 @@ namespace Console.PrL.Commands.UserCommands
 
         private void Output(UserModel user)
         {
-            this.Console.Print("\n");
-            this.Console.Print($"Username: {user.UserName}\n");
-            this.Console.Print($"Email: {user.Email}\n");
-            this.Console.Print("\n");
+            this.Console.Print();
+            this.Console.Print($"Username: {user.UserName}");
+            this.Console.Print($"Email: {user.Email}");
+            this.Console.Print();
         }
     }
 }

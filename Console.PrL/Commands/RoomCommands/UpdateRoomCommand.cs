@@ -35,21 +35,25 @@ namespace Console.PrL.Commands.RoomCommands
 
             var rooms = (await this.roomService.GetRoomsForUser(user)).ToList();
 
-            var roomUpdateData = new RoomUpdateModel();
+            var roomUpdateData = new RoomEditModel();
 
             var apply = this.GetRoomUpdateData(rooms, roomUpdateData);
 
             if (apply)
             {
-                await this.roomService.UpdateRoomForUser(user, roomUpdateData);
+                var result = await this.roomService.UpdateRoomForUser(user, roomUpdateData);
+                if (!result.IsSuccess)
+                {
+                    return new OptionalResult<string>(result);
+                }
 
-                this.Console.Print("Room updated successfully\n");
+                this.Console.Print("Room updated successfully");
             }
 
             return new OptionalResult<string>();
         }
 
-        private bool GetRoomUpdateData(List<RoomModel> rooms, RoomUpdateModel roomUpdateData)
+        private bool GetRoomUpdateData(List<RoomModel> rooms, RoomEditModel roomUpdateData)
         {
             var apply = this.OutputAvailableRooms(rooms);
 
@@ -66,25 +70,25 @@ namespace Console.PrL.Commands.RoomCommands
         private bool OutputAvailableRooms(List<RoomModel> rooms)
         {
             var apply = true;
-            this.Console.Print("Rooms you are in:\n");
-            this.Console.Print("\n");
+            this.Console.Print("Rooms you are in:");
+            this.Console.Print();
             if (rooms.Count == 0)
             {
-                this.Console.Print("<You don't have any rooms to edit>\n");
+                this.Console.Print("<You don't have any rooms to edit>");
                 apply = false;
             }
 
             for (int i = 0; i < rooms.Count; i++)
             {
                 var room = rooms[i];
-                this.Console.Print($"{i + 1}) {room.Name}\n");
+                this.Console.Print($"{i + 1}) {room.Name}");
             }
 
-            this.Console.Print("\n");
+            this.Console.Print();
             return apply;
         }
 
-        private void SetEditingRoomId(List<RoomModel> rooms, RoomUpdateModel roomUpdateData)
+        private void SetEditingRoomId(List<RoomModel> rooms, RoomEditModel roomUpdateData)
         {
             int index;
             while (true)
@@ -93,11 +97,11 @@ namespace Console.PrL.Commands.RoomCommands
                 index--;
                 if (!parsed)
                 {
-                    this.Console.Print("Enter a valid number.\n");
+                    this.Console.Print("Enter a valid number.");
                 }
                 else if (index < 0 || index >= rooms.Count)
                 {
-                    this.Console.Print("Enter a number, that is in range of rooms.\n");
+                    this.Console.Print("Enter a number, that is in range of rooms.");
                 }
                 else
                 {
@@ -108,7 +112,7 @@ namespace Console.PrL.Commands.RoomCommands
             roomUpdateData.Id = rooms[index].Id;
         }
 
-        private void SetNewName(RoomUpdateModel roomUpdateData)
+        private void SetNewName(RoomEditModel roomUpdateData)
         {
             var newName = this.Console.Input("New Name(leave blank to not change): ");
 

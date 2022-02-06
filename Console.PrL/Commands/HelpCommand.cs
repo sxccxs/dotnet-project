@@ -5,12 +5,12 @@ namespace Console.PrL.Commands
 {
     internal class HelpCommand : Command
     {
-        private Command[] commands;
+        private readonly Command[] commands;
 
-        public HelpCommand(IConsole console, Command[] commands)
+        public HelpCommand(IConsole console, IEnumerable<Command> commands)
             : base(console)
         {
-            this.commands = commands;
+            this.commands = commands.ToArray();
             this.commands = this.commands.Append(this).ToArray();
         }
 
@@ -26,10 +26,10 @@ namespace Console.PrL.Commands
 
         private void Output()
         {
-            this.Console.Print("Possible commands:\n");
+            this.Console.Print("Possible commands:");
             foreach (var command in this.commands)
             {
-                this.Console.Print($"    {command.Name}: {command.Description}\n");
+                this.Console.Print($"    {command.Name}: {command.Description}");
             }
         }
     }

@@ -28,20 +28,20 @@ namespace Console.PrL.Commands.UserCommands
                 return new OptionalResult<string>(activationResult);
             }
 
-            this.Console.Print("Your account has been successfully actived. You can login now.\n");
+            this.Console.Print("Your account has been successfully actived. You can login now.");
 
             return new OptionalResult<string>();
         }
 
         private AccountActivationPayload GetActivationInfo()
         {
-            this.Console.Print("\n");
+            this.Console.Print();
             var payload = new AccountActivationPayload()
             {
                 Uidb64 = this.Console.Input("Uidb64: "),
                 Token = this.Console.Input("Token: "),
             };
-            this.Console.Print("\n");
+            this.Console.Print();
 
             return payload;
         }

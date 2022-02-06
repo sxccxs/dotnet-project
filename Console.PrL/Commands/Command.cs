@@ -3,9 +3,9 @@ using Core.DataClasses;
 
 namespace Console.PrL.Commands
 {
-    internal abstract class Command
+    public abstract class Command
     {
-        public Command(IConsole console)
+        protected Command(IConsole console)
         {
             this.Console = console;
         }

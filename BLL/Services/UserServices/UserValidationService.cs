@@ -27,6 +27,29 @@ namespace BLL.Services.UserServices
                 this.ValidateRePassword(user.Password, user.RePassword),
             };
 
+            var incorrectResults = results.Where(r => !r.IsSuccess).ToList();
+
+            return incorrectResults.Any() ? incorrectResults.First() : new ExceptionalResult();
+        }
+
+        public ExceptionalResult ValidateUpdateModel(UserEditModel user)
+        {
+            var results = new List<ExceptionalResult>();
+            if (user.UserName is not null)
+            {
+                results.Add(this.ValidateUserName(user.UserName));
+            }
+
+            if (user.Email is not null)
+            {
+                results.Add(this.ValidateEmail(user.Email));
+            }
+
+            if (user.Password is not null)
+            {
+                results.Add(this.ValidatePassword(user.Password));
+            }
+
             foreach (var result in results)
             {
                 if (!result.IsSuccess)

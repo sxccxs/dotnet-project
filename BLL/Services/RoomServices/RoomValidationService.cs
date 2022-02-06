@@ -8,7 +8,7 @@ namespace BLL.Services.RoomServices
     {
         private const int MinNameLength = 3;
 
-        private const int MaxNameLength = 24;
+        private const int MaxNameLength = 32;
 
         public ExceptionalResult ValidateCreateModel(RoomCreateModel createModel)
         {
@@ -17,15 +17,9 @@ namespace BLL.Services.RoomServices
                 this.ValidateName(createModel.Name),
             };
 
-            foreach (var result in results)
-            {
-                if (!result.IsSuccess)
-                {
-                    return result;
-                }
-            }
+            var incorrectResults = results.Where(r => !r.IsSuccess).ToList();
 
-            return new ExceptionalResult();
+            return incorrectResults.Any() ? incorrectResults.First() : new ExceptionalResult();
         }
 
         public ExceptionalResult ValidateUpdateModel(RoomUpdateModel updateModel)
@@ -35,15 +29,9 @@ namespace BLL.Services.RoomServices
                 this.ValidateName(updateModel.Name),
             };
 
-            foreach (var result in results)
-            {
-                if (!result.IsSuccess)
-                {
-                    return result;
-                }
-            }
+            var incorrectResults = results.Where(r => !r.IsSuccess).ToList();
 
-            return new ExceptionalResult();
+            return incorrectResults.Any() ? incorrectResults.First() : new ExceptionalResult();
         }
 
         private ExceptionalResult ValidateName(string name)

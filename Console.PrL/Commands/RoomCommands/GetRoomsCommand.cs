@@ -40,20 +40,20 @@ namespace Console.PrL.Commands.RoomCommands
 
         private void Output(List<RoomModel> rooms)
         {
-            this.Console.Print("Rooms you are in:\n");
-            this.Console.Print("\n");
+            this.Console.Print("Rooms you are in:");
+            this.Console.Print();
             if (rooms.Count == 0)
             {
-                this.Console.Print("<It's empty here...>\n");
+                this.Console.Print("<It's empty here...>");
             }
 
             for (int i = 0; i < rooms.Count; i++)
             {
                 var room = rooms[i];
-                this.Console.Print($"{i + 1}) {room.Name}\n");
+                this.Console.Print($"{i + 1}) {room.Name}");
             }
 
-            this.Console.Print("\n");
+            this.Console.Print();
         }
     }
 }

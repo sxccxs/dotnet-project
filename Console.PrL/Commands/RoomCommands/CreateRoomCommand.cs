@@ -43,20 +43,20 @@ namespace Console.PrL.Commands.RoomCommands
                 return new OptionalResult<string>(createResult);
             }
 
-            this.Console.Print($"Room {roomData.Name} was successfully created\n");
+            this.Console.Print($"Room {roomData.Name} was successfully created");
 
             return new OptionalResult<string>();
         }
 
         private RoomCreateModel GetNewRoomData()
         {
-            this.Console.Print("\n");
+            this.Console.Print();
             var roomData = new RoomCreateModel()
             {
                 Name = this.Console.Input("Room name: "),
             };
 
-            this.Console.Print("\n");
+            this.Console.Print();
 
             return roomData;
         }

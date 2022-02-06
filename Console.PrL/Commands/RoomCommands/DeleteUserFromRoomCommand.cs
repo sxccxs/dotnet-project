@@ -9,23 +9,17 @@ namespace Console.PrL.Commands
 {
     internal class DeleteUserFromRoomCommand : Command
     {
-        private readonly IUserService userService;
         private readonly IUserRoomService roomService;
-        private readonly IRoomService room1Service;
         private readonly IAuthenticationService authenticationService;
 
         public DeleteUserFromRoomCommand(
             IConsole console,
-            IUserService userService,
             IUserRoomService roomService,
-            IAuthenticationService authenticationService,
-            IRoomService room1Service)
+            IAuthenticationService authenticationService)
             : base(console)
         {
-            this.userService = userService;
             this.roomService = roomService;
             this.authenticationService = authenticationService;
-            this.room1Service = room1Service;
             this.Console = console;
         }
 
@@ -47,30 +41,24 @@ namespace Console.PrL.Commands
             var rooms = (await this.roomService.GetRoomsForUser(user)).ToList();
             var apply = this.OutputAvailableRooms(rooms);
 
-            if (apply)
+            if (!apply)
             {
-                var roomIdResult = this.GetRoom(rooms);
-                if (!roomIdResult.IsSuccess)
-                {
-                    return new OptionalResult<string>(roomIdResult);
-                }
-
-                var room = (await this.room1Service.GetByCondition(x => x.Id.Value == roomIdResult.Value)).FirstOrDefault();
-
-                var users = (await this.roomService.GetUsersInRoom(room)).ToList();
-                var apply1 = this.OutputAvailableUsers(users);
-
-                if (apply1)
-                {
-                    var deleteUserId = this.GetUserToBeDeletedId(users);
-
-                    var result = await this.roomService.DeleteUserFromRoom(deleteUserId.Result.Value, roomIdResult.Value);
-                    if (result.IsSuccess)
-                    {
-                        this.Console.Print($"User {deleteUserId} deleted from room {roomIdResult.Value} successfully\n");
-                    }
-                }
+                return new OptionalResult<string>();
             }
+
+            var room = this.GetSelectedItem(rooms);
+            var users = (await this.roomService.GetUsersInRoom(room)).ToList();
+            this.OutputAvailableUsers(users);
+
+            var deleteUser = this.GetSelectedItem(users);
+
+            var result = await this.roomService.DeleteUserFromRoom(deleteUser, room);
+            if (!result.IsSuccess)
+            {
+                return new OptionalResult<string>(result);
+            }
+
+            this.Console.Print($"User {deleteUser.Id} deleted from room {room.Id} successfully");
 
             return new OptionalResult<string>();
         }
@@ -78,70 +66,60 @@ namespace Console.PrL.Commands
         private bool OutputAvailableRooms(List<RoomModel> rooms)
         {
             var apply = true;
-            this.Console.Print("Rooms you are in:\n");
-            this.Console.Print("\n");
+            this.Console.Print("Rooms you are in:");
+            this.Console.Print();
             if (rooms.Count == 0)
             {
-                this.Console.Print("<You don't have any rooms to edit>\n");
+                this.Console.Print("<You don't have any rooms to edit>");
                 apply = false;
             }
 
             for (int i = 0; i < rooms.Count; i++)
             {
                 var room = rooms[i];
-                this.Console.Print($"{i + 1}) {room.Name}\n");
+                this.Console.Print($"{i + 1}) {room.Name}");
             }
 
-            this.Console.Print("\n");
+            this.Console.Print();
             return apply;
         }
 
-        private bool OutputAvailableUsers(List<UserModel> users)
+        private void OutputAvailableUsers(List<UserModel> users)
         {
-            var apply = true;
-            this.Console.Print("Users in the room:\n");
-            this.Console.Print("\n");
+            this.Console.Print("Users in the room:");
+            this.Console.Print();
 
             for (int i = 0; i < users.Count; i++)
             {
                 var user = users[i];
-                this.Console.Print($"{i + 1}) {user.UserName}\n");
+                this.Console.Print($"{i + 1}) {user.UserName} {user.Email}");
             }
 
-            this.Console.Print("\n");
-            return apply;
+            this.Console.Print();
         }
 
-        private OptionalResult<int> GetRoom(List<RoomModel> rooms)
+        private T GetSelectedItem<T>(List<T> rooms)
         {
+            int index;
             while (true)
             {
-                int.TryParse(this.Console.Input("Which room would you like to delete a user from? "), out var number);
-                if (rooms[number - 1].Id.IsSuccess)
+                var parsed = int.TryParse(this.Console.Input("Enter number of item to select: "), out index);
+                index--;
+                if (!parsed)
                 {
-                    return rooms[number - 1].Id;
+                    this.Console.Print("Enter a valid number.");
                 }
-
-                this.Console.Print("Enter a valid number.");
-            }
-        }
-
-        private async Task<OptionalResult<int>> GetUserToBeDeletedId(List<UserModel> users)
-        {
-            while (true)
-            {
-                var email = this.Console.Input("What is the username of the user you would like to delete?: ");
-                if (!string.IsNullOrWhiteSpace(email))
+                else if (index < 0 || index >= rooms.Count)
                 {
-                    var user = (await this.userService.GetByCondition(x => x.UserName == email)).FirstOrDefault();
-                    if (user.Id.IsSuccess)
-                    {
-                        return user.Id;
-                    }
+                    this.Console.Print("Enter a number, that is in range.");
                 }
-
-                this.Console.Print("Enter a valid username.");
+                else
+                {
+                    break;
+                }
             }
+
+            return rooms[index];
         }
     }
-    }
+}

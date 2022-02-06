@@ -8,3 +8,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Naming", "CA1704:Identifiers should be spelled correctly", Justification = "<>", Scope = "member", Target = "~P:Core.Settings.AppSettings.JwtExpirationTime")]
 [assembly: SuppressMessage("Naming", "CA1704:Identifiers should be spelled correctly", Justification = "<>", Scope = "type", Target = "~T:Core.Settings.JsonDbSettings")]
 [assembly: SuppressMessage("Naming", "CA1704:Identifiers should be spelled correctly", Justification = "<>", Scope = "member", Target = "~P:Core.DataClasses.AccountActivationPayload.Uidb64")]
+[assembly: SuppressMessage("Naming", "CA1704:Identifiers should be spelled correctly", Justification = "<>", Scope = "namespace", Target = "~N:Core.Enums")]

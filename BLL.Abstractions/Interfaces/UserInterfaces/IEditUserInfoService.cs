@@ -5,6 +5,8 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IEditUserInfoService
     {
-        Task<OptionalResult<string>> EditUser(OptionalResult<int> userId);
+        Task<ExceptionalResult> EditUser(UserEditModel editModel);
+
+        bool CheckOldPassword(UserModel user, string oldPassword);
     }
 }

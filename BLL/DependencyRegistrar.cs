@@ -1,5 +1,7 @@
-﻿using BLL.Abstractions.Interfaces.RoomInterfaces;
+﻿using BLL.Abstractions.Interfaces.RoleInterfaces;
+using BLL.Abstractions.Interfaces.RoomInterfaces;
 using BLL.Abstractions.Interfaces.UserInterfaces;
+using BLL.Services.RoleServices;
 using BLL.Services.RoomServices;
 using BLL.Services.UserServices;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +14,7 @@ namespace BLL
         {
             ConfigureUserServices(services);
             ConfigureRoomServices(services);
+            ConfigureRoleServices(services);
 
             DAL.DependencyRegistrar.ConfigureServices(services);
         }
@@ -28,7 +31,6 @@ namespace BLL
             services.AddScoped<IAccountActivationService, AccountActivationService>();
             services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
-            services.AddScoped<IDeleteUserService, DeleteUserService>();
             services.AddScoped<IEditUserInfoService, EditUserInfoService>();
         }
 
@@ -37,6 +39,12 @@ namespace BLL
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IUserRoomService, UserRoomService>();
             services.AddScoped<IRoomValidationService, RoomValidationService>();
+        }
+
+        private static void ConfigureRoleServices(IServiceCollection services)
+        {
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IUserRoomRoleService, UserRoomRoleService>();
         }
     }
 }

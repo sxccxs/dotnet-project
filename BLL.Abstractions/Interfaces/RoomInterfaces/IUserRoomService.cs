@@ -8,7 +8,7 @@ namespace BLL.Abstractions.Interfaces.RoomInterfaces
     {
         Task<ExceptionalResult> CreateRoomForUser(UserModel user, RoomCreateModel createModel);
 
-        Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomUpdateModel updateModel);
+        Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomEditModel editModel);
 
         Task<ExceptionalResult> DeleteRoomByUser(UserModel user, int roomId);
 
@@ -16,8 +16,8 @@ namespace BLL.Abstractions.Interfaces.RoomInterfaces
 
         Task<IEnumerable<UserModel>> GetUsersInRoom(RoomModel room);
 
-        Task<ExceptionalResult> AddUserToRoom(int userId, int roomId);
+        Task<ExceptionalResult> AddUserToRoom(string email, RoomModel room);
 
-        Task<ExceptionalResult> DeleteUserFromRoom(int userId, int roomId);
+        Task<ExceptionalResult> DeleteUserFromRoom(UserModel user, RoomModel room);
     }
 }

@@ -1,9 +1,11 @@
-﻿using BLL.Abstractions.Interfaces.RoomInterfaces;
+﻿using BLL.Abstractions.Interfaces.RoleInterfaces;
+using BLL.Abstractions.Interfaces.RoomInterfaces;
 using BLL.Abstractions.Interfaces.UserInterfaces;
 using Console.PrL.Commands;
 using Console.PrL.Commands.RoomCommands;
 using Console.PrL.Commands.UserCommands;
 using Console.PrL.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Console.PrL
 {
@@ -11,40 +13,22 @@ namespace Console.PrL
     {
         private readonly IConsole console;
 
+        private readonly ILogger logger;
+
         private readonly Dictionary<string, Command> commands;
 
         private string authToken;
 
-        public App(
-            IConsole console,
-            ILoginService loginService,
-            IRegistrationService registrationService,
-            IAccountActivationService accountActivationService,
-            IAuthenticationService authenticationService,
-            IUserRoomService userRoomService,
-            IUserService userService,
-            IRoomService roomService)
+        public App(ILogger<App> logger, IConsole console, IEnumerable<Command> commands)
         {
+            this.logger = logger;
             this.console = console;
 
-            var commandsArray = new Command[]
-            {
-                new LoginCommand(console, loginService),
-                new RegistrationCommand(console, registrationService),
-                new ActivationCommand(console, accountActivationService),
-                new MeCommand(console, authenticationService),
-                new GetRoomsCommand(console, authenticationService, userRoomService),
-                new CreateRoomCommand(console, authenticationService, userRoomService),
-                new UpdateRoomCommand(console, authenticationService, userRoomService),
-                new DeleteRoomCommand(console, authenticationService, userRoomService),
-                new DeleteUserFromRoomCommand(console, userService, userRoomService, authenticationService, roomService),
-                new AddUserToRoomCommand(console, authenticationService, roomService, userService, userRoomService),
-            };
-
-            commandsArray = commandsArray.Append(new HelpCommand(console, commandsArray)).ToArray();
-
             this.commands = new Dictionary<string, Command>();
-            foreach (var command in commandsArray)
+            var commandsList = commands.ToList();
+            var helpCommand = new HelpCommand(console, commandsList);
+            this.commands.Add(helpCommand.Name, helpCommand);
+            foreach (var command in commandsList)
             {
                 this.commands.Add(command.Name, command);
             }
@@ -55,27 +39,35 @@ namespace Console.PrL
             while (true)
             {
                 var command = this.console.Input(string.Empty).Trim();
-                if (command is null || string.IsNullOrWhiteSpace(command))
+                if (string.IsNullOrWhiteSpace(command))
                 {
                     continue;
                 }
 
                 if (this.commands.ContainsKey(command))
                 {
-                    var cmd = this.commands[command];
-                    var result = await cmd.Execute(this.authToken);
-                    if (cmd is LoginCommand && result.IsSuccess)
+                    try
                     {
-                        this.authToken = result.Value;
+                        var cmd = this.commands[command];
+                        var result = await cmd.Execute(this.authToken);
+                        if (cmd is LoginCommand && result.IsSuccess)
+                        {
+                            this.authToken = result.Value;
+                        }
+                        else if (!result.IsSuccess)
+                        {
+                            this.console.Print($"{result.ExceptionMessage}");
+                        }
                     }
-                    else if (!result.IsSuccess)
+                    catch (Exception ex)
                     {
-                        this.console.Print($"{result.ExceptionMessage}\n");
+                        this.logger.LogError(ex.Message);
+                        throw;
                     }
                 }
                 else
                 {
-                    this.console.Print($"Invalid command {command}.\n");
+                    this.console.Print($"Invalid command {command}.");
                 }
             }
         }

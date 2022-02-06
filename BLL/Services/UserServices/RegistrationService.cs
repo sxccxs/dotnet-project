@@ -72,7 +72,7 @@ namespace BLL.Services.UserServices
             var token = this.tokenGeneratorService.GetToken(user);
             var subject = "Email confirmation";
             var url = $"{this.appSettings.Domain}/{uidb64}/{token}";
-            var body = File.ReadAllText(this.appSettings.AccountActivationEmailTemplate)
+            var body = (await File.ReadAllTextAsync(this.appSettings.AccountActivationEmailTemplate))
                            .Replace("{UserName}", user.UserName)
                            .Replace("{url}", url);
             await this.emailService.SendEmail(user.Email, subject, body);

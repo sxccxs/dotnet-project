@@ -5,9 +5,9 @@ namespace BLL.Abstractions.Interfaces.RoomInterfaces
 {
     public interface IRoomService
     {
-        Task<IEnumerable<RoomModel>> GetAll();
-
         Task<IEnumerable<RoomModel>> GetByCondition(Func<RoomModel, bool> condition);
+
+        Task<RoomModel> GetRoomById(int id);
 
         Task<OptionalResult<RoomModel>> Create(RoomCreateModel roomModel);
 
