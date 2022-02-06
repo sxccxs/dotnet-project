@@ -52,7 +52,7 @@ namespace BLL.Services.RoleServices
                 : await this.InnerAddRoleForUserAndRoom(user, room, roleName);
         }
 
-        public async Task<OptionalResult<RoleModel>> DeleteRoleForUserAndRoom(UserModel user, RoomModel room, bool asTransaction = true)
+        public async Task<ExceptionalResult> DeleteRoleForUserAndRoom(UserModel user, RoomModel room, bool asTransaction = true)
         {
             return asTransaction
                 ? await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteRoleForUserAndRoom(user, room))
@@ -127,7 +127,7 @@ namespace BLL.Services.RoleServices
             return new ExceptionalResult();
         }
 
-        private async Task<OptionalResult<RoleModel>> InnerDeleteRoleForUserAndRoom(UserModel user, RoomModel room)
+        private async Task<ExceptionalResult> InnerDeleteRoleForUserAndRoom(UserModel user, RoomModel room)
         {
             var role = await this.GetRoleForUserAndRoom(user, room);
 
@@ -135,23 +135,13 @@ namespace BLL.Services.RoleServices
             var userResult = await this.UpdateUserRoles(user);
             if (!userResult.IsSuccess)
             {
-                return new OptionalResult<RoleModel>(userResult);
+                return userResult;
             }
 
             room.Roles.Remove(role);
             var roomResult = await this.UpdateRoomRoles(room);
-            if (!roomResult.IsSuccess)
-            {
-                return new OptionalResult<RoleModel>(roomResult);
-            }
 
-            var roleResult = await this.roleService.Delete(role.Id);
-            if (!roleResult.IsSuccess)
-            {
-                return new OptionalResult<RoleModel>(roleResult);
-            }
-
-            return new OptionalResult<RoleModel>(role);
+            return !roomResult.IsSuccess ? roomResult : new ExceptionalResult();
         }
 
         private async Task<ExceptionalResult> AddRoleModelToUserAndRoom(UserModel user, RoomModel room, RoleModel role)

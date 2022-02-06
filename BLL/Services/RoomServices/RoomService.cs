@@ -23,7 +23,7 @@ namespace BLL.Services.RoomServices
 
         public async Task<RoomModel> GetRoomById(int id)
         {
-            return (await this.GetByCondition(r => r.Id == id)).FirstOrDefault();
+            return (await this.GetByConditions(r => r.Id == id)).FirstOrDefault();
         }
 
         public async Task<OptionalResult<RoomModel>> Create(RoomCreateModel roomModel)
@@ -77,7 +77,7 @@ namespace BLL.Services.RoomServices
             });
             var mapper = new Mapper(mapperConfiguration);
             var room = mapper.Map<RoomModel>(updateModel);
-            var changingRoom = (await this.GetByConditions(x => x.Id == updateModel.Id)).First();
+            var changingRoom = await this.GetRoomById(updateModel.Id);
 
             foreach (var prop in room.GetType().GetProperties())
             {

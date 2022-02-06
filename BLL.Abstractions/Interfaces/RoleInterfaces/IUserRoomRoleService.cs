@@ -12,7 +12,7 @@ namespace BLL.Abstractions.Interfaces.RoleInterfaces
 
         Task<ExceptionalResult> AddRoleForUserAndRoom(UserModel user, RoomModel room, string roleName, bool asTransaction = true);
 
-        Task<OptionalResult<RoleModel>> DeleteRoleForUserAndRoom(UserModel user, RoomModel room, bool asTransaction = true);
+        Task<ExceptionalResult> DeleteRoleForUserAndRoom(UserModel user, RoomModel room, bool asTransaction = true);
 
         Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, string roleName);
 

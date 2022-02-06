@@ -32,7 +32,7 @@ namespace BLL.Services.UserServices
 
         public async Task<UserModel> GetUserById(int id)
         {
-            return (await this.GetByCondition(u => u.Id == id)).FirstOrDefault();
+            return (await this.GetByConditions(u => u.Id == id)).FirstOrDefault();
         }
 
         public async Task<OptionalResult<UserModel>> CreateNonActiveUser(UserCreateModel user)
@@ -104,7 +104,7 @@ namespace BLL.Services.UserServices
             });
             var mapper = new Mapper(mapperConfig);
             var userObject = mapper.Map<UserModel>(user);
-            var changingUser = (await this.GetByConditions(x => x.Id == user.Id)).First();
+            var changingUser = await this.GetUserById(user.Id);
 
             foreach (var field in userObject.GetType().GetProperties())
             {
@@ -116,7 +116,7 @@ namespace BLL.Services.UserServices
 
             if (user.Password is not null)
             {
-                changingUser.HashedPassword = this.HashingService.Hash(user.Password);
+                changingUser.HashedPassword = this.hashingService.Hash(user.Password);
             }
 
             return changingUser;

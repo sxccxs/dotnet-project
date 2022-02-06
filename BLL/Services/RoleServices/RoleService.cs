@@ -20,6 +20,11 @@ namespace BLL.Services.RoleServices
             return await this.storage.GetByConditions(conditions, r => r.Room, r => r.User, r => r.RoleType);
         }
 
+        public async Task<RoleModel> GetRoleById(int id)
+        {
+            return (await this.GetByConditions(r => r.Id == id)).FirstOrDefault();
+        }
+
         public async Task<OptionalResult<RoleModel>> CreateRole(RoleModel role)
         {
             await this.storage.Create(role);
@@ -29,7 +34,7 @@ namespace BLL.Services.RoleServices
 
         public async Task<OptionalResult<RoleModel>> Update(RoleModel role)
         {
-            var changingRole = (await this.GetByConditions(x => x.Id == role.Id)).FirstOrDefault();
+            var changingRole = await this.GetRoleById(role.Id);
             if (changingRole is null)
             {
                 return new OptionalResult<RoleModel>(false, $"Role with id {role.Id} does not exist.");
@@ -43,7 +48,7 @@ namespace BLL.Services.RoleServices
 
         public async Task<ExceptionalResult> Delete(int id)
         {
-            var role = (await this.GetByConditions(x => x.Id == id)).FirstOrDefault();
+            var role = await this.GetRoleById(id);
             if (role is null)
             {
                 return new ExceptionalResult(false, $"Role with id {id} does not exist.");

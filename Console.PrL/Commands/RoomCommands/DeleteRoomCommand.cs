@@ -23,7 +23,7 @@ namespace Console.PrL.Commands.RoomCommands
 
         public override string Description => "Delete room. You must be logged in";
 
-        public async override Task<OptionalResult<string>> Execute(string token)
+        public override async Task<OptionalResult<string>> Execute(string token)
         {
             var userResult = await this.authenticationService.GetUserByToken(token);
 
@@ -36,19 +36,21 @@ namespace Console.PrL.Commands.RoomCommands
 
             var rooms = user.Rooms.ToHashSet().ToList();
 
-            var apply = this.GetDeleteRoomId(rooms, out int deletionId);
+            var apply = this.GetDeleteRoomId(rooms, out var deletionId);
 
-            if (apply)
+            if (!apply)
             {
-                var deleteResult = await this.roomService.DeleteRoomByUser(user, deletionId);
-
-                if (!deleteResult.IsSuccess)
-                {
-                    return new OptionalResult<string>(deleteResult);
-                }
-
-                this.Console.Print("Room deleted successfully");
+                return new OptionalResult<string>();
             }
+
+            var deleteResult = await this.roomService.DeleteRoomByUser(user, deletionId);
+
+            if (!deleteResult.IsSuccess)
+            {
+                return new OptionalResult<string>(deleteResult);
+            }
+
+            this.Console.Print("Room deleted successfully");
 
             return new OptionalResult<string>();
         }
