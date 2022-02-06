@@ -3,8 +3,8 @@ using Core.Models.UserModels;
 
 namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
-    public interface IValidationService
+    public interface IEditUserInfoService
     {
-        ExceptionalResult Validate(UserRegistrationModel user);
+        Task<OptionalResult<string>> EditUser(OptionalResult<int> userId);
     }
 }

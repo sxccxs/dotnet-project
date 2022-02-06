@@ -18,7 +18,7 @@ namespace Console.PrL.Utilities
         {
             System.Console.Write($"{this.inputPrefix} {text}");
 
-            return System.Console.ReadLine();
+            return System.Console.ReadLine().Trim();
         }
 
         public void Print(string text)

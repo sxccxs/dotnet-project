@@ -15,7 +15,7 @@ namespace BLL.Services.UserServices
             this.userService = userService;
         }
 
-        public ExceptionalResult Activate(AccountActivationPayload activationPayload)
+        public async Task<ExceptionalResult> Activate(AccountActivationPayload activationPayload)
         {
             var idResult = this.tokenGeneratorService.GetIdFromUidb64(activationPayload.Uidb64);
             if (!idResult.IsSuccess)
@@ -24,7 +24,7 @@ namespace BLL.Services.UserServices
             }
 
             var id = idResult.Value;
-            var user = this.userService.GetByCondition(x => x.Id == id).FirstOrDefault();
+            var user = (await this.userService.GetByCondition(x => x.Id == id)).FirstOrDefault();
             if (user is null)
             {
                 return new ExceptionalResult(false, $"User with id {id} does not exist");
@@ -34,7 +34,7 @@ namespace BLL.Services.UserServices
 
             if (!tokenResult.IsSuccess && tokenResult.ExceptionMessage == "Token is outdated")
             {
-                this.userService.Delete(id);
+                await this.userService.Delete(id);
                 return new ExceptionalResult(false, "Token is outdated. You have to register again");
             }
 
@@ -43,7 +43,7 @@ namespace BLL.Services.UserServices
                 return tokenResult;
             }
 
-            this.userService.ActivateUser(id);
+            await this.userService.ActivateUser(id);
             return new ExceptionalResult();
         }
     }

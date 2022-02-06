@@ -3,8 +3,8 @@ using Core.Models.UserModels;
 
 namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
-    public interface IRegistrationService
+    public interface IAuthenticationService
     {
-        Task<ExceptionalResult> Register(UserRegistrationModel userData);
+        Task<OptionalResult<UserModel>> GetUserByToken(string jwtToken);
     }
 }

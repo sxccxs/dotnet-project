@@ -38,7 +38,7 @@ namespace BLL.Services.UserServices
         {
             if (jwt is null)
             {
-                return new OptionalResult<int>();
+                return new OptionalResult<int>(false, "Token is empty");
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -63,9 +63,9 @@ namespace BLL.Services.UserServices
 
                 return new OptionalResult<int>(userId);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new OptionalResult<int>();
+                return new OptionalResult<int>(false, ex.Message);
             }
         }
     }

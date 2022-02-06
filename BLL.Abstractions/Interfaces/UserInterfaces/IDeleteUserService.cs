@@ -3,8 +3,8 @@ using Core.Models.UserModels;
 
 namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
-    public interface IRegistrationService
+    public interface IDeleteUserService
     {
-        Task<ExceptionalResult> Register(UserRegistrationModel userData);
+        Task<OptionalResult<string>> DeleteUser(OptionalResult<int> userId);
     }
 }

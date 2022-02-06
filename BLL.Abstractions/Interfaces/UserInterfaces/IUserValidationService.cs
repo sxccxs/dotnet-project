@@ -3,8 +3,8 @@ using Core.Models.UserModels;
 
 namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
-    public interface IRegistrationService
+    public interface IUserValidationService
     {
-        Task<ExceptionalResult> Register(UserRegistrationModel userData);
+        ExceptionalResult Validate(UserRegistrationModel user);
     }
 }

@@ -3,7 +3,7 @@ using Console.PrL.Interfaces;
 using Core.DataClasses;
 using Core.Models.UserModels;
 
-namespace Console.PrL.Commands
+namespace Console.PrL.Commands.UserCommands
 {
     internal class LoginCommand : Command
     {
@@ -17,10 +17,12 @@ namespace Console.PrL.Commands
 
         public override string Name => "/login";
 
-        public override OptionalResult<string> Execute()
+        public override string Description => "Login to app";
+
+        public async override Task<OptionalResult<string>> Execute(string token)
         {
             var userData = this.GetLoginInfo();
-            var tokenResult = this.loginService.Login(userData);
+            var tokenResult = await this.loginService.Login(userData);
             if (tokenResult.IsSuccess)
             {
                 this.Console.Print("Logged in successfully\n");

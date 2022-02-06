@@ -8,6 +8,6 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IEmailService
     {
-        void SendEmail(string toEmail, string emailSubject, string emailHtmlBody);
+        Task SendEmail(string toEmail, string emailSubject, string emailHtmlBody);
     }
 }

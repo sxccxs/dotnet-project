@@ -18,56 +18,56 @@ namespace BLL.Services.UserServices
 
         public IHashingService HashingService { get; private set; }
 
-        public IEnumerable<UserModel> Get()
+        public async Task<IEnumerable<UserModel>> Get()
         {
-            return this.storage.GetAll();
+            return (await this.storage.GetAll()).Where(x => x.IsActive);
         }
 
-        public IEnumerable<UserModel> GetByCondition(Func<UserModel, bool> condition)
+        public async Task<IEnumerable<UserModel>> GetByCondition(Func<UserModel, bool> condition)
         {
-            return this.storage.GetByCondition(condition);
+            return (await this.Get()).Where(condition);
         }
 
-        public OptionalResult<UserModel> CreateNonActiveUser(UserCreateModel user)
+        public async Task<OptionalResult<UserModel>> CreateNonActiveUser(UserCreateModel user)
         {
-            if (this.storage.GetByCondition(x => x.Email == user.Email).Any())
+            if ((await this.storage.GetByCondition(x => x.Email == user.Email)).Any())
             {
                 return new OptionalResult<UserModel>(false, $"User with email {user.Email} already exists");
             }
 
-            var userModel = this.MapUserCreateModel(user);
-            this.storage.Create(userModel);
+            var userModel = await this.MapUserCreateModel(user);
+            await this.storage.Create(userModel);
 
             return new OptionalResult<UserModel>(userModel);
         }
 
-        public OptionalResult<UserModel> Delete(int id)
+        public async Task<OptionalResult<UserModel>> Delete(int id)
         {
-            var user = this.storage.GetByCondition(x => x.Id == id).FirstOrDefault();
+            var user = (await this.storage.GetByCondition(x => x.Id == id)).FirstOrDefault();
             if (user is null)
             {
                 return new OptionalResult<UserModel>(false, $"User with id {id} does not exist");
             }
 
-            this.storage.Delete(user);
+            await this.storage.Delete(user);
 
             return new OptionalResult<UserModel>(user);
         }
 
-        public OptionalResult<UserModel> Update(UserUpdateModel user)
+        public async Task<OptionalResult<UserModel>> Update(UserUpdateModel user)
         {
-            if (!this.storage.GetByCondition(x => x.Id == user.Id).Any())
+            if (!(await this.storage.GetByCondition(x => x.Id == user.Id)).Any())
             {
                 return new OptionalResult<UserModel>(false, $"User with id {user.Id} does not exist");
             }
 
-            var userModel = this.MapUserUpdateModel(user);
-            this.storage.Update(userModel);
+            var userModel = await this.MapUserUpdateModel(user);
+            await this.storage.Update(userModel);
 
             return new OptionalResult<UserModel>(userModel);
         }
 
-        public OptionalResult<UserModel> ActivateUser(int id)
+        public async Task<OptionalResult<UserModel>> ActivateUser(int id)
         {
             var userData = new UserUpdateModel()
             {
@@ -75,27 +75,27 @@ namespace BLL.Services.UserServices
                 IsActive = true,
             };
 
-            return this.Update(userData);
+            return await this.Update(userData);
         }
 
-        private UserModel MapUserCreateModel(UserCreateModel user)
+        private async Task<UserModel> MapUserCreateModel(UserCreateModel user)
         {
             var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<UserCreateModel, UserModel>());
             var mapper = new Mapper(mapperConfig);
             var userObject = mapper.Map<UserModel>(user);
-            userObject.Id = this.storage.GetNextId();
+            userObject.Id = await this.storage.GetNextId();
             userObject.HashedPassword = this.HashingService.Hash(user.Password);
             userObject.IsActive = false;
 
             return userObject;
         }
 
-        private UserModel MapUserUpdateModel(UserUpdateModel user)
+        private async Task<UserModel> MapUserUpdateModel(UserUpdateModel user)
         {
             var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<UserUpdateModel, UserModel>(MemberList.Source));
             var mapper = new Mapper(mapperConfig);
             var userObject = mapper.Map<UserModel>(user);
-            var changingUser = this.GetByCondition(x => x.Id == user.Id).First();
+            var changingUser = (await this.GetByCondition(x => x.Id == user.Id)).First();
 
             foreach (var field in userObject.GetType().GetProperties())
             {

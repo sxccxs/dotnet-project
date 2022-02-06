@@ -3,7 +3,7 @@ using Console.PrL.Interfaces;
 using Core.DataClasses;
 using Core.Models.UserModels;
 
-namespace Console.PrL.Commands
+namespace Console.PrL.Commands.UserCommands
 {
     internal class RegistrationCommand : Command
     {
@@ -17,11 +17,13 @@ namespace Console.PrL.Commands
 
         public override string Name => "/register";
 
-        public override OptionalResult<string> Execute()
+        public override string Description => "Register in app";
+
+        public async override Task<OptionalResult<string>> Execute(string token)
         {
             var userRegistration = this.GetRegistrationInfo();
 
-            var registrationResult = this.registrationService.Register(userRegistration);
+            var registrationResult = await this.registrationService.Register(userRegistration);
             if (!registrationResult.IsSuccess)
             {
                 return new OptionalResult<string>(registrationResult);

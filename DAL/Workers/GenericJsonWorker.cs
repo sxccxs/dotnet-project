@@ -18,42 +18,42 @@ namespace DAL.Workers
                                                           : throw new ArgumentNullException(nameof(settings));
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task<IEnumerable<T>> GetAll()
         {
-            return this.readerWriter.Read<IEnumerable<T>>(this.storagePath);
+            return await this.readerWriter.Read<IEnumerable<T>>(this.storagePath);
         }
 
-        public IEnumerable<T> GetByCondition(Func<T, bool> condition)
+        public async Task<IEnumerable<T>> GetByCondition(Func<T, bool> condition)
         {
-            return this.GetAll().Where(condition);
+            return (await this.GetAll()).Where(condition);
         }
 
-        public int GetNextId()
+        public async Task<int> GetNextId()
         {
-            return this.GetAll().OrderBy(x => x.Id).FirstOrDefault()?.Id + 1 ?? 1;
+            return (await this.GetAll()).OrderBy(x => x.Id).LastOrDefault()?.Id.Value + 1 ?? 1;
         }
 
-        public void Create(T entity)
+        public async Task Create(T entity)
         {
-            var data = this.GetAll().ToList();
+            var data = (await this.GetAll()).ToList();
             data.Add(entity);
-            this.readerWriter.Write(this.storagePath, data);
+            await this.readerWriter.Write(this.storagePath, data);
         }
 
-        public void Delete(T entity)
+        public async Task Delete(T entity)
         {
-            var data = this.GetAll().ToList();
+            var data = (await this.GetAll()).ToList();
             var item = data.FirstOrDefault(x => x.Id == entity.Id);
             data.Remove(item);
-            this.readerWriter.Write(this.storagePath, data);
+            await this.readerWriter.Write(this.storagePath, data);
         }
 
-        public void Update(T entity)
+        public async Task Update(T entity)
         {
-            var data = this.GetAll().ToList();
+            var data = (await this.GetAll()).ToList();
             var index = data.IndexOf(data.FirstOrDefault(x => x.Id == entity.Id));
             data[index] = entity;
-            this.readerWriter.Write(this.storagePath, data);
+            await this.readerWriter.Write(this.storagePath, data);
         }
 
         public string GetFilePath(JsonDbSettings settings)
