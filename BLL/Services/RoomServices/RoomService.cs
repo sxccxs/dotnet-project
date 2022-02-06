@@ -21,6 +21,11 @@ namespace BLL.Services.RoomServices
             return await this.storage.GetByConditions(conditions, r => r.Roles, r => r.Users);
         }
 
+        public async Task<RoomModel> GetRoomById(int id)
+        {
+            return (await this.GetByCondition(r => r.Id == id)).FirstOrDefault();
+        }
+
         public async Task<OptionalResult<RoomModel>> Create(RoomCreateModel roomModel)
         {
             var room = this.MapRoomCreateModelToRoomModel(roomModel);
@@ -31,7 +36,7 @@ namespace BLL.Services.RoomServices
 
         public async Task<ExceptionalResult> Delete(int id)
         {
-            var room = (await this.GetByConditions(x => x.Id == id)).FirstOrDefault();
+            var room = await this.GetRoomById(id);
             if (room is null)
             {
                 return new ExceptionalResult(false, $"Room with id {id} does not exist");
@@ -44,7 +49,7 @@ namespace BLL.Services.RoomServices
 
         public async Task<OptionalResult<RoomModel>> Update(RoomUpdateModel roomModel)
         {
-            if (!(await this.GetByConditions(x => x.Id == roomModel.Id)).Any())
+            if (await this.GetRoomById(roomModel.Id) is null)
             {
                 return new OptionalResult<RoomModel>(false, $"Room with id {roomModel.Id} does not exist");
             }

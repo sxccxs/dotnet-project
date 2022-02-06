@@ -289,7 +289,7 @@ namespace BLL.Services.RoomServices
 
         private async Task<OptionalResult<RoomModel>> ValidateUserAndRoomId(UserModel user, int roomId)
         {
-            var room = (await this.roomService.GetByConditions(x => x.Id == roomId)).FirstOrDefault();
+            var room = await this.roomService.GetRoomById(roomId);
             if (room is null)
             {
                 return new OptionalResult<RoomModel>(false, $"Room with id {roomId} does not exist");

@@ -5,12 +5,12 @@ namespace Console.PrL.Commands
 {
     internal class HelpCommand : Command
     {
-        private Command[] commands;
+        private readonly Command[] commands;
 
-        public HelpCommand(IConsole console, Command[] commands)
+        public HelpCommand(IConsole console, IEnumerable<Command> commands)
             : base(console)
         {
-            this.commands = commands;
+            this.commands = commands.ToArray();
             this.commands = this.commands.Append(this).ToArray();
         }
 

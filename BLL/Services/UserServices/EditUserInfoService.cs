@@ -17,14 +17,23 @@ namespace BLL.Services.UserServices
 
         private readonly ITokenGeneratorService tokenGeneratorService;
 
+        private readonly IHashingService hashingService;
+
         private readonly AppSettings appSettings;
 
-        public EditUserInfoService(IUserService userService, IUserValidationService validationService, IEmailService emailService, IOptions<AppSettings> appSettings, ITokenGeneratorService tokenGeneratorService)
+        public EditUserInfoService(
+            IUserService userService,
+            IUserValidationService validationService,
+            IEmailService emailService,
+            IOptions<AppSettings> appSettings,
+            ITokenGeneratorService tokenGeneratorService,
+            IHashingService hashingService)
         {
             this.userService = userService;
             this.emailService = emailService;
             this.validationService = validationService;
             this.tokenGeneratorService = tokenGeneratorService;
+            this.hashingService = hashingService;
             this.appSettings = appSettings.Value;
         }
 
@@ -59,7 +68,7 @@ namespace BLL.Services.UserServices
 
         public bool CheckOldPassword(UserModel user, string oldPassword)
         {
-            return this.userService.HashingService.Hash(oldPassword) == user.HashedPassword;
+            return this.hashingService.Hash(oldPassword) == user.HashedPassword;
         }
 
         private async Task SendChangeEmail(UserModel user)
@@ -68,7 +77,7 @@ namespace BLL.Services.UserServices
             var token = this.tokenGeneratorService.GetToken(user);
             var subject = "Change email in your account";
             var url = $"{this.appSettings.Domain}/{uidb64}/{token}";
-            var body = File.ReadAllText(this.appSettings.AccountActivationEmailTemplate)
+            var body = (await File.ReadAllTextAsync(this.appSettings.AccountActivationEmailTemplate))
                 .Replace("{UserName}", user.UserName)
                 .Replace("{url}", url);
             await this.emailService.SendEmail(user.Email, subject, body);

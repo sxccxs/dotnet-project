@@ -27,15 +27,9 @@ namespace BLL.Services.UserServices
                 this.ValidateRePassword(user.Password, user.RePassword),
             };
 
-            foreach (var result in results)
-            {
-                if (!result.IsSuccess)
-                {
-                    return result;
-                }
-            }
+            var incorrectResults = results.Where(r => !r.IsSuccess).ToList();
 
-            return new ExceptionalResult();
+            return incorrectResults.Any() ? incorrectResults.First() : new ExceptionalResult();
         }
 
         public ExceptionalResult ValidateUpdateModel(UserEditModel user)

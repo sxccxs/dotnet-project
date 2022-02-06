@@ -11,13 +11,13 @@ namespace BLL.Services.UserServices
     {
         private readonly IGenericStorageWorker<UserModel> storage;
 
+        private readonly IHashingService hashingService;
+
         public UserService(IGenericStorageWorker<UserModel> storage, IHashingService hashingService)
         {
             this.storage = storage;
-            this.HashingService = hashingService;
+            this.hashingService = hashingService;
         }
-
-        public IHashingService HashingService { get; private set; }
 
         public async Task<IEnumerable<UserModel>> GetByConditions(params Expression<Func<UserModel, bool>>[] conditions)
         {
@@ -28,6 +28,11 @@ namespace BLL.Services.UserServices
         {
             additionalConditions = additionalConditions.Append(x => x.IsActive).ToArray();
             return await this.GetByConditions(additionalConditions);
+        }
+
+        public async Task<UserModel> GetUserById(int id)
+        {
+            return (await this.GetByCondition(u => u.Id == id)).FirstOrDefault();
         }
 
         public async Task<OptionalResult<UserModel>> CreateNonActiveUser(UserCreateModel user)
@@ -45,7 +50,7 @@ namespace BLL.Services.UserServices
 
         public async Task<ExceptionalResult> Delete(int id)
         {
-            var user = (await this.GetByConditions(x => x.Id == id)).FirstOrDefault();
+            var user = await this.GetUserById(id);
             if (user is null)
             {
                 return new ExceptionalResult(false, $"User with id {id} does not exist");
@@ -58,7 +63,7 @@ namespace BLL.Services.UserServices
 
         public async Task<OptionalResult<UserModel>> Update(UserUpdateModel user)
         {
-            if (!(await this.GetByConditions(x => x.Id == user.Id)).Any())
+            if (await this.GetUserById(user.Id) is null)
             {
                 return new OptionalResult<UserModel>(false, $"User with id {user.Id} does not exist");
             }
@@ -85,7 +90,7 @@ namespace BLL.Services.UserServices
             var mapperConfiguration = new MapperConfiguration(cfg => cfg.CreateMap<UserCreateModel, UserModel>());
             var mapper = new Mapper(mapperConfiguration);
             var userObject = mapper.Map<UserModel>(user);
-            userObject.HashedPassword = this.HashingService.Hash(user.Password);
+            userObject.HashedPassword = this.hashingService.Hash(user.Password);
             userObject.IsActive = false;
 
             return userObject;

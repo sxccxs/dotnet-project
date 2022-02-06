@@ -24,7 +24,7 @@ namespace BLL.Services.UserServices
             }
 
             var id = idResult.Value;
-            var user = (await this.userService.GetByConditions(x => x.Id == id)).FirstOrDefault();
+            var user = await this.userService.GetUserById(id);
             if (user is null)
             {
                 return new ExceptionalResult(false, $"User with id {id} does not exist");
