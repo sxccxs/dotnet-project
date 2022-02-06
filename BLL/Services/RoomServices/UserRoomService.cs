@@ -29,14 +29,14 @@ namespace BLL.Services.RoomServices
 
         public async Task<IEnumerable<RoomModel>> GetRoomsForUser(UserModel user)
         {
-            var tasks = await Task.WhenAll(user.Rooms.Select(id => this.roomService.GetByCondition(x => id == x.Id)));
-            return tasks.Where(result => result is not null).Select(result => result.First());
+            var tasks = await Task.WhenAll(user.Rooms.Select(id => this.roomService.GetRoomById(id)));
+            return tasks.Where(result => result is not null);
         }
 
         public async Task<IEnumerable<UserModel>> GetUsersInRoom(RoomModel room)
         {
-            var tasks = await Task.WhenAll(room.Users.Select(id => this.userService.GetByCondition(x => x.Id == id)));
-            return tasks.Where(result => result is not null).Select(result => result.First());
+            var tasks = await Task.WhenAll(room.Users.Select(id => this.userService.GetUserById(id)));
+            return tasks.Where(result => result is not null);
         }
 
         public async Task<ExceptionalResult> CreateRoomForUser(UserModel user, RoomCreateModel createModel)
@@ -229,7 +229,7 @@ namespace BLL.Services.RoomServices
 
         private async Task<OptionalResult<RoomModel>> ValidateUserAndRoomId(UserModel user, int roomId)
         {
-            var room = (await this.roomService.GetByCondition(x => x.Id == roomId)).FirstOrDefault();
+            var room = await this.roomService.GetRoomById(roomId);
             if (room is null)
             {
                 return new OptionalResult<RoomModel>(false, $"Room with id {roomId} does not exist");

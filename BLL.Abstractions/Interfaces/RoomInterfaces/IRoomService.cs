@@ -7,6 +7,8 @@ namespace BLL.Abstractions.Interfaces.RoomInterfaces
     {
         Task<IEnumerable<RoomModel>> GetByCondition(Func<RoomModel, bool> condition);
 
+        Task<RoomModel> GetRoomById(int id);
+
         Task<OptionalResult<RoomModel>> Create(RoomCreateModel roomModel);
 
         Task<OptionalResult<RoomModel>> Update(RoomUpdateModel roomModel);

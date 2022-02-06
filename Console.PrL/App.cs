@@ -19,42 +19,16 @@ namespace Console.PrL
 
         private string authToken;
 
-        public App(
-            ILogger<App> logger,
-            IConsole console,
-            ILoginService loginService,
-            IRegistrationService registrationService,
-            IAccountActivationService accountActivationService,
-            IAuthenticationService authenticationService,
-            IEditUserInfoService editUserInfoService,
-            IUserService userService,
-            IUserRoomService userRoomService,
-            IUserRoomRoleService userRoomRoleService)
+        public App(ILogger<App> logger, IConsole console, IEnumerable<Command> commands)
         {
             this.logger = logger;
             this.console = console;
 
-            var commandsArray = new Command[]
-            {
-                new LoginCommand(console, loginService),
-                new RegistrationCommand(console, registrationService),
-                new ActivationCommand(console, accountActivationService),
-                new MeCommand(console, authenticationService),
-                new EditAccountCommand(console, authenticationService, editUserInfoService),
-                new DeleteAccountCommand(console, authenticationService, userService),
-                new GetRoomsCommand(console, authenticationService, userRoomService),
-                new CreateRoomCommand(console, authenticationService, userRoomService),
-                new UpdateRoomCommand(console, authenticationService, userRoomService),
-                new DeleteRoomCommand(console, authenticationService, userRoomService),
-                new DeleteUserFromRoomCommand(console, userRoomService, authenticationService),
-                new AddUserToRoomCommand(console, authenticationService, userRoomService),
-                new ChangeRoleCommand(console, authenticationService, userRoomService, userRoomRoleService),
-            };
-
-            commandsArray = commandsArray.Append(new HelpCommand(console, commandsArray)).ToArray();
-
             this.commands = new Dictionary<string, Command>();
-            foreach (var command in commandsArray)
+            var commandsList = commands.ToList();
+            var helpCommand = new HelpCommand(console, commandsList);
+            this.commands.Add(helpCommand.Name, helpCommand);
+            foreach (var command in commandsList)
             {
                 this.commands.Add(command.Name, command);
             }
@@ -65,7 +39,7 @@ namespace Console.PrL
             while (true)
             {
                 var command = this.console.Input(string.Empty).Trim();
-                if (command is null || string.IsNullOrWhiteSpace(command))
+                if (string.IsNullOrWhiteSpace(command))
                 {
                     continue;
                 }

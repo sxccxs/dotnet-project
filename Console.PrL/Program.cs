@@ -1,7 +1,4 @@
-﻿using BLL;
-using Console.PrL.Interfaces;
-using Console.PrL.Utilities;
-using Core.Settings;
+﻿using Core.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -32,11 +29,8 @@ namespace Console.PrL
             services.Configure<JsonDbSettings>(configuration.GetSection("JsonDb"));
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
-
-            DependencyRegistrar.ConfigureServices(services);
-            services.AddScoped<IConsole, CustomConsole>();
-            services.AddScoped<App>();
             services.AddLogging(configure => configure.AddSerilog());
+            DependencyRegistrar.ConfigureServices(services);
         }
     }
 }

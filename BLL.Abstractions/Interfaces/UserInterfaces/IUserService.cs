@@ -5,8 +5,6 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
 {
     public interface IUserService
     {
-        IHashingService HashingService { get; }
-
         Task<OptionalResult<UserModel>> CreateNonActiveUser(UserCreateModel user);
 
         Task<OptionalResult<UserModel>> ActivateUser(int id);
@@ -18,5 +16,7 @@ namespace BLL.Abstractions.Interfaces.UserInterfaces
         Task<IEnumerable<UserModel>> GetByCondition(Func<UserModel, bool> condition);
 
         Task<IEnumerable<UserModel>> GetActiveUsers(Func<UserModel, bool> additionalCondition);
+
+        Task<UserModel> GetUserById(int id);
     }
 }
