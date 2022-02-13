@@ -34,6 +34,7 @@ public class AppContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        // For migrations creation
         optionsBuilder.UseSqlServer("data source=DESKTOP-D7HHFTG;initial catalog=projdb;trusted_connection=true");
     }
 

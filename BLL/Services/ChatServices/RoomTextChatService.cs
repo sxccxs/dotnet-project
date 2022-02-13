@@ -109,6 +109,20 @@ public class RoomTextChatService : IRoomTextChatService
             : await this.InnerRemoveUserFromPublicTextChatInRoomByUser(room, userToRemove, user, textChatModel);
     }
 
+    public ExceptionalResult CheckUserInChat(UserModel user, TextChatModel chat)
+    {
+        return chat.Users.Contains(user)
+            ? new ExceptionalResult()
+            : new ExceptionalResult(false, $"User {user.Id} does not belong to chat{chat.Id}");
+    }
+
+    public async Task<ExceptionalResult> ValidateRoomUserChatRole(RoomModel room, UserModel user, TextChatModel chat, Role minRole = Role.ADMIN)
+    {
+        var result = await this.CheckRoomUserRole(room, user, minRole);
+
+        return result.IsSuccess ? this.CheckUserInChat(user, chat) : result;
+    }
+
     private async Task<ExceptionalResult> InnerUpdateTextChatInRoomByUser(RoomModel room, UserModel user, ChatEditModel editModel)
     {
         var chat = await this.chatService.GetTextChatById(editModel.Id);
@@ -282,20 +296,6 @@ public class RoomTextChatService : IRoomTextChatService
         }
 
         return new ExceptionalResult();
-    }
-
-    private ExceptionalResult CheckUserInChat(UserModel user, TextChatModel chat)
-    {
-        return chat.Users.Contains(user)
-            ? new ExceptionalResult()
-            : new ExceptionalResult(false, $"User {user.Id} does not belong to chat{chat.Id}");
-    }
-
-    private async Task<ExceptionalResult> ValidateRoomUserChatRole(RoomModel room, UserModel user, TextChatModel chat, Role minRole = Role.ADMIN)
-    {
-        var result = await this.CheckRoomUserRole(room, user, minRole);
-
-        return result.IsSuccess ? this.CheckUserInChat(user, chat) : result;
     }
 
     private TextChatUpdateModel MapEditModelToUpdateModel(ChatEditModel editModel)

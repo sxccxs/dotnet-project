@@ -8,7 +8,7 @@ namespace BLL.Abstractions.Interfaces.RoomInterfaces
     {
         Task<ExceptionalResult> CreateRoomForUser(UserModel user, RoomCreateModel createModel, bool asTransaction = true);
 
-        Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomEditModel editModel);
+        Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomEditModel editModel, bool asTransaction = true);
 
         Task<ExceptionalResult> DeleteRoomByUser(UserModel user, int roomId, bool asTransaction = true);
 

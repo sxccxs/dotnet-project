@@ -1,4 +1,5 @@
 ﻿using Core.DataClasses;
+using Core.Enums;
 using Core.Models.ChatModels;
 using Core.Models.RoomModels;
 using Core.Models.UserModels;
@@ -10,6 +11,10 @@ public interface IRoomTextChatService
     IEnumerable<TextChatModel> GetPublicTextChatsForUserAndRoom(UserModel user, RoomModel room);
 
     IEnumerable<TextChatModel> GetPrivateTextChatsForUserAndRoom(UserModel user, RoomModel room);
+
+    ExceptionalResult CheckUserInChat(UserModel user, TextChatModel chat);
+
+    Task<ExceptionalResult> ValidateRoomUserChatRole(RoomModel room, UserModel user, TextChatModel chat, Role minRole = Role.ADMIN);
 
     Task<ExceptionalResult> CreatePublicTextChatInRoomByUser(RoomModel room, UserModel user, ChatCreateModel createModel, bool asTransaction = true);
 

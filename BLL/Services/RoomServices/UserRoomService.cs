@@ -70,7 +70,14 @@ namespace BLL.Services.RoomServices
                 : await this.InnerAddUserToRoom(email, room);
         }
 
-        public async Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomEditModel editModel)
+        public async Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomEditModel editModel, bool asTransaction = true)
+        {
+            return asTransaction
+                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerUpdateRoomForUser(user, editModel))
+                : await this.InnerUpdateRoomForUser(user, editModel);
+        }
+
+        private async Task<ExceptionalResult> InnerUpdateRoomForUser(UserModel user, RoomEditModel editModel)
         {
             var roomResult = await this.ValidateUserAndRoomId(user, editModel.Id);
             if (!roomResult.IsSuccess)

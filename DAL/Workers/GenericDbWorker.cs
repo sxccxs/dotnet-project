@@ -28,7 +28,7 @@ public class GenericDbWorker<T> : IGenericStorageWorker<T>
             query = query.Where(condition);
         }
 
-        return await query.ToListAsync();
+        return (await query.ToListAsync()).ToHashSet();
     }
 
     public async Task Create(T entity)

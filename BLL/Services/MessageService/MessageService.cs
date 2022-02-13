@@ -26,7 +26,7 @@ public class MessageService : IMessageService
             m => m.ReplyTo);
     }
 
-    public async Task<MessageModel> GetRoomById(int id)
+    public async Task<MessageModel> GetMessageById(int id)
     {
         return (await this.GetByConditions(m => m.Id == id)).FirstOrDefault();
     }
@@ -40,7 +40,7 @@ public class MessageService : IMessageService
 
     public async Task<OptionalResult<MessageModel>> Update(MessageModel messageModel)
     {
-        if (await this.GetRoomById(messageModel.Id) is null)
+        if (await this.GetMessageById(messageModel.Id) is null)
         {
             return new OptionalResult<MessageModel>(false, $"Message with id {messageModel.Id} does not exist");
         }
@@ -53,7 +53,7 @@ public class MessageService : IMessageService
 
     public async Task<ExceptionalResult> Delete(int id)
     {
-        var message = await this.GetRoomById(id);
+        var message = await this.GetMessageById(id);
         if (message is null)
         {
             return new ExceptionalResult(false, $"Message with id {id} does not exist");
