@@ -21,5 +21,9 @@ public class MessageModel : BaseModel
     public DateTime SendingTime { get; set; }
 
     [Required]
-    public bool IsEdited { get; set; } = false;
+    public bool IsEdited { get; set; }
+
+    public MessageModel ReplyTo { get; set; }
+
+    public UserModel ForwardedFrom { get; set; }
 }

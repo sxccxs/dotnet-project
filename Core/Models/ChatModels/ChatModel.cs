@@ -14,6 +14,9 @@ public class ChatModel : BaseModel
     public RoomModel Room { get; set; }
 
     [Required]
+    public int RoomId { get; set; }
+
+    [Required]
     public bool IsPrivate { get; set; }
 
     public ICollection<UserModel> Users { get; set; } = new HashSet<UserModel>();

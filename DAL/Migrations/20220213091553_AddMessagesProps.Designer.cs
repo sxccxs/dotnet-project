@@ -4,6 +4,7 @@ using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppContext))]
-    partial class AppContextModelSnapshot : ModelSnapshot
+    [Migration("20220213091553_AddMessagesProps")]
+    partial class AddMessagesProps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,9 +96,6 @@ namespace DAL.Migrations
                     b.Property<int>("ChatId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ForwardedFromId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsEdited")
                         .HasColumnType("bit");
 
@@ -117,8 +116,6 @@ namespace DAL.Migrations
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("ChatId");
-
-                    b.HasIndex("ForwardedFromId");
 
                     b.HasIndex("ReplyToId");
 
@@ -302,10 +299,6 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Models.UserModels.UserModel", "ForwardedFrom")
-                        .WithMany()
-                        .HasForeignKey("ForwardedFromId");
-
                     b.HasOne("Core.Models.MessagesModels.MessageModel", "ReplyTo")
                         .WithMany()
                         .HasForeignKey("ReplyToId");
@@ -313,8 +306,6 @@ namespace DAL.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("Chat");
-
-                    b.Navigation("ForwardedFrom");
 
                     b.Navigation("ReplyTo");
                 });

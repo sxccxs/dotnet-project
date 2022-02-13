@@ -18,7 +18,12 @@ public class MessageService : IMessageService
     public async Task<IEnumerable<MessageModel>> GetByConditions(
         params Expression<Func<MessageModel, bool>>[] conditions)
     {
-        return await this.storage.GetByConditions(conditions, m => m.Author, m => m.Chat);
+        return await this.storage.GetByConditions(
+            conditions,
+            m => m.Author,
+            m => m.Chat,
+            m => m.ForwardedFrom,
+            m => m.ReplyTo);
     }
 
     public async Task<MessageModel> GetRoomById(int id)

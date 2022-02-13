@@ -46,10 +46,15 @@ public class AppContext : DbContext
             .Property(m => m.SendingTime)
             .HasDefaultValueSql("getdate()");
         builder.Entity<TextChatModel>()
-            .HasIndex(tc => new { tc.Name, tc.Room })
+            .HasIndex(tc => new { tc.Name, tc.RoomId })
             .IsUnique();
         builder.Entity<VoiceChatModel>()
-            .HasIndex(vc => new { vc.Name, vc.Room })
+            .HasIndex(vc => new { vc.Name, vc.RoomId })
             .IsUnique();
+        builder.Entity<MessageModel>()
+            .HasOne(m => m.Author)
+            .WithMany(u => u.Messages);
+        builder.Entity<MessageModel>()
+            .HasOne(m => m.ForwardedFrom);
     }
 }
