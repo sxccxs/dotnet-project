@@ -8,7 +8,7 @@ public interface IVoiceChatService
 {
     Task<IEnumerable<VoiceChatModel>> GetByConditions(params Expression<Func<VoiceChatModel, bool>>[] conditions);
 
-    Task<VoiceChatModel> GetTextChatById(int id);
+    Task<VoiceChatModel> GetVoiceChatById(int id);
 
     Task<OptionalResult<VoiceChatModel>> Create(ChatCreateModel chatModel);
 

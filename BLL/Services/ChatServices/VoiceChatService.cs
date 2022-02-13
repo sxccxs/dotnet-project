@@ -25,7 +25,7 @@ public class VoiceChatService : IVoiceChatService
             vc => vc.Room);
     }
 
-    public async Task<VoiceChatModel> GetTextChatById(int id)
+    public async Task<VoiceChatModel> GetVoiceChatById(int id)
     {
         return (await this.GetByConditions(vc => vc.Id == id)).FirstOrDefault();
     }
@@ -40,7 +40,7 @@ public class VoiceChatService : IVoiceChatService
 
     public async Task<OptionalResult<VoiceChatModel>> Update(ChatUpdateModel chatModel)
     {
-        if (await this.GetTextChatById(chatModel.Id) is null)
+        if (await this.GetVoiceChatById(chatModel.Id) is null)
         {
             return new OptionalResult<VoiceChatModel>(false, $"Voice chat with id {chatModel.Id} does not exist");
         }
@@ -53,7 +53,7 @@ public class VoiceChatService : IVoiceChatService
 
     public async Task<ExceptionalResult> Delete(int id)
     {
-        var voiceChat = await this.GetTextChatById(id);
+        var voiceChat = await this.GetVoiceChatById(id);
         if (voiceChat is null)
         {
             return new ExceptionalResult(false, $"Voice chat with id {id} does not exist");
@@ -81,7 +81,7 @@ public class VoiceChatService : IVoiceChatService
             });
             var mapper = new Mapper(mapperConfiguration);
             var room = mapper.Map<VoiceChatModel>(updateModel);
-            var changingRoom = await this.GetTextChatById(updateModel.Id);
+            var changingRoom = await this.GetVoiceChatById(updateModel.Id);
 
             foreach (var prop in room.GetType().GetProperties())
             {

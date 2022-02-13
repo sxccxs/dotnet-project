@@ -15,5 +15,7 @@ namespace Core.Models.RoomModels
         public ICollection<RoleModel> Roles { get; set; }
 
         public ICollection<TextChatModel> TextChats { get; set; }
+
+        public ICollection<VoiceChatModel> VoiceChats { get; set; }
     }
 }
