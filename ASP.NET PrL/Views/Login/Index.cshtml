@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@model Core.Models.UserModels.UserLoginModel
+@using (Html.BeginForm("Login", "Login", FormMethod.Post))
+{
+    <fieldset>
+        <p>
+            @Html.LabelFor(m => m.Email, "Email")
+            <br />
+            @Html.EditorFor(m => m.Email)
+        </p>
+        <p>
+            @Html.LabelFor(m => m.Password, "Password")
+            <br />
+            @Html.EditorFor(m => m.Password)
+ 
+        </p>
+        <p><input type="submit" value="Login" /></p>
+    </fieldset>
+}

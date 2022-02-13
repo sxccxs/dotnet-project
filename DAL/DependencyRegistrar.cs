@@ -11,7 +11,7 @@ namespace DAL
     {
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<AppContext>(options => options.UseSqlServer(configuration.GetConnectionString("DbConnectionString")));
+            // services.AddDbContext<AppContext>(options => options.UseSqlServer(configuration.GetConnectionString("DbConnectionString")));
             services.AddScoped(typeof(IGenericStorageWorker<>), typeof(GenericDbWorker<>));
             services.AddScoped<IReaderWriter, JsonReaderWriter>();
             services.AddScoped<ITransactionsWorker, TransactionsWorker>();

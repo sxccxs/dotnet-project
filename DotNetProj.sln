@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL.Abstractions", "DAL.Abstractions\DAL.Abstractions.csproj", "{EE7CB177-DBFE-4A40-89F2-1AEDFE60FE73}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP.NET PrL", "ASP.NET PrL\ASP.NET PrL.csproj", "{7EEA4A5E-1960-48A6-8459-3B7A62F2A605}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{EE7CB177-DBFE-4A40-89F2-1AEDFE60FE73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE7CB177-DBFE-4A40-89F2-1AEDFE60FE73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE7CB177-DBFE-4A40-89F2-1AEDFE60FE73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EEA4A5E-1960-48A6-8459-3B7A62F2A605}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EEA4A5E-1960-48A6-8459-3B7A62F2A605}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EEA4A5E-1960-48A6-8459-3B7A62F2A605}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EEA4A5E-1960-48A6-8459-3B7A62F2A605}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
