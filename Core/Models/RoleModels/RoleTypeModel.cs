@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Core.Models;
+namespace Core.Models.RoleModels;
 
 public class RoleTypeModel : BaseModel
 {

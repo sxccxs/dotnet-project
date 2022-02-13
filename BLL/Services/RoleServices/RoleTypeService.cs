@@ -2,6 +2,7 @@
 using BLL.Abstractions.Interfaces.RoleInterfaces;
 using Core.DataClasses;
 using Core.Models;
+using Core.Models.RoleModels;
 using Core.Models.UserModels;
 using DAL.Abstractions.Interfaces;
 

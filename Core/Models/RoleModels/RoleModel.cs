@@ -2,7 +2,7 @@
 using Core.Models.RoomModels;
 using Core.Models.UserModels;
 
-namespace Core.Models
+namespace Core.Models.RoleModels
 {
     public class RoleModel : BaseModel
     {
