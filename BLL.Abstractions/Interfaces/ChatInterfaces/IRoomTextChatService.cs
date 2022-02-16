@@ -29,4 +29,6 @@ public interface IRoomTextChatService
     Task<ExceptionalResult> AddUserToPublicTextChatInRoomByUser(RoomModel room, UserModel userToAdd, UserModel user, TextChatModel textChatModel, bool asTransaction = true);
 
     Task<ExceptionalResult> RemoveUserFromPublicTextChatInRoomByUser(RoomModel room, UserModel userToRemove, UserModel user, TextChatModel textChatModel, bool asTransaction = true);
+
+    Task<ExceptionalResult> ClearPublicChatHistory(UserModel user, TextChatModel chat, bool asTransaction = true);
 }

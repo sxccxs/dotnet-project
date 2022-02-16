@@ -5,6 +5,11 @@ public enum ActionType
     /// <summary>
     /// ActionType
     /// </summary>
+    ClearTextChatHistory,
+
+    /// <summary>
+    /// ActionType
+    /// </summary>
     EditRoomInfo,
 
     /// <summary>

@@ -118,6 +118,44 @@ public class RoomTextChatService : IRoomTextChatService
         return result.IsSuccess ? this.CheckUserInChat(user, chat) : result;
     }
 
+    public async Task<ExceptionalResult> ClearPublicChatHistory(UserModel user, TextChatModel chat, bool asTransaction = true)
+    {
+        return asTransaction
+            ? await this.transactionsWorker.RunAsTransaction(() => this.InnerClearPublicChatHistory(user, chat))
+            : await this.InnerClearPublicChatHistory(user, chat);
+    }
+
+    private async Task<ExceptionalResult> InnerClearPublicChatHistory(UserModel user, TextChatModel chat)
+    {
+        var validationResult = await this.ValidateRoomUserChatRole(chat.Room, user, chat);
+        if (!validationResult.IsSuccess)
+        {
+            return validationResult;
+        }
+
+        chat.Messages.Clear();
+        var updateModel = new TextChatUpdateModel()
+        {
+            Id = chat.Id,
+            Messages = chat.Messages,
+        };
+        var result = await this.chatService.Update(updateModel);
+        if (!result.IsSuccess)
+        {
+            return result;
+        }
+
+        var record = new CreateAuditRecordModel()
+        {
+            ActionType = ActionType.ClearTextChatHistory,
+            Actor = user,
+            Room = chat.Room,
+            TextChat = chat,
+        };
+
+        return await this.auditService.CreateAuditRecord(record);
+    }
+
     private async Task<ExceptionalResult> InnerUpdateTextChatInRoomByUser(RoomModel room, UserModel user, ChatEditModel editModel)
     {
         var chat = await this.chatService.GetTextChatById(editModel.Id);
