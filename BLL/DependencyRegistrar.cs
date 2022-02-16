@@ -1,6 +1,8 @@
-﻿using BLL.Abstractions.Interfaces.RoleInterfaces;
+﻿using BLL.Abstractions.Interfaces.ChatInterfaces;
+using BLL.Abstractions.Interfaces.RoleInterfaces;
 using BLL.Abstractions.Interfaces.RoomInterfaces;
 using BLL.Abstractions.Interfaces.UserInterfaces;
+using BLL.Services.ChatServices;
 using BLL.Services.RoleServices;
 using BLL.Services.RoomServices;
 using BLL.Services.UserServices;
@@ -16,6 +18,7 @@ namespace BLL
             ConfigureUserServices(services);
             ConfigureRoomServices(services);
             ConfigureRoleServices(services);
+            ConfigureChatServices(services);
 
             DAL.DependencyRegistrar.ConfigureServices(services, configuration);
         }
@@ -47,6 +50,15 @@ namespace BLL
         {
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IUserRoomRoleService, UserRoomRoleService>();
+        }
+
+        private static void ConfigureChatServices(IServiceCollection services)
+        {
+            services.AddScoped<ITextChatService, TextChatService>();
+            services.AddScoped<IVoiceChatService, VoiceChatService>();
+            services.AddScoped<IRoomTextChatService, RoomTextChatService>();
+            services.AddScoped<IChatValidationService, ChatValidationService>();
+            services.AddScoped<IRoomVoiceChatService, RoomVoiceChatService>();
         }
     }
 }

@@ -4,6 +4,7 @@ using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppContext))]
-    partial class AppContextModelSnapshot : ModelSnapshot
+    [Migration("20220212145045_RemoveChatsRoleObmezhuvach")]
+    partial class RemoveChatsRoleObmezhuvach
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,9 +47,6 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.HasIndex("Name", "RoomId")
-                        .IsUnique();
-
                     b.ToTable("TextChats");
                 });
 
@@ -74,9 +73,6 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.HasIndex("Name", "RoomId")
-                        .IsUnique();
-
                     b.ToTable("VoiceChats");
                 });
 
@@ -94,15 +90,6 @@ namespace DAL.Migrations
                     b.Property<int>("ChatId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ForwardedFromId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsEdited")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ReplyToId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("SendingTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -117,10 +104,6 @@ namespace DAL.Migrations
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("ChatId");
-
-                    b.HasIndex("ForwardedFromId");
-
-                    b.HasIndex("ReplyToId");
 
                     b.ToTable("Messages");
                 });
@@ -302,21 +285,9 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Models.UserModels.UserModel", "ForwardedFrom")
-                        .WithMany()
-                        .HasForeignKey("ForwardedFromId");
-
-                    b.HasOne("Core.Models.MessagesModels.MessageModel", "ReplyTo")
-                        .WithMany()
-                        .HasForeignKey("ReplyToId");
-
                     b.Navigation("Author");
 
                     b.Navigation("Chat");
-
-                    b.Navigation("ForwardedFrom");
-
-                    b.Navigation("ReplyTo");
                 });
 
             modelBuilder.Entity("Core.Models.RoleModels.RoleModel", b =>

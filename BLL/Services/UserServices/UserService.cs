@@ -21,7 +21,13 @@ namespace BLL.Services.UserServices
 
         public async Task<IEnumerable<UserModel>> GetByConditions(params Expression<Func<UserModel, bool>>[] conditions)
         {
-            return await this.storage.GetByConditions(conditions, u => u.Rooms, u => u.Roles);
+            return await this.storage.GetByConditions(
+                conditions,
+                u => u.Rooms,
+                u => u.Roles,
+                u => u.TextChats,
+                u => u.VoiceChats,
+                u => u.Messages);
         }
 
         public async Task<IEnumerable<UserModel>> GetActiveUsers(params Expression<Func<UserModel, bool>>[] additionalConditions)

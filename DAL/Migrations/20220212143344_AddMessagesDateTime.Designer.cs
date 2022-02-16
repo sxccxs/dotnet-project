@@ -4,6 +4,7 @@ using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppContext))]
-    partial class AppContextModelSnapshot : ModelSnapshot
+    [Migration("20220212143344_AddMessagesDateTime")]
+    partial class AddMessagesDateTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,6 +32,9 @@ namespace DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("AccessRoleTypeId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsPrivate")
                         .HasColumnType("bit");
 
@@ -43,10 +48,9 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomId");
+                    b.HasIndex("AccessRoleTypeId");
 
-                    b.HasIndex("Name", "RoomId")
-                        .IsUnique();
+                    b.HasIndex("RoomId");
 
                     b.ToTable("TextChats");
                 });
@@ -59,6 +63,9 @@ namespace DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("AccessRoleTypeId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsPrivate")
                         .HasColumnType("bit");
 
@@ -72,10 +79,9 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomId");
+                    b.HasIndex("AccessRoleTypeId");
 
-                    b.HasIndex("Name", "RoomId")
-                        .IsUnique();
+                    b.HasIndex("RoomId");
 
                     b.ToTable("VoiceChats");
                 });
@@ -94,15 +100,6 @@ namespace DAL.Migrations
                     b.Property<int>("ChatId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ForwardedFromId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsEdited")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ReplyToId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("SendingTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -117,10 +114,6 @@ namespace DAL.Migrations
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("ChatId");
-
-                    b.HasIndex("ForwardedFromId");
-
-                    b.HasIndex("ReplyToId");
 
                     b.ToTable("Messages");
                 });
@@ -268,22 +261,38 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("Core.Models.ChatModels.TextChatModel", b =>
                 {
+                    b.HasOne("Core.Models.RoleModels.RoleTypeModel", "AccessRoleType")
+                        .WithMany()
+                        .HasForeignKey("AccessRoleTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Core.Models.RoomModels.RoomModel", "Room")
                         .WithMany("TextChats")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("AccessRoleType");
+
                     b.Navigation("Room");
                 });
 
             modelBuilder.Entity("Core.Models.ChatModels.VoiceChatModel", b =>
                 {
+                    b.HasOne("Core.Models.RoleModels.RoleTypeModel", "AccessRoleType")
+                        .WithMany()
+                        .HasForeignKey("AccessRoleTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Core.Models.RoomModels.RoomModel", "Room")
                         .WithMany("VoiceChats")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AccessRoleType");
 
                     b.Navigation("Room");
                 });
@@ -302,21 +311,9 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Models.UserModels.UserModel", "ForwardedFrom")
-                        .WithMany()
-                        .HasForeignKey("ForwardedFromId");
-
-                    b.HasOne("Core.Models.MessagesModels.MessageModel", "ReplyTo")
-                        .WithMany()
-                        .HasForeignKey("ReplyToId");
-
                     b.Navigation("Author");
 
                     b.Navigation("Chat");
-
-                    b.Navigation("ForwardedFrom");
-
-                    b.Navigation("ReplyTo");
                 });
 
             modelBuilder.Entity("Core.Models.RoleModels.RoleModel", b =>

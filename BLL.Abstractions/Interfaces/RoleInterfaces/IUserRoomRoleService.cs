@@ -1,6 +1,7 @@
 ﻿using Core.DataClasses;
 using Core.Enums;
 using Core.Models;
+using Core.Models.RoleModels;
 using Core.Models.RoomModels;
 using Core.Models.UserModels;
 
