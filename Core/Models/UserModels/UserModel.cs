@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Core.Models.ChatModels;
-using Core.Models.MessagesModels;
+using Core.Models.MessageModels;
 using Core.Models.RoleModels;
 using Core.Models.RoomModels;
 

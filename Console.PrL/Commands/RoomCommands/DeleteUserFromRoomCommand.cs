@@ -5,7 +5,7 @@ using Core.DataClasses;
 using Core.Models.RoomModels;
 using Core.Models.UserModels;
 
-namespace Console.PrL.Commands
+namespace Console.PrL.Commands.RoomCommands
 {
     internal class DeleteUserFromRoomCommand : Command
     {

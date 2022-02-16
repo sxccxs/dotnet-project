@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Core.Models.ChatModels;
 using Core.Models.UserModels;
 
-namespace Core.Models.MessagesModels;
+namespace Core.Models.MessageModels;
 
 public class MessageModel : BaseModel
 {

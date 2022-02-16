@@ -1,4 +1,4 @@
-﻿using Core.Models.MessagesModels;
+﻿using Core.Models.MessageModels;
 
 namespace Core.Models.ChatModels;
 

@@ -1,7 +1,7 @@
 ﻿using Core.Models.ChatModels;
 using Core.Models.UserModels;
 
-namespace Core.Models.MessagesModels;
+namespace Core.Models.MessageModels;
 
 public class CreateMessageModel
 {

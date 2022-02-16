@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Core.DataClasses;
-using Core.Models.MessagesModels;
+using Core.Models.MessageModels;
 
 namespace BLL.Abstractions.Interfaces.MessageInterfaces;
 

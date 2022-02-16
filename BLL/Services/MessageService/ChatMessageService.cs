@@ -6,7 +6,7 @@ using Core.DataClasses;
 using Core.Enums;
 using Core.Models.AuditModels;
 using Core.Models.ChatModels;
-using Core.Models.MessagesModels;
+using Core.Models.MessageModels;
 using Core.Models.UserModels;
 using DAL.Abstractions.Interfaces;
 

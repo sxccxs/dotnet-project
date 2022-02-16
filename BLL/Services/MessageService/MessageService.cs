@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using BLL.Abstractions.Interfaces.MessageInterfaces;
 using Core.DataClasses;
-using Core.Models.MessagesModels;
+using Core.Models.MessageModels;
 using DAL.Abstractions.Interfaces;
 
 namespace BLL.Services.MessageService;

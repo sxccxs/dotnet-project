@@ -1,6 +1,6 @@
 ﻿using Core.DataClasses;
 using Core.Models.ChatModels;
-using Core.Models.MessagesModels;
+using Core.Models.MessageModels;
 using Core.Models.UserModels;
 
 namespace BLL.Abstractions.Interfaces.MessageInterfaces;

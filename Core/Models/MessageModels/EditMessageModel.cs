@@ -1,4 +1,4 @@
-﻿namespace Core.Models.MessagesModels;
+﻿namespace Core.Models.MessageModels;
 
 public class EditMessageModel
 {
