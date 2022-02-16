@@ -4,6 +4,7 @@ using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppContext))]
-    partial class AppContextModelSnapshot : ModelSnapshot
+    [Migration("20220213200524_AddAuditRecordProps")]
+    partial class AddAuditRecordProps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,13 +33,9 @@ namespace DAL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("ActionTypes");
                 });
@@ -58,7 +56,7 @@ namespace DAL.Migrations
                     b.Property<int>("ActionTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ActorId")
+                    b.Property<int?>("MessageId")
                         .HasColumnType("int");
 
                     b.Property<int?>("NewRoleId")
@@ -73,7 +71,7 @@ namespace DAL.Migrations
                     b.Property<int?>("TextChatId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserUnderActionId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.Property<int?>("VoiceChatId")
@@ -83,7 +81,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ActionTypeId");
 
-                    b.HasIndex("ActorId");
+                    b.HasIndex("MessageId");
 
                     b.HasIndex("NewRoleId");
 
@@ -93,7 +91,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("TextChatId");
 
-                    b.HasIndex("UserUnderActionId");
+                    b.HasIndex("UserId");
 
                     b.HasIndex("VoiceChatId");
 
@@ -241,12 +239,9 @@ namespace DAL.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("RoleTypes");
                 });
@@ -355,9 +350,9 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Models.UserModels.UserModel", "Actor")
+                    b.HasOne("Core.Models.MessagesModels.MessageModel", "Message")
                         .WithMany()
-                        .HasForeignKey("ActorId");
+                        .HasForeignKey("MessageId");
 
                     b.HasOne("Core.Models.RoleModels.RoleTypeModel", "NewRole")
                         .WithMany()
@@ -377,9 +372,11 @@ namespace DAL.Migrations
                         .WithMany()
                         .HasForeignKey("TextChatId");
 
-                    b.HasOne("Core.Models.UserModels.UserModel", "UserUnderAction")
+                    b.HasOne("Core.Models.UserModels.UserModel", "User")
                         .WithMany()
-                        .HasForeignKey("UserUnderActionId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Core.Models.ChatModels.VoiceChatModel", "VoiceChat")
                         .WithMany()
@@ -387,7 +384,7 @@ namespace DAL.Migrations
 
                     b.Navigation("ActionType");
 
-                    b.Navigation("Actor");
+                    b.Navigation("Message");
 
                     b.Navigation("NewRole");
 
@@ -397,7 +394,7 @@ namespace DAL.Migrations
 
                     b.Navigation("TextChat");
 
-                    b.Navigation("UserUnderAction");
+                    b.Navigation("User");
 
                     b.Navigation("VoiceChat");
                 });

@@ -52,7 +52,7 @@ namespace Console.PrL.Commands
 
             var deleteUser = this.GetSelectedItem(users);
 
-            var result = await this.roomService.DeleteUserFromRoom(deleteUser, room);
+            var result = await this.roomService.DeleteUserFromRoom(user, room, deleteUser);
             if (!result.IsSuccess)
             {
                 return new OptionalResult<string>(result);

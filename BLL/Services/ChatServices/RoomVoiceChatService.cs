@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
+using BLL.Abstractions.Interfaces.AuditInterfaces;
 using BLL.Abstractions.Interfaces.ChatInterfaces;
 using BLL.Abstractions.Interfaces.RoleInterfaces;
-using BLL.Abstractions.Interfaces.RoomInterfaces;
-using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.DataClasses;
 using Core.Enums;
+using Core.Models.AuditModels;
 using Core.Models.ChatModels;
 using Core.Models.RoomModels;
 using Core.Models.UserModels;
@@ -20,24 +20,20 @@ public class RoomVoiceChatService : IRoomVoiceChatService
 
     private readonly IChatValidationService chatValidationService;
 
-    private readonly IUserService userService;
-
-    private readonly IRoomService roomService;
+    private readonly IAuditService auditService;
 
     private readonly ITransactionsWorker transactionsWorker;
 
     public RoomVoiceChatService(
         ITransactionsWorker transactionsWorker,
+        IAuditService auditService,
         IUserRoomRoleService roleService,
         IVoiceChatService chatService,
-        IUserService userService,
-        IRoomService roomService,
         IChatValidationService chatValidationService)
     {
         this.roleService = roleService;
+        this.auditService = auditService;
         this.chatService = chatService;
-        this.userService = userService;
-        this.roomService = roomService;
         this.chatValidationService = chatValidationService;
         this.transactionsWorker = transactionsWorker;
     }
@@ -54,11 +50,10 @@ public class RoomVoiceChatService : IRoomVoiceChatService
 
     public async Task<ExceptionalResult> CreatePublicVoiceChatInRoomByUser(RoomModel room, UserModel user, ChatCreateModel createModel, bool asTransaction = true)
     {
-        createModel.IsPrivate = false;
         return asTransaction
             ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.CreateVoiceChatInRoomForUser(room, user, createModel))
-            : await this.CreateVoiceChatInRoomForUser(room, user, createModel);
+                this.InnerCreatePublicVoiceChatInRoomByUser(room, user, createModel))
+            : await this.InnerCreatePublicVoiceChatInRoomByUser(room, user, createModel);
     }
 
     public async Task<ExceptionalResult> CreatePrivateVoiceChatInRoomForUsers(RoomModel room, UserModel userCreator, UserModel user, ChatCreateModel createModel, bool asTransaction = true)
@@ -81,8 +76,8 @@ public class RoomVoiceChatService : IRoomVoiceChatService
     {
         return asTransaction
             ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.DeleteChatInRoomForUser(room, user, voiceChat, Role.MEMBER))
-            : await this.DeleteChatInRoomForUser(room, user, voiceChat, Role.MEMBER);
+                this.DeleteChatInRoomForUser(room, user, voiceChat, RoleType.Member))
+            : await this.DeleteChatInRoomForUser(room, user, voiceChat, RoleType.Member);
     }
 
     public async Task<ExceptionalResult> UpdateVoiceChatInRoomByUser(RoomModel room, UserModel user, ChatEditModel editModel, bool asTransaction = true)
@@ -120,7 +115,21 @@ public class RoomVoiceChatService : IRoomVoiceChatService
 
         var updateModel = this.MapEditModelToUpdateModel(editModel);
 
-        return await this.chatService.Update(updateModel);
+        var result = await this.chatService.Update(updateModel);
+        if (!result.IsSuccess)
+        {
+            return result;
+        }
+
+        var record = new CreateAuditRecordModel()
+        {
+            ActionType = ActionType.EditVoiceChatInfo,
+            Actor = user,
+            Room = room,
+            VoiceChat = chat,
+        };
+
+        return await this.auditService.CreateAuditRecord(record);
     }
 
     private async Task<ExceptionalResult> InnerAddUserToPublicVoiceChatInRoomByUser(RoomModel room, UserModel userToAdd, UserModel user, VoiceChatModel voiceChatModel)
@@ -131,16 +140,30 @@ public class RoomVoiceChatService : IRoomVoiceChatService
             return role1Result;
         }
 
-        var role2Result = await this.CheckRoomUserRole(room, userToAdd, Role.MEMBER);
+        var role2Result = await this.CheckRoomUserRole(room, userToAdd, RoleType.Member);
         if (!role2Result.IsSuccess)
         {
             return role2Result;
         }
 
         voiceChatModel.Users.Add(userToAdd);
-        var updateResult = await this.UpdateChatUsers(voiceChatModel);
 
-        return !updateResult.IsSuccess ? updateResult : new ExceptionalResult();
+        var result = await this.UpdateChatUsers(voiceChatModel);
+        if (!result.IsSuccess)
+        {
+            return result;
+        }
+
+        var record = new CreateAuditRecordModel()
+        {
+            ActionType = ActionType.AddUserToVoiceChat,
+            Actor = user,
+            Room = room,
+            UserUnderAction = userToAdd,
+            VoiceChat = voiceChatModel,
+        };
+
+        return await this.auditService.CreateAuditRecord(record);
     }
 
     private async Task<ExceptionalResult> InnerRemoveUserFromPublicVoiceChatInRoomByUser(RoomModel room, UserModel userToRemove, UserModel user, VoiceChatModel voiceChatModel)
@@ -151,33 +174,63 @@ public class RoomVoiceChatService : IRoomVoiceChatService
             return role1Result;
         }
 
-        var role2Result = await this.ValidateRoomUserChatRole(room, userToRemove, voiceChatModel, Role.MEMBER);
+        var role2Result = await this.ValidateRoomUserChatRole(room, userToRemove, voiceChatModel, RoleType.Member);
         if (!role2Result.IsSuccess)
         {
             return role2Result;
         }
 
         voiceChatModel.Users.Remove(userToRemove);
-        var updateResult = await this.UpdateChatUsers(voiceChatModel);
 
-        return !updateResult.IsSuccess ? updateResult : new ExceptionalResult();
-    }
-
-    private async Task<ExceptionalResult> InnerCreatePrivateVoiceChatInRoomForUsers(RoomModel room, UserModel userCreator, UserModel user, ChatCreateModel createModel)
-    {
-        createModel.IsPrivate = true;
-        var result = await this.CreateVoiceChatInRoomForUser(room, userCreator, createModel, Role.MEMBER);
+        var result = await this.UpdateChatUsers(voiceChatModel);
         if (!result.IsSuccess)
         {
             return result;
         }
 
-        user.VoiceChats.Add(result.Value);
+        var record = new CreateAuditRecordModel()
+        {
+            ActionType = ActionType.DeleteUserFromVoiceChat,
+            Actor = user,
+            Room = room,
+            UserUnderAction = userToRemove,
+            VoiceChat = voiceChatModel,
+        };
 
-        return await this.UpdateUserChats(user);
+        return await this.auditService.CreateAuditRecord(record);
     }
 
-    private async Task<OptionalResult<VoiceChatModel>> CreateVoiceChatInRoomForUser(RoomModel room, UserModel user, ChatCreateModel createModel, Role minRole = Role.ADMIN)
+    private async Task<ExceptionalResult> InnerCreatePublicVoiceChatInRoomByUser(RoomModel room, UserModel user, ChatCreateModel createModel)
+    {
+        createModel.IsPrivate = false;
+        createModel.Users = new List<UserModel>() { user };
+
+        var result = await this.CreateVoiceChatInRoomForUser(room, user, createModel);
+        if (!result.IsSuccess)
+        {
+            return result;
+        }
+
+        var record = new CreateAuditRecordModel()
+        {
+            ActionType = ActionType.CreateVoiceChat,
+            Actor = user,
+            Room = room,
+            VoiceChat = result.Value,
+        };
+
+        return await this.auditService.CreateAuditRecord(record);
+    }
+
+    private async Task<ExceptionalResult> InnerCreatePrivateVoiceChatInRoomForUsers(RoomModel room, UserModel userCreator, UserModel user, ChatCreateModel createModel)
+    {
+        createModel.IsPrivate = true;
+        createModel.Users = new List<UserModel>() { userCreator, user };
+
+        return await this.CreateVoiceChatInRoomForUser(room, userCreator, createModel, RoleType.Member);
+    }
+
+    private async Task<OptionalResult<VoiceChatModel>> CreateVoiceChatInRoomForUser(RoomModel room, UserModel user, ChatCreateModel createModel, RoleType minRole = RoleType.Admin)
     {
         var roleResult = await this.CheckRoomUserRole(room, user, minRole);
         if (!roleResult.IsSuccess)
@@ -191,64 +244,34 @@ public class RoomVoiceChatService : IRoomVoiceChatService
             return new OptionalResult<VoiceChatModel>(validationResult);
         }
 
-        var chatResult = await this.chatService.Create(createModel);
-        if (!chatResult.IsSuccess)
-        {
-            return chatResult;
-        }
+        createModel.Room = room;
 
-        var chat = chatResult.Value;
-        user.VoiceChats.Add(chat);
-        var userResult = await this.UpdateUserChats(user);
-        if (!userResult.IsSuccess)
-        {
-            return new OptionalResult<VoiceChatModel>(userResult);
-        }
-
-        room.VoiceChats.Add(chat);
-        var roomResult = await this.UpdateRoomChats(room);
-
-        return !roomResult.IsSuccess ? new OptionalResult<VoiceChatModel>(roomResult) : new OptionalResult<VoiceChatModel>(chat);
+        return await this.chatService.Create(createModel);
     }
 
-    private async Task<ExceptionalResult> DeleteChatInRoomForUser(RoomModel room, UserModel user, VoiceChatModel textChat, Role minRole = Role.ADMIN)
+    private async Task<ExceptionalResult> DeleteChatInRoomForUser(RoomModel room, UserModel user, VoiceChatModel voiceChat, RoleType minRole = RoleType.Admin)
     {
-        var roleResult = await this.ValidateRoomUserChatRole(room, user, textChat, minRole);
+        var roleResult = await this.ValidateRoomUserChatRole(room, user, voiceChat, minRole);
         if (!roleResult.IsSuccess)
         {
             return roleResult;
         }
 
-        room.VoiceChats.Remove(textChat);
-        var roomResult = await this.UpdateRoomChats(room);
-        if (!roomResult.IsSuccess)
+        var result = await this.chatService.Delete(voiceChat.Id);
+        if (!result.IsSuccess || voiceChat.IsPrivate)
         {
-            return roomResult;
+            return result;
         }
 
-        foreach (var chatUser in textChat.Users)
+        var record = new CreateAuditRecordModel()
         {
-            chatUser.VoiceChats.Remove(textChat);
-            var userResult = await this.UpdateUserChats(chatUser);
-            if (!userResult.IsSuccess)
-            {
-                return userResult;
-            }
-        }
-
-        return await this.chatService.Delete(textChat.Id);
-    }
-
-    private async Task<OptionalResult<UserModel>> UpdateUserChats(UserModel user)
-    {
-        var updateModel = new UserUpdateModel()
-        {
-            Id = user.Id,
-            VoiceChats = user.VoiceChats,
-            IsActive = user.IsActive,
+            ActionType = ActionType.DeleteVoiceChat,
+            Actor = user,
+            Room = room,
+            VoiceChat = voiceChat,
         };
 
-        return await this.userService.Update(updateModel);
+        return await this.auditService.CreateAuditRecord(record);
     }
 
     private async Task<OptionalResult<VoiceChatModel>> UpdateChatUsers(VoiceChatModel chat)
@@ -262,18 +285,7 @@ public class RoomVoiceChatService : IRoomVoiceChatService
         return await this.chatService.Update(updateModel);
     }
 
-    private async Task<OptionalResult<RoomModel>> UpdateRoomChats(RoomModel room)
-    {
-        var updateModel = new RoomUpdateModel()
-        {
-            Id = room.Id,
-            VoiceChats = room.VoiceChats,
-        };
-
-        return await this.roomService.Update(updateModel);
-    }
-
-    private async Task<ExceptionalResult> CheckRoomUserRole(RoomModel room, UserModel user, Role minRole = Role.ADMIN)
+    private async Task<ExceptionalResult> CheckRoomUserRole(RoomModel room, UserModel user, RoleType minRole = RoleType.Admin)
     {
         var role = await this.roleService.GetRoleForUserAndRoom(user, room);
         if (role is null || role.RoleType.Name != minRole.ToString())
@@ -291,7 +303,7 @@ public class RoomVoiceChatService : IRoomVoiceChatService
             : new ExceptionalResult(false, $"User {user.Id} does not belong to chat {chat.Id}");
     }
 
-    private async Task<ExceptionalResult> ValidateRoomUserChatRole(RoomModel room, UserModel user, VoiceChatModel chat, Role minRole = Role.ADMIN)
+    private async Task<ExceptionalResult> ValidateRoomUserChatRole(RoomModel room, UserModel user, VoiceChatModel chat, RoleType minRole = RoleType.Admin)
     {
         var result = await this.CheckRoomUserRole(room, user, minRole);
 

@@ -50,7 +50,7 @@ namespace Console.PrL.Commands.RoomCommands
             }
 
             var room = this.GetSelectedItem(rooms);
-            if ((await this.roleService.GetRoleForUserAndRoom(user, room)).RoleType.Name != Role.ADMIN.ToString())
+            if ((await this.roleService.GetRoleForUserAndRoom(user, room)).RoleType.Name != RoleType.Admin.ToString())
             {
                 return new OptionalResult<string>(false, $"You dont have rights to change roles in room {room.Name}");
             }
@@ -59,14 +59,14 @@ namespace Console.PrL.Commands.RoomCommands
             await this.ListUsers(users, room);
             var editUser = this.GetSelectedItem(users);
             this.ListRoles(editUser);
-            var role = this.GetSelectedItem(Enum.GetValues(typeof(Role)).Cast<Role>().ToList());
-            var updateResult = await this.roleService.UpdateRoleForUser(editUser, room, role.ToString());
+            var role = this.GetSelectedItem(Enum.GetValues(typeof(RoleType)).Cast<RoleType>().ToList());
+            var updateResult = await this.roleService.UpdateRoleForUser(editUser, room, role.ToString(), user);
             if (!updateResult.IsSuccess)
             {
                 return new OptionalResult<string>(updateResult);
             }
 
-            this.Console.Print("Role changes successfuly");
+            this.Console.Print("Role changed successfully");
 
             return new OptionalResult<string>();
         }
@@ -133,7 +133,7 @@ namespace Console.PrL.Commands.RoomCommands
         private void ListRoles(UserModel user)
         {
             this.Console.Print($"Select new role for user {user.UserName}:");
-            var values = Enum.GetValues(typeof(Role)).Cast<Role>().ToList();
+            var values = Enum.GetValues(typeof(RoleType)).Cast<RoleType>().ToList();
             for (var i = 0; i < values.Count(); i++)
             {
                 var role = values[i];

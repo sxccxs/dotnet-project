@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BLL.Abstractions.Interfaces.AuditInterfaces;
 using BLL.Abstractions.Interfaces.ChatInterfaces;
 using BLL.Abstractions.Interfaces.MessageInterfaces;
-using BLL.Abstractions.Interfaces.UserInterfaces;
 using Core.DataClasses;
+using Core.Enums;
+using Core.Models.AuditModels;
 using Core.Models.ChatModels;
 using Core.Models.MessagesModels;
 using Core.Models.UserModels;
@@ -16,18 +18,23 @@ public class ChatMessageService : IChatMessageService
 
     private readonly IMessageService messageService;
 
-    private readonly IUserService userService;
-
     private readonly ITextChatService chatService;
 
     private readonly IRoomTextChatService roomChatService;
 
-    public ChatMessageService(ITransactionsWorker transactionsWorker, IRoomTextChatService roomChatService, IMessageService messageService, IUserService userService, ITextChatService chatService)
+    private readonly IAuditService auditService;
+
+    public ChatMessageService(
+        ITransactionsWorker transactionsWorker,
+        IRoomTextChatService roomChatService,
+        IMessageService messageService,
+        IAuditService auditService,
+        ITextChatService chatService)
     {
+        this.auditService = auditService;
         this.transactionsWorker = transactionsWorker;
         this.chatService = chatService;
         this.messageService = messageService;
-        this.userService = userService;
         this.roomChatService = roomChatService;
     }
 
@@ -89,22 +96,13 @@ public class ChatMessageService : IChatMessageService
             return validationResult;
         }
 
-        var messageResult = await this.messageService.Create(messageModel);
-        if (!messageResult.IsSuccess)
+        var creationResult = await this.messageService.Create(messageModel);
+        if (!creationResult.IsSuccess)
         {
-            return messageResult;
+            return creationResult;
         }
 
-        user.Messages.Add(messageModel);
-        var userResult = await this.UpdateUserMessages(user);
-        if (!userResult.IsSuccess)
-        {
-            return userResult;
-        }
-
-        chat.Messages.Add(messageModel);
-
-        return await this.UpdateChatMessages(chat);
+        return await this.CreateAuditRecordForMessage(messageModel);
     }
 
     private async Task<ExceptionalResult> InnerEditMessageByUser(EditMessageModel editMessage, UserModel user)
@@ -163,25 +161,37 @@ public class ChatMessageService : IChatMessageService
         return mapper.Map<MessageModel>(createModel);
     }
 
-    private async Task<ExceptionalResult> UpdateUserMessages(UserModel user)
+    private async Task<ExceptionalResult> CreateAuditRecordForMessage(MessageModel message)
     {
-        var updateModel = new UserUpdateModel()
+        CreateAuditRecordModel createModel = null;
+        if (message.ForwardedFrom is not null)
         {
-            Id = user.Id,
-            Messages = user.Messages,
-        };
+            createModel = new CreateAuditRecordModel()
+            {
+                ActionType = ActionType.MessageForward,
+                Actor = message.Author,
+                Room = message.Chat.Room,
+                TextChat = message.Chat,
+                UserUnderAction = message.ForwardedFrom,
+            };
 
-        return await this.userService.Update(updateModel);
-    }
+            return await this.auditService.CreateAuditRecord(createModel);
+        }
 
-    private async Task<ExceptionalResult> UpdateChatMessages(TextChatModel chat)
-    {
-        var updateModel = new TextChatUpdateModel()
+        if (message.ReplyTo is not null)
         {
-            Id = chat.Id,
-            Messages = chat.Messages,
-        };
+            createModel = new CreateAuditRecordModel()
+            {
+                ActionType = ActionType.MessageReply,
+                Actor = message.Author,
+                Room = message.Chat.Room,
+                TextChat = message.Chat,
+                UserUnderAction = message.ReplyTo.Author,
+            };
+        }
 
-        return await this.chatService.Update(updateModel);
+        return createModel is not null
+            ? await this.auditService.CreateAuditRecord(createModel)
+            : new ExceptionalResult();
     }
 }

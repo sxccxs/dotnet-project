@@ -1,8 +1,5 @@
-﻿using BLL.Abstractions.Interfaces.RoleInterfaces;
-using BLL.Abstractions.Interfaces.RoomInterfaces;
-using BLL.Abstractions.Interfaces.UserInterfaces;
+﻿using BLL.Abstractions.Interfaces;
 using Console.PrL.Commands;
-using Console.PrL.Commands.RoomCommands;
 using Console.PrL.Commands.UserCommands;
 using Console.PrL.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -17,12 +14,15 @@ namespace Console.PrL
 
         private readonly Dictionary<string, Command> commands;
 
+        private readonly IStartupService startupService;
+
         private string authToken;
 
-        public App(ILogger<App> logger, IConsole console, IEnumerable<Command> commands)
+        public App(ILogger<App> logger, IConsole console, IStartupService startupService, IEnumerable<Command> commands)
         {
             this.logger = logger;
             this.console = console;
+            this.startupService = startupService;
 
             this.commands = new Dictionary<string, Command>();
             var commandsList = commands.ToList();
@@ -36,6 +36,13 @@ namespace Console.PrL
 
         public async Task StartApp()
         {
+            var startupResult = await this.startupService.SetUp();
+            if (!startupResult.IsSuccess)
+            {
+                this.logger.LogError(startupResult.ExceptionMessage);
+                throw new Exception(startupResult.ExceptionMessage);
+            }
+
             while (true)
             {
                 var command = this.console.Input(string.Empty).Trim();

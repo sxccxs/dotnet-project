@@ -23,7 +23,8 @@ internal class RoomService : IRoomService
             r => r.Roles,
             r => r.Users,
             r => r.TextChats,
-            r => r.VoiceChats);
+            r => r.VoiceChats,
+            r => r.AuditJournal);
     }
 
     public async Task<RoomModel> GetRoomById(int id)

@@ -4,6 +4,7 @@ using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppContext))]
-    partial class AppContextModelSnapshot : ModelSnapshot
+    [Migration("20220216110929_AddUniqueIndexes")]
+    partial class AddUniqueIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,7 +60,10 @@ namespace DAL.Migrations
                     b.Property<int>("ActionTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ActorId")
+                    b.Property<int>("ActorId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ForwardToTextChatId")
                         .HasColumnType("int");
 
                     b.Property<int?>("NewRoleId")
@@ -84,6 +89,8 @@ namespace DAL.Migrations
                     b.HasIndex("ActionTypeId");
 
                     b.HasIndex("ActorId");
+
+                    b.HasIndex("ForwardToTextChatId");
 
                     b.HasIndex("NewRoleId");
 
@@ -357,7 +364,13 @@ namespace DAL.Migrations
 
                     b.HasOne("Core.Models.UserModels.UserModel", "Actor")
                         .WithMany()
-                        .HasForeignKey("ActorId");
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Models.ChatModels.TextChatModel", "ForwardToTextChat")
+                        .WithMany()
+                        .HasForeignKey("ForwardToTextChatId");
 
                     b.HasOne("Core.Models.RoleModels.RoleTypeModel", "NewRole")
                         .WithMany()
@@ -388,6 +401,8 @@ namespace DAL.Migrations
                     b.Navigation("ActionType");
 
                     b.Navigation("Actor");
+
+                    b.Navigation("ForwardToTextChat");
 
                     b.Navigation("NewRole");
 

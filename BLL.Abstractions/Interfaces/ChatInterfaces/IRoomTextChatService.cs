@@ -14,7 +14,7 @@ public interface IRoomTextChatService
 
     ExceptionalResult CheckUserInChat(UserModel user, TextChatModel chat);
 
-    Task<ExceptionalResult> ValidateRoomUserChatRole(RoomModel room, UserModel user, TextChatModel chat, Role minRole = Role.ADMIN);
+    Task<ExceptionalResult> ValidateRoomUserChatRole(RoomModel room, UserModel user, TextChatModel chat, RoleType minRole = RoleType.Admin);
 
     Task<ExceptionalResult> CreatePublicTextChatInRoomByUser(RoomModel room, UserModel user, ChatCreateModel createModel, bool asTransaction = true);
 

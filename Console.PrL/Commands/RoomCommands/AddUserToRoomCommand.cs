@@ -50,7 +50,7 @@ namespace Console.PrL.Commands.RoomCommands
             var users = room.Users.ToHashSet().ToList();
 
             var email = this.Console.Input("What is the e-mail of the user you would like to add?: ");
-            var result = await this.userRoomService.AddUserToRoom(email, room);
+            var result = await this.userRoomService.AddUserToRoom(email, room, user);
             if (!result.IsSuccess)
             {
                 return new OptionalResult<string>(result);
