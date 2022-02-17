@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using Core.DataClasses;
+﻿using Core.DataClasses;
 using DAL.Abstractions.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -38,7 +37,7 @@ public class TransactionsWorker : ITransactionsWorker
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
-            this.logger.LogError($"Exception happened while executing transaction. Transaction rollbacked. Exception message: {ex.Message}");
+            this.logger.LogError($"Exception happened while executing transaction. Transaction rollbacked. Exception message: {ex.Message} Exception place: {ex.Source} Exception stack trace {ex.StackTrace}");
             var exceptionalResult = new ExceptionalResult(false, ex.Message);
 
             result = exceptionalResult is T exceptionalResultT ? exceptionalResultT : result;

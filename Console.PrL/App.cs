@@ -68,7 +68,7 @@ namespace Console.PrL
                     }
                     catch (Exception ex)
                     {
-                        this.logger.LogError(ex.Message);
+                        this.logger.LogError($"Message {ex.Message} Place: {ex.Source} StackTrace: {ex.StackTrace}");
                         throw;
                     }
                 }
