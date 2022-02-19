@@ -2,8 +2,6 @@
 {
     public class OptionalResult<T> : ExceptionalResult
     {
-        private readonly T value;
-
         public OptionalResult(bool isSuccess = true, string exceptionMessage = null)
             : base(isSuccess, exceptionMessage)
         {
@@ -12,7 +10,7 @@
         public OptionalResult(T value)
             : base()
         {
-            this.value = value;
+            this.Value = value;
         }
 
         public OptionalResult(ExceptionalResult exceptionalResult)
@@ -20,6 +18,6 @@
         {
         }
 
-        public T Value => this.value;
+        public T Value { get; }
     }
 }

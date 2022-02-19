@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <data name="AddUserToRoom" xml:space="preserve">
+        <value>User {0} was added to room {1} by user {1}.</value>
+    </data>
+    <data name="DeleteUserFromRoom" xml:space="preserve">
+        <value>User {0} was removed from room {1} by user {2}.</value>
+    </data>
+    <data name="ChangeUserRoleType" xml:space="preserve">
+        <value>Role of user {0} was changed from {1} to {2} in room {3} by user {4}.</value>
+    </data>
+    <data name="AddUserToTextChat" xml:space="preserve">
+        <value>User {0} was added to text chat {1} in room {2} by user {3}.</value>
+    </data>
+    <data name="DeleteUserFromTextChat" xml:space="preserve">
+        <value>User {0} was removed to text chat {1} in room {2} by user {3}.</value>
+    </data>
+    <data name="AddUserToVoiceChat" xml:space="preserve">
+        <value>User {0} was added to text chat {1} in room {2} by user {3}.</value>
+    </data>
+    <data name="DeleteUserFromVoiceChat" xml:space="preserve">
+        <value>User {0} was removed to text chat {1} in room {2} by user {3}.</value>
+    </data>
+    <data name="MessageForward" xml:space="preserve">
+        <value>User {0} forwarded message from chat {1} and user {2} in room {3}.</value>
+    </data>
+    <data name="MessageReply" xml:space="preserve">
+        <value>User {0} replied to message of user {1} in chat {2} in room {3}.</value>
+    </data>
+    <data name="EditRoomInfo" xml:space="preserve">
+        <value>User {0} changed info of room {1}.</value>
+    </data>
+    <data name="EditTextChatInfo" xml:space="preserve">
+        <value>User {0} changed info of text chat {1} in room {2}.</value>
+    </data>
+    <data name="EditVoiceChatInfo" xml:space="preserve">
+        <value>User {0} changed info of voice chat {1} in room {2}.</value>
+    </data>
+    <data name="UserLeftFromRoom" xml:space="preserve">
+        <value>User {0} left room {1}.</value>
+    </data>
+    <data name="CreateTextChat" xml:space="preserve">
+        <value>User {0} created text chat {1} in room {2}.</value>
+    </data>
+    <data name="DeleteTextChat" xml:space="preserve">
+        <value>User {0} deleted text chat {1} in room {2}.</value>
+    </data>
+    <data name="CreateVoiceChat" xml:space="preserve">
+        <value>User {0} created voice chat {1} in room {2}.</value>
+    </data>
+    <data name="DeleteVoiceChat" xml:space="preserve">
+        <value>User {0} deleted voice chat {1} in room {2}.</value>
+    </data>
+</root>

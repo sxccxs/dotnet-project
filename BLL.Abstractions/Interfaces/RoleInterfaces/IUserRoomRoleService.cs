@@ -1,6 +1,7 @@
 ﻿using Core.DataClasses;
 using Core.Enums;
 using Core.Models;
+using Core.Models.RoleModels;
 using Core.Models.RoomModels;
 using Core.Models.UserModels;
 
@@ -12,9 +13,7 @@ namespace BLL.Abstractions.Interfaces.RoleInterfaces
 
         Task<ExceptionalResult> AddRoleForUserAndRoom(UserModel user, RoomModel room, string roleName, bool asTransaction = true);
 
-        Task<ExceptionalResult> DeleteRoleForUserAndRoom(UserModel user, RoomModel room, bool asTransaction = true);
-
-        Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, string roleName);
+        Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, string roleName, UserModel actor);
 
         Task<bool> IsUserLastAdminInRoom(UserModel user, RoomModel room);
     }

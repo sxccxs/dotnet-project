@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Core.DataClasses;
 using Core.Models;
+using Core.Models.RoleModels;
 using Core.Models.UserModels;
 
 namespace BLL.Abstractions.Interfaces.RoleInterfaces;

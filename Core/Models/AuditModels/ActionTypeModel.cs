@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Core.Models;
+namespace Core.Models.AuditModels;
 
-public class RoleTypeModel : BaseModel
+public class ActionTypeModel : BaseModel
 {
     [Required]
     public string Name { get; set; }

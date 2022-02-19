@@ -1,6 +1,14 @@
-﻿using BLL.Abstractions.Interfaces.RoleInterfaces;
+﻿using BLL.Abstractions.Interfaces;
+using BLL.Abstractions.Interfaces.AuditInterfaces;
+using BLL.Abstractions.Interfaces.ChatInterfaces;
+using BLL.Abstractions.Interfaces.MessageInterfaces;
+using BLL.Abstractions.Interfaces.RoleInterfaces;
 using BLL.Abstractions.Interfaces.RoomInterfaces;
 using BLL.Abstractions.Interfaces.UserInterfaces;
+using BLL.Services;
+using BLL.Services.AuditServices;
+using BLL.Services.ChatServices;
+using BLL.Services.MessageService;
 using BLL.Services.RoleServices;
 using BLL.Services.RoomServices;
 using BLL.Services.UserServices;
@@ -16,6 +24,11 @@ namespace BLL
             ConfigureUserServices(services);
             ConfigureRoomServices(services);
             ConfigureRoleServices(services);
+            ConfigureChatServices(services);
+            ConfigureMessageServices(services);
+            ConfigureAuditServices(services);
+
+            services.AddScoped<IStartupService, StartupService>();
 
             DAL.DependencyRegistrar.ConfigureServices(services, configuration);
         }
@@ -47,6 +60,28 @@ namespace BLL
         {
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IUserRoomRoleService, UserRoomRoleService>();
+        }
+
+        private static void ConfigureChatServices(IServiceCollection services)
+        {
+            services.AddScoped<ITextChatService, TextChatService>();
+            services.AddScoped<IVoiceChatService, VoiceChatService>();
+            services.AddScoped<IRoomTextChatService, RoomTextChatService>();
+            services.AddScoped<IChatValidationService, ChatValidationService>();
+            services.AddScoped<IRoomVoiceChatService, RoomVoiceChatService>();
+        }
+
+        private static void ConfigureMessageServices(IServiceCollection services)
+        {
+            services.AddScoped<IMessageService, MessageService>();
+            services.AddScoped<IChatMessageService, ChatMessageService>();
+        }
+
+        private static void ConfigureAuditServices(IServiceCollection services)
+        {
+            services.AddScoped<IActionTypeService, ActionTypeService>();
+            services.AddScoped<IAuditRecordService, AuditRecordService>();
+            services.AddScoped<IAuditService, AuditService>();
         }
     }
 }
