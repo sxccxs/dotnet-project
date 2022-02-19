@@ -41,46 +41,35 @@ namespace BLL.Services.RoomServices
             this.validationService = validationService;
         }
 
-        public async Task<ExceptionalResult> CreateRoomForUser(UserModel user, RoomCreateModel createModel, bool asTransaction = true)
+        public async Task<ExceptionalResult> CreateRoomForUser(UserModel user, RoomCreateModel createModel)
         {
-            return asTransaction
-                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerCreateRoomForUser(user, createModel))
-                : await this.CreateRoomForUser(user, createModel);
+            return await this.transactionsWorker.RunAsTransaction(() => this.InnerCreateRoomForUser(user, createModel));
         }
 
-        public async Task<ExceptionalResult> DeleteRoomByUser(UserModel user, int roomId, bool asTransaction = true)
+        public async Task<ExceptionalResult> DeleteRoomByUser(UserModel user, int roomId)
         {
-            return asTransaction
-                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteRoomByUser(user, roomId))
-                : await this.InnerDeleteRoomByUser(user, roomId);
+            return await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteRoomByUser(user, roomId));
         }
 
-        public async Task<ExceptionalResult> DeleteUserAndRooms(UserModel user, bool asTransaction = true)
+        public async Task<ExceptionalResult> DeleteUserAndRooms(UserModel user)
         {
-            return asTransaction
-                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteUserAndRooms(user))
-                : await this.InnerDeleteUserAndRooms(user);
+            return await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteUserAndRooms(user));
         }
 
-        public async Task<ExceptionalResult> DeleteUserFromRoom(UserModel user, RoomModel room, UserModel userToDelete, bool asTransaction = true)
+        public async Task<ExceptionalResult> DeleteUserFromRoom(UserModel user, RoomModel room, UserModel userToDelete)
         {
-            return asTransaction
-                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteUserFromRoom(user, room, userToDelete))
-                : await this.InnerDeleteUserFromRoom(user, room, userToDelete);
+            return await this.transactionsWorker.RunAsTransaction(() =>
+                this.InnerDeleteUserFromRoom(user, room, userToDelete));
         }
 
-        public async Task<ExceptionalResult> AddUserToRoom(string email, RoomModel room,  UserModel actor, bool asTransaction = true)
+        public async Task<ExceptionalResult> AddUserToRoom(string email, RoomModel room,  UserModel actor)
         {
-            return asTransaction
-                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerAddUserToRoom(email, room, actor))
-                : await this.InnerAddUserToRoom(email, room, actor);
+            return await this.transactionsWorker.RunAsTransaction(() => this.InnerAddUserToRoom(email, room, actor));
         }
 
-        public async Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomEditModel editModel, bool asTransaction = true)
+        public async Task<ExceptionalResult> UpdateRoomForUser(UserModel user, RoomEditModel editModel)
         {
-            return asTransaction
-                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerUpdateRoomForUser(user, editModel))
-                : await this.InnerUpdateRoomForUser(user, editModel);
+            return await this.transactionsWorker.RunAsTransaction(() => this.InnerUpdateRoomForUser(user, editModel));
         }
 
         private async Task<ExceptionalResult> InnerUpdateRoomForUser(UserModel user, RoomEditModel editModel)

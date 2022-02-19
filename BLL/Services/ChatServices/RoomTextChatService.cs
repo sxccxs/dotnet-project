@@ -48,60 +48,43 @@ public class RoomTextChatService : IRoomTextChatService
         return user.TextChats.Where(tc => tc.Room == room && tc.IsPrivate);
     }
 
-    public async Task<ExceptionalResult> CreatePublicTextChatInRoomByUser(RoomModel room, UserModel user, ChatCreateModel createModel, bool asTransaction = true)
+    public async Task<ExceptionalResult> CreatePublicTextChatInRoomByUser(RoomModel room, UserModel user, ChatCreateModel createModel)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.InnerCreatePublicTextChatInRoomByUser(room, user, createModel))
-            : await this.InnerCreatePublicTextChatInRoomByUser(room, user, createModel);
+        return await this.transactionsWorker.RunAsTransaction(() =>
+            this.InnerCreatePublicTextChatInRoomByUser(room, user, createModel));
     }
 
-    public async Task<ExceptionalResult> CreatePrivateTextChatInRoomForUsers(RoomModel room, UserModel userCreator, UserModel user, ChatCreateModel createModel, bool asTransaction = true)
+    public async Task<ExceptionalResult> CreatePrivateTextChatInRoomForUsers(RoomModel room, UserModel userCreator, UserModel user, ChatCreateModel createModel)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.InnerCreatePrivateTextChatInRoomForUsers(room, userCreator, user, createModel))
-            : await this.InnerCreatePrivateTextChatInRoomForUsers(room, userCreator, user, createModel);
+        return await this.transactionsWorker.RunAsTransaction(() =>
+            this.InnerCreatePrivateTextChatInRoomForUsers(room, userCreator, user, createModel));
     }
 
-    public async Task<ExceptionalResult> DeletePublicChatInRoomByUser(RoomModel room, UserModel user, TextChatModel textChat, bool asTransaction = true)
+    public async Task<ExceptionalResult> DeletePublicChatInRoomByUser(RoomModel room, UserModel user, TextChatModel textChat)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.DeleteChatInRoomForUser(room, user, textChat))
-            : await this.DeleteChatInRoomForUser(room, user, textChat);
+        return await this.transactionsWorker.RunAsTransaction(() => this.DeleteChatInRoomForUser(room, user, textChat));
     }
 
-    public async Task<ExceptionalResult> DeletePrivateChatInRoomByUser(RoomModel room, UserModel user, TextChatModel textChat, bool asTransaction = true)
+    public async Task<ExceptionalResult> DeletePrivateChatInRoomByUser(RoomModel room, UserModel user, TextChatModel textChat)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.DeleteChatInRoomForUser(room, user, textChat, RoleType.Member))
-            : await this.DeleteChatInRoomForUser(room, user, textChat, RoleType.Member);
+        return await this.transactionsWorker.RunAsTransaction(() => this.DeleteChatInRoomForUser(room, user, textChat, RoleType.Member));
     }
 
-    public async Task<ExceptionalResult> UpdateTextChatInRoomByUser(RoomModel room, UserModel user, ChatEditModel editModel, bool asTransaction = true)
+    public async Task<ExceptionalResult> UpdateTextChatInRoomByUser(RoomModel room, UserModel user, ChatEditModel editModel)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.InnerUpdateTextChatInRoomByUser(room, user, editModel))
-            : await this.InnerUpdateTextChatInRoomByUser(room, user, editModel);
+        return await this.transactionsWorker.RunAsTransaction(() => this.InnerUpdateTextChatInRoomByUser(room, user, editModel));
     }
 
-    public async Task<ExceptionalResult> AddUserToPublicTextChatInRoomByUser(RoomModel room, UserModel userToAdd, UserModel user, TextChatModel textChatModel, bool asTransaction = true)
+    public async Task<ExceptionalResult> AddUserToPublicTextChatInRoomByUser(RoomModel room, UserModel userToAdd, UserModel user, TextChatModel textChatModel)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.InnerAddUserToPublicTextChatInRoomByUser(room, userToAdd, user, textChatModel))
-            : await this.InnerAddUserToPublicTextChatInRoomByUser(room, userToAdd, user, textChatModel);
+        return await this.transactionsWorker.RunAsTransaction(() =>
+            this.InnerAddUserToPublicTextChatInRoomByUser(room, userToAdd, user, textChatModel));
     }
 
-    public async Task<ExceptionalResult> RemoveUserFromPublicTextChatInRoomByUser(RoomModel room, UserModel userToRemove, UserModel user, TextChatModel textChatModel, bool asTransaction = true)
+    public async Task<ExceptionalResult> RemoveUserFromPublicTextChatInRoomByUser(RoomModel room, UserModel userToRemove, UserModel user, TextChatModel textChatModel)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.InnerRemoveUserFromPublicTextChatInRoomByUser(room, userToRemove, user, textChatModel))
-            : await this.InnerRemoveUserFromPublicTextChatInRoomByUser(room, userToRemove, user, textChatModel);
+        return await this.transactionsWorker.RunAsTransaction(() =>
+            this.InnerRemoveUserFromPublicTextChatInRoomByUser(room, userToRemove, user, textChatModel));
     }
 
     public ExceptionalResult CheckUserInChat(UserModel user, TextChatModel chat)
@@ -118,11 +101,9 @@ public class RoomTextChatService : IRoomTextChatService
         return result.IsSuccess ? this.CheckUserInChat(user, chat) : result;
     }
 
-    public async Task<ExceptionalResult> ClearPublicChatHistory(UserModel user, TextChatModel chat, bool asTransaction = true)
+    public async Task<ExceptionalResult> ClearPublicChatHistory(UserModel user, TextChatModel chat)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() => this.InnerClearPublicChatHistory(user, chat))
-            : await this.InnerClearPublicChatHistory(user, chat);
+        return await this.transactionsWorker.RunAsTransaction(() => this.InnerClearPublicChatHistory(user, chat));
     }
 
     private async Task<ExceptionalResult> InnerClearPublicChatHistory(UserModel user, TextChatModel chat)

@@ -34,31 +34,16 @@ namespace BLL.Services.UserServices
 
         public ExceptionalResult ValidateUpdateModel(UserEditModel user)
         {
-            var results = new List<ExceptionalResult>();
-            if (user.UserName is not null)
+            ExceptionalResult[] results =
             {
-                results.Add(this.ValidateUserName(user.UserName));
-            }
+                user.UserName is not null ? this.ValidateUserName(user.UserName) : new ExceptionalResult(),
+                user.Email is not null ? this.ValidateEmail(user.Email) : new ExceptionalResult(),
+                user.Password is not null ? this.ValidatePassword(user.Password) : new ExceptionalResult(),
+            };
 
-            if (user.Email is not null)
-            {
-                results.Add(this.ValidateEmail(user.Email));
-            }
+            var incorrectResults = results.Where(r => !r.IsSuccess).ToList();
 
-            if (user.Password is not null)
-            {
-                results.Add(this.ValidatePassword(user.Password));
-            }
-
-            foreach (var result in results)
-            {
-                if (!result.IsSuccess)
-                {
-                    return result;
-                }
-            }
-
-            return new ExceptionalResult();
+            return incorrectResults.Any() ? incorrectResults.First() : new ExceptionalResult();
         }
 
         private ExceptionalResult ValidateUserName(string username)
@@ -113,7 +98,8 @@ namespace BLL.Services.UserServices
             {
                 return new ExceptionalResult(false, "Password must contain at least one capital, one small letter, one number and one symbol.");
             }
-            else if (password.Any(x => !(this.IsUpperAsciiLetter(x) ||
+
+            if (password.Any(x => !(this.IsUpperAsciiLetter(x) ||
                                         this.IsLowerAsciiLetter(x) ||
                                         this.IsAsciiDigit(x) ||
                                         this.PasswordSpecialCharacters.Contains(x))))

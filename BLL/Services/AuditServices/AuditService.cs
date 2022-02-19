@@ -1,8 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Resources;
+using AutoMapper;
 using BLL.Abstractions.Interfaces.AuditInterfaces;
 using Core.DataClasses;
 using Core.Enums;
 using Core.Models.AuditModels;
+using Core.Settings;
+using Microsoft.Extensions.Options;
 
 namespace BLL.Services.AuditServices;
 
@@ -12,10 +15,13 @@ public class AuditService : IAuditService
 
     private readonly IAuditRecordService auditRecordService;
 
-    public AuditService(IActionTypeService actionTypeService, IAuditRecordService auditRecordService)
+    private readonly AppSettings appSettings;
+
+    public AuditService(IOptions<AppSettings> appSettings, IActionTypeService actionTypeService, IAuditRecordService auditRecordService)
     {
         this.actionTypeService = actionTypeService;
         this.auditRecordService = auditRecordService;
+        this.appSettings = appSettings.Value;
     }
 
     public async Task<ExceptionalResult> CreateAuditRecord(CreateAuditRecordModel createModel)
@@ -37,74 +43,37 @@ public class AuditService : IAuditService
     {
         try
         {
+            var resources = new ResourceManager(this.appSettings.RecordMessagesPath, typeof(AuditRecordModel).Assembly);
             string result;
-            switch (record.ActionType.Name)
+            var name = record.ActionType.Name;
+            switch (name)
             {
-                case nameof(ActionType.AddUserToRoom):
-                    result =
-                        $"User {this.GetUserUnderActionName(record)} was added to room {record.Room.Name} by user {this.GetActorName(record)}.";
-                    break;
-                case nameof(ActionType.DeleteUserFromRoom):
-                    result =
-                        $"User {this.GetUserUnderActionName(record)} was removed from room {record.Room.Name} by user {this.GetActorName(record)}.";
+                case nameof(ActionType.AddUserToRoom) or nameof(ActionType.DeleteUserFromRoom):
+                    result = string.Format(resources.GetString(name) !, this.GetUserUnderActionName(record), record.Room.Name, this.GetActorName(record));
                     break;
                 case nameof(ActionType.ChangeUserRoleType):
-                    result =
-                        $"Role of user {this.GetUserUnderActionName(record)} was changed from {record.OldRole.Name} to {record.NewRole.Name} in room {record.Room.Name} by user {this.GetActorName(record)}.";
+                    result = string.Format(resources.GetString(name) !, this.GetUserUnderActionName(record), record.OldRole.Name, record.Room.Name, this.GetActorName(record));
                     break;
-                case nameof(ActionType.AddUserToTextChat):
-                    result =
-                        $"User {this.GetUserUnderActionName(record)} was added to text chat {record.TextChat.Name} in room {record.Room.Name} by user {this.GetActorName(record)}.";
+                case nameof(ActionType.AddUserToTextChat) or nameof(ActionType.DeleteUserFromTextChat):
+                    result = string.Format(resources.GetString(name) !, this.GetUserUnderActionName(record), record.TextChat.Name, record.Room.Name, this.GetActorName(record));
                     break;
-                case nameof(ActionType.DeleteUserFromTextChat):
-                    result =
-                        $"User {this.GetUserUnderActionName(record)} was removed to text chat {record.TextChat.Name} in room {record.Room.Name} by user {this.GetActorName(record)}.";
-                    break;
-                case nameof(ActionType.AddUserToVoiceChat):
-                    result =
-                        $"User {this.GetUserUnderActionName(record)} was added to text chat {record.VoiceChat.Name} in room {record.Room.Name} by user {this.GetActorName(record)}.";
-                    break;
-                case nameof(ActionType.DeleteUserFromVoiceChat):
-                    result =
-                        $"User {this.GetUserUnderActionName(record)} was removed to text chat {record.VoiceChat.Name} in room {record.Room.Name} by user {this.GetActorName(record)}.";
+                case nameof(ActionType.AddUserToVoiceChat) or nameof(ActionType.DeleteUserFromVoiceChat):
+                    result = string.Format(resources.GetString(name) !, this.GetUserUnderActionName(record), record.VoiceChat.Name, record.Room.Name, this.GetActorName(record));
                     break;
                 case nameof(ActionType.MessageForward):
-                    result =
-                        $"User {this.GetActorName(record)} forwarded message from chat {record.TextChat.Name} and user {this.GetUserUnderActionName(record)} in room {record.Room.Name}.";
+                    result = string.Format(resources.GetString(name) !, this.GetActorName(record), record.TextChat.Name, this.GetUserUnderActionName(record), record.Room.Name);
                     break;
                 case nameof(ActionType.MessageReply):
-                    result =
-                        $"User {this.GetActorName(record)} replied to message of user {this.GetUserUnderActionName(record)} in chat {record.TextChat.Name} in room {record.Room.Name}.";
+                    result = string.Format(resources.GetString(name) !, this.GetActorName(record), this.GetUserUnderActionName(record), record.TextChat.Name, record.Room.Name);
                     break;
-                case nameof(ActionType.EditRoomInfo):
-                    result = $"User {this.GetActorName(record)} changed info of room {record.Room.Name}.";
+                case nameof(ActionType.EditRoomInfo) or nameof(ActionType.UserLeftFromRoom):
+                    result = string.Format(resources.GetString(name) !, this.GetActorName(record), record.Room.Name);
                     break;
-                case nameof(ActionType.EditTextChatInfo):
-                    result =
-                        $"User {this.GetActorName(record)} changed info of text chat {record.TextChat} in room {record.Room.Name}.";
+                case nameof(ActionType.EditTextChatInfo) or nameof(ActionType.CreateTextChat) or nameof(ActionType.DeleteTextChat):
+                    result = string.Format(resources.GetString(name) !, this.GetActorName(record), record.TextChat.Name, record.Room.Name);
                     break;
-                case nameof(ActionType.EditVoiceChatInfo):
-                    result =
-                        $"User {this.GetActorName(record)} changed info of voice chat {record.VoiceChat} in room {record.Room.Name}";
-                    break;
-                case nameof(ActionType.UserLeftFromRoom):
-                    result = $"User {this.GetActorName(record)} left room {record.Room.Name}.";
-                    break;
-                case nameof(ActionType.CreateTextChat):
-                    result =
-                        $"User {this.GetActorName(record)} created text chat {record.TextChat.Name} in room {record.Room.Name}.";
-                    break;
-                case nameof(ActionType.DeleteTextChat):
-                    result =
-                        $"User {this.GetActorName(record)} deleted text chat {record.TextChat.Name} in room {record.Room.Name}.";
-                    break;
-                case nameof(ActionType.CreateVoiceChat):
-                    result =
-                        $"User {this.GetActorName(record)} created voice chat {record.VoiceChat.Name} in room {record.Room.Name}.";
-                    break;
-                case nameof(ActionType.DeleteVoiceChat):
-                    result =
-                        $"User {this.GetActorName(record)} deleted voice chat {record.VoiceChat.Name} in room {record.Room.Name}.";
+                case nameof(ActionType.EditVoiceChatInfo) or nameof(ActionType.CreateVoiceChat) or nameof(ActionType.DeleteVoiceChat):
+                    result = string.Format(resources.GetString(name) !, this.GetActorName(record), record.VoiceChat.Name, record.Room.Name);
                     break;
                 default:
                     return new OptionalResult<string>(false, "Invalid record type provided.");
@@ -112,7 +81,7 @@ public class AuditService : IAuditService
 
             return new OptionalResult<string>(result);
         }
-        catch (NullReferenceException ex)
+        catch (Exception ex)
         {
             return new OptionalResult<string>(false, $"Some record fields was not specified: {ex.Message}");
         }

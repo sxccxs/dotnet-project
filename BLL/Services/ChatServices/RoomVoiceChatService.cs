@@ -48,60 +48,45 @@ public class RoomVoiceChatService : IRoomVoiceChatService
         return user.VoiceChats.Where(vc => vc.Room == room && vc.IsPrivate);
     }
 
-    public async Task<ExceptionalResult> CreatePublicVoiceChatInRoomByUser(RoomModel room, UserModel user, ChatCreateModel createModel, bool asTransaction = true)
+    public async Task<ExceptionalResult> CreatePublicVoiceChatInRoomByUser(RoomModel room, UserModel user, ChatCreateModel createModel)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.InnerCreatePublicVoiceChatInRoomByUser(room, user, createModel))
-            : await this.InnerCreatePublicVoiceChatInRoomByUser(room, user, createModel);
+        return await this.transactionsWorker.RunAsTransaction(() =>
+            this.InnerCreatePublicVoiceChatInRoomByUser(room, user, createModel));
     }
 
-    public async Task<ExceptionalResult> CreatePrivateVoiceChatInRoomForUsers(RoomModel room, UserModel userCreator, UserModel user, ChatCreateModel createModel, bool asTransaction = true)
+    public async Task<ExceptionalResult> CreatePrivateVoiceChatInRoomForUsers(RoomModel room, UserModel userCreator, UserModel user, ChatCreateModel createModel)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.InnerCreatePrivateVoiceChatInRoomForUsers(room, userCreator, user, createModel))
-            : await this.InnerCreatePrivateVoiceChatInRoomForUsers(room, userCreator, user, createModel);
+        return await this.transactionsWorker.RunAsTransaction(() =>
+            this.InnerCreatePrivateVoiceChatInRoomForUsers(room, userCreator, user, createModel));
     }
 
-    public async Task<ExceptionalResult> DeletePublicChatInRoomByUser(RoomModel room, UserModel user, VoiceChatModel voiceChat, bool asTransaction = true)
+    public async Task<ExceptionalResult> DeletePublicChatInRoomByUser(RoomModel room, UserModel user, VoiceChatModel voiceChat)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.DeleteChatInRoomForUser(room, user, voiceChat))
-            : await this.DeleteChatInRoomForUser(room, user, voiceChat);
+        return await this.transactionsWorker.RunAsTransaction(() => this.DeleteChatInRoomForUser(room, user, voiceChat));
     }
 
-    public async Task<ExceptionalResult> DeletePrivateChatInRoomByUser(RoomModel room, UserModel user, VoiceChatModel voiceChat, bool asTransaction = true)
+    public async Task<ExceptionalResult> DeletePrivateChatInRoomByUser(RoomModel room, UserModel user, VoiceChatModel voiceChat)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.DeleteChatInRoomForUser(room, user, voiceChat, RoleType.Member))
-            : await this.DeleteChatInRoomForUser(room, user, voiceChat, RoleType.Member);
+        return await this.transactionsWorker.RunAsTransaction(() =>
+            this.DeleteChatInRoomForUser(room, user, voiceChat, RoleType.Member));
     }
 
-    public async Task<ExceptionalResult> UpdateVoiceChatInRoomByUser(RoomModel room, UserModel user, ChatEditModel editModel, bool asTransaction = true)
+    public async Task<ExceptionalResult> UpdateVoiceChatInRoomByUser(RoomModel room, UserModel user, ChatEditModel editModel)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.InnerUpdateVoiceChatInRoomByUser(room, user, editModel))
-            : await this.InnerUpdateVoiceChatInRoomByUser(room, user, editModel);
+        return await this.transactionsWorker.RunAsTransaction(() =>
+            this.InnerUpdateVoiceChatInRoomByUser(room, user, editModel));
     }
 
-    public async Task<ExceptionalResult> AddUserToPublicVoiceChatInRoomByUser(RoomModel room, UserModel userToAdd, UserModel user, VoiceChatModel voiceChatModel, bool asTransaction = true)
+    public async Task<ExceptionalResult> AddUserToPublicVoiceChatInRoomByUser(RoomModel room, UserModel userToAdd, UserModel user, VoiceChatModel voiceChatModel)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.InnerAddUserToPublicVoiceChatInRoomByUser(room, userToAdd, user, voiceChatModel))
-            : await this.InnerAddUserToPublicVoiceChatInRoomByUser(room, userToAdd, user, voiceChatModel);
+        return await this.transactionsWorker.RunAsTransaction(() =>
+            this.InnerAddUserToPublicVoiceChatInRoomByUser(room, userToAdd, user, voiceChatModel));
     }
 
-    public async Task<ExceptionalResult> RemoveUserFromPublicVoiceChatInRoomByUser(RoomModel room, UserModel userToRemove, UserModel user, VoiceChatModel voiceChatModel, bool asTransaction = true)
+    public async Task<ExceptionalResult> RemoveUserFromPublicVoiceChatInRoomByUser(RoomModel room, UserModel userToRemove, UserModel user, VoiceChatModel voiceChatModel)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() =>
-                this.InnerRemoveUserFromPublicVoiceChatInRoomByUser(room, userToRemove, user, voiceChatModel))
-            : await this.InnerRemoveUserFromPublicVoiceChatInRoomByUser(room, userToRemove, user, voiceChatModel);
+        return await this.transactionsWorker.RunAsTransaction(() =>
+            this.InnerRemoveUserFromPublicVoiceChatInRoomByUser(room, userToRemove, user, voiceChatModel));
     }
 
     private async Task<ExceptionalResult> InnerUpdateVoiceChatInRoomByUser(RoomModel room, UserModel user, ChatEditModel editModel)

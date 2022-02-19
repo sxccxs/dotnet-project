@@ -54,11 +54,10 @@ namespace BLL.Services.RoleServices
                 r.RoleType.Name == RoleType.Admin.ToString() && r.User != user);
         }
 
-        public async Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, string roleName, UserModel actor, bool asTransaction = true)
+        public async Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, string roleName, UserModel actor)
         {
-            return asTransaction
-                ? await this.transactionsWorker.RunAsTransaction(() => this.InnerUpdateRoleForUser(user, room, roleName, actor))
-                : await this.InnerUpdateRoleForUser(user, room, roleName, actor);
+            return await this.transactionsWorker.RunAsTransaction(() =>
+                this.InnerUpdateRoleForUser(user, room, roleName, actor));
         }
 
         private async Task<ExceptionalResult> InnerUpdateRoleForUser(UserModel user, RoomModel room, string roleName, UserModel actor)

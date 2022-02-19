@@ -13,7 +13,7 @@ namespace BLL.Abstractions.Interfaces.RoleInterfaces
 
         Task<ExceptionalResult> AddRoleForUserAndRoom(UserModel user, RoomModel room, string roleName, bool asTransaction = true);
 
-        Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, string roleName, UserModel actor, bool asTransaction = true);
+        Task<ExceptionalResult> UpdateRoleForUser(UserModel user, RoomModel room, string roleName, UserModel actor);
 
         Task<bool> IsUserLastAdminInRoom(UserModel user, RoomModel room);
     }

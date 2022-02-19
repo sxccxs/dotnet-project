@@ -38,26 +38,22 @@ public class ChatMessageService : IChatMessageService
         this.roomChatService = roomChatService;
     }
 
-    public async Task<ExceptionalResult> SendMessageToChatByUser(CreateMessageModel createModel, bool asTransaction)
+    public async Task<ExceptionalResult> SendMessageToChatByUser(CreateMessageModel createModel)
     {
         var message = this.MapCreateModelToMessageModel(createModel);
 
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() => this.CreateMessageForUserAndChat(message))
-            : await this.CreateMessageForUserAndChat(message);
+        return await this.transactionsWorker.RunAsTransaction(() => this.CreateMessageForUserAndChat(message));
     }
 
-    public async Task<ExceptionalResult> ReplyToMessageInChatByUser(CreateMessageModel replyMessage, MessageModel replyToMessage, bool asTransaction)
+    public async Task<ExceptionalResult> ReplyToMessageInChatByUser(CreateMessageModel replyMessage, MessageModel replyToMessage)
     {
         var message = this.MapCreateModelToMessageModel(replyMessage);
         message.ReplyTo = replyToMessage;
 
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() => this.CreateMessageForUserAndChat(message))
-            : await this.CreateMessageForUserAndChat(message);
+        return await this.transactionsWorker.RunAsTransaction(() => this.CreateMessageForUserAndChat(message));
     }
 
-    public async Task<ExceptionalResult> ForwardMessageToChatByUser(MessageModel forwardMessage, TextChatModel chat, UserModel user, bool asTransaction)
+    public async Task<ExceptionalResult> ForwardMessageToChatByUser(MessageModel forwardMessage, TextChatModel chat, UserModel user)
     {
         var message = new MessageModel()
         {
@@ -67,23 +63,17 @@ public class ChatMessageService : IChatMessageService
             ForwardedFrom = forwardMessage.ForwardedFrom ?? forwardMessage.Author,
         };
 
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() => this.CreateMessageForUserAndChat(message))
-            : await this.CreateMessageForUserAndChat(message);
+        return await this.transactionsWorker.RunAsTransaction(() => this.CreateMessageForUserAndChat(message));
     }
 
-    public async Task<ExceptionalResult> EditMessageByUser(EditMessageModel editMessage, UserModel user, bool asTransaction)
+    public async Task<ExceptionalResult> EditMessageByUser(EditMessageModel editMessage, UserModel user)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() => this.InnerEditMessageByUser(editMessage, user))
-            : await this.InnerEditMessageByUser(editMessage, user);
+        return await this.transactionsWorker.RunAsTransaction(() => this.InnerEditMessageByUser(editMessage, user));
     }
 
-    public async Task<ExceptionalResult> DeleteMessageByUser(MessageModel messageModel, UserModel user, bool asTransaction)
+    public async Task<ExceptionalResult> DeleteMessageByUser(MessageModel messageModel, UserModel user)
     {
-        return asTransaction
-            ? await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteMessageByUser(messageModel, user))
-            : await this.InnerDeleteMessageByUser(messageModel, user);
+        return await this.transactionsWorker.RunAsTransaction(() => this.InnerDeleteMessageByUser(messageModel, user));
     }
 
     private async Task<ExceptionalResult> CreateMessageForUserAndChat(MessageModel messageModel)
