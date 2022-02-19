@@ -4,7 +4,6 @@
 
 namespace DAL.Migrations
 {
-#pragma warning disable CA1704
     public partial class RemoveChatsRoleObmezhuvach : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

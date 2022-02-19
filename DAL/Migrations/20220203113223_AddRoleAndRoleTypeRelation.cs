@@ -4,9 +4,6 @@
 
 namespace DAL.Migrations
 {
-    /// <summary>
-    /// aa.
-    /// </summary>
     public partial class AddRoleAndRoleTypeRelation : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

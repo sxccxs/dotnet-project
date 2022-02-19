@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Core.DataClasses;
-using Core.Models.MessagesModels;
+using Core.Models.MessageModels;
 
 namespace BLL.Abstractions.Interfaces.MessageInterfaces;
 
@@ -8,7 +8,7 @@ public interface IMessageService
 {
     Task<IEnumerable<MessageModel>> GetByConditions(params Expression<Func<MessageModel, bool>>[] conditions);
 
-    Task<MessageModel> GetRoomById(int id);
+    Task<MessageModel> GetMessageById(int id);
 
     Task<OptionalResult<MessageModel>> Create(MessageModel messageModel);
 

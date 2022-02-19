@@ -13,5 +13,7 @@
         public string AccountActivationEmailTemplate { get; set; }
 
         public string EmailChangeEmailTemplate { get; set; }
+
+        public string RecordMessagesPath { get; set; }
     }
 }

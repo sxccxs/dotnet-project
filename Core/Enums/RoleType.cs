@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace Core.Enums
 {
-    public enum Role
+    public enum RoleType
     {
         /// <summary>
         /// default member of room
         /// </summary>
-        MEMBER,
+        Member,
 
         /// <summary>
         /// admin of the room
         /// </summary>
-        ADMIN,
+        Admin,
     }
 }

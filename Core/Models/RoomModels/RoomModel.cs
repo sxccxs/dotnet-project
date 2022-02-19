@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Core.Models.AuditModels;
 using Core.Models.ChatModels;
 using Core.Models.RoleModels;
 using Core.Models.UserModels;
@@ -18,5 +19,7 @@ namespace Core.Models.RoomModels
         public ICollection<TextChatModel> TextChats { get; set; } = new HashSet<TextChatModel>();
 
         public ICollection<VoiceChatModel> VoiceChats { get; set; } = new HashSet<VoiceChatModel>();
+
+        public ICollection<AuditRecordModel> AuditJournal { get; set; } = new HashSet<AuditRecordModel>();
     }
 }

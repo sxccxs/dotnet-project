@@ -22,6 +22,84 @@ namespace DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("Core.Models.AuditModels.ActionTypeModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("ActionTypes");
+                });
+
+            modelBuilder.Entity("Core.Models.AuditModels.AuditRecordModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("ActionTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<int>("ActionTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ActorId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NewRoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OldRoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TextChatId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserUnderActionId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VoiceChatId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActionTypeId");
+
+                    b.HasIndex("ActorId");
+
+                    b.HasIndex("NewRoleId");
+
+                    b.HasIndex("OldRoleId");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("TextChatId");
+
+                    b.HasIndex("UserUnderActionId");
+
+                    b.HasIndex("VoiceChatId");
+
+                    b.ToTable("AuditRecords");
+                });
+
             modelBuilder.Entity("Core.Models.ChatModels.TextChatModel", b =>
                 {
                     b.Property<int>("Id")
@@ -163,9 +241,12 @@ namespace DAL.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("RoleTypes");
                 });
@@ -264,6 +345,61 @@ namespace DAL.Migrations
                     b.HasIndex("VoiceChatsId");
 
                     b.ToTable("UserModelVoiceChatModel");
+                });
+
+            modelBuilder.Entity("Core.Models.AuditModels.AuditRecordModel", b =>
+                {
+                    b.HasOne("Core.Models.AuditModels.ActionTypeModel", "ActionType")
+                        .WithMany()
+                        .HasForeignKey("ActionTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Models.UserModels.UserModel", "Actor")
+                        .WithMany()
+                        .HasForeignKey("ActorId");
+
+                    b.HasOne("Core.Models.RoleModels.RoleTypeModel", "NewRole")
+                        .WithMany()
+                        .HasForeignKey("NewRoleId");
+
+                    b.HasOne("Core.Models.RoleModels.RoleTypeModel", "OldRole")
+                        .WithMany()
+                        .HasForeignKey("OldRoleId");
+
+                    b.HasOne("Core.Models.RoomModels.RoomModel", "Room")
+                        .WithMany("AuditJournal")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Models.ChatModels.TextChatModel", "TextChat")
+                        .WithMany()
+                        .HasForeignKey("TextChatId");
+
+                    b.HasOne("Core.Models.UserModels.UserModel", "UserUnderAction")
+                        .WithMany()
+                        .HasForeignKey("UserUnderActionId");
+
+                    b.HasOne("Core.Models.ChatModels.VoiceChatModel", "VoiceChat")
+                        .WithMany()
+                        .HasForeignKey("VoiceChatId");
+
+                    b.Navigation("ActionType");
+
+                    b.Navigation("Actor");
+
+                    b.Navigation("NewRole");
+
+                    b.Navigation("OldRole");
+
+                    b.Navigation("Room");
+
+                    b.Navigation("TextChat");
+
+                    b.Navigation("UserUnderAction");
+
+                    b.Navigation("VoiceChat");
                 });
 
             modelBuilder.Entity("Core.Models.ChatModels.TextChatModel", b =>
@@ -398,6 +534,8 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("Core.Models.RoomModels.RoomModel", b =>
                 {
+                    b.Navigation("AuditJournal");
+
                     b.Navigation("Roles");
 
                     b.Navigation("TextChats");

@@ -1,4 +1,5 @@
-﻿using Core.Models.ChatModels;
+﻿using Core.Models.AuditModels;
+using Core.Models.ChatModels;
 using Core.Models.RoleModels;
 using Core.Models.UserModels;
 
@@ -17,5 +18,7 @@ namespace Core.Models.RoomModels
         public ICollection<TextChatModel> TextChats { get; set; }
 
         public ICollection<VoiceChatModel> VoiceChats { get; set; }
+
+        public ICollection<AuditRecordModel> AuditJournal { get; set; }
     }
 }

@@ -10,5 +10,7 @@ namespace Core.Models.RoomModels
     public class RoomCreateModel
     {
         public string Name { get; set; }
+
+        public ICollection<UserModel> Users { get; set; } = new HashSet<UserModel>();
     }
 }
