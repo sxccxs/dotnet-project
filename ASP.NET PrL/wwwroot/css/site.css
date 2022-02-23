@@ -14,5 +14,13 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+  /*margin-bottom: 60px;*/
+}
+
+main{
+  min-height: calc(100vh - 110px);
+}
+
+.form-group{
+  margin-top: 1rem;
 }
